@@ -16,6 +16,7 @@ docs/
 │   ├── frontend-fsd.md         # Frontend FSD architecture
 │   └── container-strategy.md   # Container platform strategy
 ├── api/                         # API documentation
+│   ├── openapi.yaml             # OpenAPI 3.1 specification
 │   └── standard-response-format.md  # API response format
 ├── testing/                     # Testing documentation
 │   ├── backend-examples.md     # Backend testing examples
@@ -41,6 +42,7 @@ docs/
 - [Container Strategy](./architecture/container-strategy.md) - Container platform strategy (Docker/Podman, CI/CD, Production)
 
 ### API
+- [OpenAPI 3.1 Specification](./api/openapi.yaml) - Complete API contract
 - [Standard Response Format](./api/standard-response-format.md) - API response specification
 
 ### Testing

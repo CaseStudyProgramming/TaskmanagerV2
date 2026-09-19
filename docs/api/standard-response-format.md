@@ -1,12 +1,12 @@
-# API Standard Response Format
+# Standard Response Format
 
-This document defines the standard API response format for all endpoints in the Advanced Task Manager.
+This document defines the standard API response format used throughout the Advanced Task Manager API.
 
 ## Overview
 
-All API responses MUST follow this standard format to ensure consistency across the application.
+All API responses follow a consistent structure to ensure predictability and ease of integration. This format is implemented in the OpenAPI 3.1 specification located in <ref_file file="/home/davidtan/_Workspaces/WebDevelopment/taskmanagerV2/docs/api/openapi.yaml" />.
 
-## Standard Response Structure
+## Response Structure
 
 ### Success Response
 
@@ -22,7 +22,7 @@ All API responses MUST follow this standard format to ensure consistency across 
   },
   "meta": {
     "timestamp": 1726652400000,
-    "request_id": "550e8400-e29b-41d4-a716-446655440000",
+    "request_id": "550e8400-e29b-41d4-a716-446655440001",
     "pagination": {
       "page": 1,
       "limit": 20,
@@ -45,148 +45,7 @@ All API responses MUST follow this standard format to ensure consistency across 
   "data": null,
   "meta": {
     "timestamp": 1726652400000,
-    "request_id": "550e8400-e29b-41d4-a716-446655440000",
-    "errors": [
-      {
-        "field": "title",
-        "message": "Title is required"
-      },
-      {
-        "field": "priority",
-        "message": "Invalid priority value"
-      }
-    ]
-  }
-}
-```
-
-## Response Components
-
-### 1. Status (Required)
-
-```typescript
-interface ResponseStatus {
-  code: number;        // HTTP status code
-  message: string;     // Human-readable message
-  is_success: boolean; // Success indicator
-}
-```
-
-### 2. Data (Required for success, null for errors)
-
-The actual response data. Can be:
-- Object (single resource)
-- Array (list of resources)
-- null (for error responses)
-
-### 3. Meta (Required)
-
-```typescript
-interface ResponseMeta {
-  timestamp: number;              // Request completion time (epoch milliseconds)
-  request_id: string;             // Unique request identifier
-  pagination?: PaginationMeta;   // Optional pagination metadata
-  errors?: ErrorDetail[];         // Optional error details
-}
-```
-
-## Status Codes
-
-| Code | Message | Usage |
-|------|---------|-------|
-| 200 | Success | Successful GET, PUT, DELETE |
-| 201 | Created | Successful POST (resource created) |
-| 400 | Bad Request | Validation errors, invalid input |
-| 401 | Unauthorized | Missing or invalid authentication |
-| 403 | Forbidden | Insufficient permissions |
-| 404 | Not Found | Resource not found |
-| 409 | Conflict | Duplicate resource, state conflict |
-| 500 | Internal Server Error | Unexpected server error |
-
-## Example Responses
-
-### GET /api/v1/tasks
-
-**Success Response:**
-```json
-{
-  "status": {
-    "code": 200,
-    "message": "Success",
-    "is_success": true
-  },
-  "data": [
-    {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "user_id": "660e8400-e29b-41d4-a716-446655440000",
-      "title": "Complete project documentation",
-      "description": "Write comprehensive documentation for the project",
-      "status": "todo",
-      "priority": "high",
-      "due_date": 1726738800000,
-      "tags": ["documentation", "important"],
-      "created_at": 1726652400000,
-      "updated_at": 1726652400000,
-      "completed_at": null,
-      "priority_score": 85
-    }
-  ],
-  "meta": {
-    "timestamp": 1726652400000,
-    "request_id": "550e8400-e29b-41d4-a716-446655440000",
-    "pagination": {
-      "page": 1,
-      "limit": 20,
-      "total": 1,
-      "total_pages": 1
-    }
-  }
-}
-```
-
-### POST /api/v1/tasks
-
-**Success Response:**
-```json
-{
-  "status": {
-    "code": 201,
-    "message": "Task created successfully",
-    "is_success": true
-  },
-  "data": {
-    "id": "770e8400-e29b-41d4-a716-446655440000",
-    "user_id": "660e8400-e29b-41d4-a716-446655440000",
-    "title": "New task",
-    "description": null,
-    "status": "todo",
-    "priority": "medium",
-    "due_date": null,
-    "tags": [],
-    "created_at": 1726652400000,
-    "updated_at": 1726652400000,
-    "completed_at": null,
-    "priority_score": 50
-  },
-  "meta": {
-    "timestamp": 1726652400000,
-    "request_id": "880e8400-e29b-41d4-a716-446655440000"
-  }
-}
-```
-
-**Error Response (Validation):**
-```json
-{
-  "status": {
-    "code": 400,
-    "message": "Validation failed",
-    "is_success": false
-  },
-  "data": null,
-  "meta": {
-    "timestamp": 1726652400000,
-    "request_id": "990e8400-e29b-41d4-a716-446655440000",
+    "request_id": "550e8400-e29b-41d4-a716-446655440001",
     "errors": [
       {
         "field": "title",
@@ -197,211 +56,74 @@ interface ResponseMeta {
 }
 ```
 
-### GET /api/v1/tasks/:id
+## Components
 
-**Success Response:**
-```json
-{
-  "status": {
-    "code": 200,
-    "message": "Success",
-    "is_success": true
-  },
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "user_id": "660e8400-e29b-41d4-a716-446655440000",
-    "title": "Complete project documentation",
-    "description": "Write comprehensive documentation for the project",
-    "status": "todo",
-    "priority": "high",
-    "due_date": 1726738800000,
-    "tags": ["documentation", "important"],
-    "created_at": 1726652400000,
-    "updated_at": 1726652400000,
-    "completed_at": null,
-    "priority_score": 85
-  },
-  "meta": {
-    "timestamp": 1726652400000,
-    "request_id": "110e8400-e29b-41d4-a716-446655440000"
-  }
-}
-```
+### 1. Status Object (Required)
 
-**Error Response (Not Found):**
-```json
-{
-  "status": {
-    "code": 404,
-    "message": "Task not found",
-    "is_success": false
-  },
-  "data": null,
-  "meta": {
-    "timestamp": 1726652400000,
-    "request_id": "220e8400-e29b-41d4-a716-446655440000"
-  }
-}
-```
+Contains the HTTP status information:
 
-### PUT /api/v1/tasks/:id
+- `code` (integer): HTTP status code
+- `message` (string): Human-readable message
+- `is_success` (boolean): Boolean indicating success/failure
 
-**Success Response:**
-```json
-{
-  "status": {
-    "code": 200,
-    "message": "Task updated successfully",
-    "is_success": true
-  },
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "user_id": "660e8400-e29b-41d4-a716-446655440000",
-    "title": "Updated task title",
-    "description": "Updated description",
-    "status": "in-progress",
-    "priority": "urgent",
-    "due_date": 1726738800000,
-    "tags": ["documentation", "important", "urgent"],
-    "created_at": 1726652400000,
-    "updated_at": 1726653000000,
-    "completed_at": null,
-    "priority_score": 100
-  },
-  "meta": {
-    "timestamp": 1726653000000,
-    "request_id": "330e8400-e29b-41d4-a716-446655440000"
-  }
-}
-```
+### 2. Data Object (Required for success responses)
 
-### DELETE /api/v1/tasks/:id
+Contains the actual response data:
 
-**Success Response:**
-```json
-{
-  "status": {
-    "code": 200,
-    "message": "Task deleted successfully",
-    "is_success": true
-  },
-  "data": null,
-  "meta": {
-    "timestamp": 1726653000000,
-    "request_id": "440e8400-e29b-41d4-a716-446655440000"
-  }
-}
-```
+- Can be an object, array, or null
+- Structure varies by endpoint
+- For error responses, this is set to `null`
 
-### POST /api/v1/auth/google
+### 3. Meta Object (Required)
 
-**Success Response:**
-```json
-{
-  "status": {
-    "code": 200,
-    "message": "Authentication successful",
-    "is_success": true
-  },
-  "data": {
-    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "expires_in": 900,
-    "user": {
-      "id": "660e8400-e29b-41d4-a716-446655440000",
-      "email": "user@example.com",
-      "name": "John Doe",
-      "avatar_url": "https://example.com/avatar.jpg"
-    }
-  },
-  "meta": {
-    "timestamp": 1726653000000,
-    "request_id": "550e8400-e29b-41d4-a716-446655440000"
-  }
-}
-```
+Contains metadata about the response:
 
-**Error Response (Unauthorized):**
-```json
-{
-  "status": {
-    "code": 401,
-    "message": "Invalid Google OAuth token",
-    "is_success": false
-  },
-  "data": null,
-  "meta": {
-    "timestamp": 1726653000000,
-    "request_id": "660e8400-e29b-41d4-a716-446655440000"
-  }
-}
-```
+- `timestamp` (integer): Request completion time in epoch milliseconds
+- `request_id` (string): Unique identifier for request tracking (UUID)
+- `pagination` (object): Included for list responses (optional)
+- `errors` (array): Error details for error responses (optional)
 
-## Pagination
+### 4. Pagination Object (Optional for list responses)
 
-List endpoints support pagination via query parameters:
+Included in list endpoints:
 
-```
-GET /api/v1/tasks?page=1&limit=20&status=todo&priority=high
-```
+- `page` (integer): Current page number
+- `limit` (integer): Items per page
+- `total` (integer): Total number of items
+- `total_pages` (integer): Total number of pages
 
-### Pagination Meta
+### 5. Error Details Array (Optional for error responses)
 
-```typescript
-interface PaginationMeta {
-  page: number;        // Current page (1-indexed)
-  limit: number;       // Items per page
-  total: number;       // Total number of items
-  total_pages: number; // Total number of pages
-}
-```
+Included in error responses:
 
-### Pagination Query Parameters
+- `field` (string): Field that caused the error
+- `message` (string): Error message
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| page | integer | 1 | Page number (1-indexed) |
-| limit | integer | 20 | Items per page (max 100) |
-| status | string | - | Filter by status |
-| priority | string | - | Filter by priority |
-| search | string | - | Search in title and description |
+## HTTP Status Codes
 
-## Error Handling
+- `200`: Success
+- `201`: Created
+- `400`: Bad Request (validation errors)
+- `401`: Unauthorized
+- `403`: Forbidden
+- `404`: Not Found
+- `409`: Conflict (duplicate, etc.)
+- `500`: Internal Server Error
 
-### Error Detail Structure
-
-```typescript
-interface ErrorDetail {
-  field: string;   // Field name that caused the error
-  message: string; // Human-readable error message
-}
-```
-
-### Common Error Messages
-
-| Code | Message | Description |
-|------|---------|-------------|
-| 400 | Validation failed | Input validation failed |
-| 400 | Invalid request body | Request body format error |
-| 401 | Unauthorized | Missing or invalid token |
-| 401 | Token expired | Access token has expired |
-| 403 | Forbidden | Insufficient permissions |
-| 404 | Resource not found | Requested resource doesn't exist |
-| 409 | Resource already exists | Duplicate resource |
-| 500 | Internal server error | Unexpected server error |
-
-## Implementation Examples
+## Implementation Guidelines
 
 ### Backend (Go)
+
+Implement helper functions in `internal/shared/response/`:
 
 ```go
 package response
 
 import (
-    "encoding/json"
     "net/http"
-    "time"
+    "encoding/json"
     "github.com/google/uuid"
+    "time"
 )
 
 type ResponseStatus struct {
@@ -411,10 +133,17 @@ type ResponseStatus struct {
 }
 
 type ResponseMeta struct {
-    Timestamp  int64                  `json:"timestamp"`
-    RequestID  string                 `json:"request_id"`
-    Pagination map[string]interface{} `json:"pagination,omitempty"`
-    Errors     []ErrorDetail          `json:"errors,omitempty"`
+    Timestamp  int64             `json:"timestamp"`
+    RequestID  string            `json:"request_id"`
+    Pagination *PaginationMeta   `json:"pagination,omitempty"`
+    Errors     []ErrorDetail     `json:"errors,omitempty"`
+}
+
+type PaginationMeta struct {
+    Page       int `json:"page"`
+    Limit      int `json:"limit"`
+    Total      int `json:"total"`
+    TotalPages int `json:"total_pages"`
 }
 
 type ErrorDetail struct {
@@ -422,63 +151,81 @@ type ErrorDetail struct {
     Message string `json:"message"`
 }
 
-type Response struct {
+type StandardResponse struct {
     Status ResponseStatus      `json:"status"`
-    Data   interface{}         `json:"data"`
+    Data   interface{}        `json:"data"`
     Meta   ResponseMeta        `json:"meta"`
 }
 
-func Success(w http.ResponseWriter, data interface{}, meta map[string]interface{}) {
-    response := Response{
+func Success(w http.ResponseWriter, data interface{}) {
+    meta := ResponseMeta{
+        Timestamp: time.Now().UnixMilli(),
+        RequestID: uuid.New().String(),
+    }
+    
+    response := StandardResponse{
         Status: ResponseStatus{
-            Code:      200,
+            Code:      http.StatusOK,
             Message:   "Success",
             IsSuccess: true,
         },
         Data: data,
-        Meta: ResponseMeta{
-            Timestamp: time.Now().UnixMilli(),
-            RequestID: uuid.New().String(),
-        },
-    }
-    
-    if meta != nil {
-        if pagination, ok := meta["pagination"]; ok {
-            response.Meta.Pagination = pagination.(map[string]interface{})
-        }
+        Meta: meta,
     }
     
     w.Header().Set("Content-Type", "application/json")
-    w.WriteHeader(http.StatusOK)
     json.NewEncoder(w).Encode(response)
 }
 
 func Error(w http.ResponseWriter, code int, message string, errors []ErrorDetail) {
-    response := Response{
+    meta := ResponseMeta{
+        Timestamp: time.Now().UnixMilli(),
+        RequestID: uuid.New().String(),
+        Errors:    errors,
+    }
+    
+    response := StandardResponse{
         Status: ResponseStatus{
             Code:      code,
             Message:   message,
             IsSuccess: false,
         },
         Data: nil,
-        Meta: ResponseMeta{
-            Timestamp: time.Now().UnixMilli(),
-            RequestID: uuid.New().String(),
-            Errors:    errors,
-        },
+        Meta: meta,
     }
     
     w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(code)
     json.NewEncoder(w).Encode(response)
 }
+
+func Paginated(w http.ResponseWriter, data interface{}, pagination PaginationMeta) {
+    meta := ResponseMeta{
+        Timestamp:  time.Now().UnixMilli(),
+        RequestID:  uuid.New().String(),
+        Pagination: &pagination,
+    }
+    
+    response := StandardResponse{
+        Status: ResponseStatus{
+            Code:      http.StatusOK,
+            Message:   "Success",
+            IsSuccess: true,
+        },
+        Data: data,
+        Meta: meta,
+    }
+    
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(response)
+}
 ```
 
 ### Frontend (TypeScript)
 
-```typescript
-// src/shared/lib/response-helpers.ts
+Implement helper functions in `src/shared/api/`:
 
+```typescript
 export interface ResponseStatus {
   code: number;
   message: string;
@@ -492,11 +239,6 @@ export interface ResponseMeta {
   errors?: ErrorDetail[];
 }
 
-export interface ErrorDetail {
-  field: string;
-  message: string;
-}
-
 export interface PaginationMeta {
   page: number;
   limit: number;
@@ -504,9 +246,14 @@ export interface PaginationMeta {
   total_pages: number;
 }
 
-export interface StandardResponse<T> {
+export interface ErrorDetail {
+  field: string;
+  message: string;
+}
+
+export interface StandardResponse<T = any> {
   status: ResponseStatus;
-  data: T;
+  data: T | null;
   meta: ResponseMeta;
 }
 
@@ -514,25 +261,116 @@ export function extractData<T>(response: StandardResponse<T>): T {
   if (!response.status.is_success) {
     throw new Error(response.status.message);
   }
-  return response.data;
+  return response.data as T;
 }
 
-export function extractError(response: StandardResponse<null>): ErrorDetail[] {
+export function extractError(response: StandardResponse): ErrorDetail[] {
   return response.meta.errors || [];
 }
 
-export function isSuccess(response: StandardResponse<any>): boolean {
+export function isSuccess(response: StandardResponse): boolean {
   return response.status.is_success;
 }
 ```
 
+## Examples
+
+### Task List Response
+
+```json
+{
+  "status": {
+    "code": 200,
+    "message": "Tasks retrieved successfully",
+    "is_success": true
+  },
+  "data": {
+    "tasks": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "user_id": "550e8400-e29b-41d4-a716-446655440001",
+        "title": "Complete project documentation",
+        "description": "Write comprehensive documentation for the project",
+        "status": "in-progress",
+        "priority": "high",
+        "due_date": 1726738800000,
+        "tags": ["documentation", "urgent"],
+        "created_at": 1726652400000,
+        "updated_at": 1726652400000,
+        "completed_at": null,
+        "priority_score": 85
+      }
+    ]
+  },
+  "meta": {
+    "timestamp": 1726652400000,
+    "request_id": "550e8400-e29b-41d4-a716-446655440001",
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 45,
+      "total_pages": 3
+    }
+  }
+}
+```
+
+### Validation Error Response
+
+```json
+{
+  "status": {
+    "code": 400,
+    "message": "Validation failed",
+    "is_success": false
+  },
+  "data": null,
+  "meta": {
+    "timestamp": 1726652400000,
+    "request_id": "550e8400-e29b-41d4-a716-446655440001",
+    "errors": [
+      {
+        "field": "title",
+        "message": "Title is required"
+      },
+      {
+        "field": "due_date",
+        "message": "Due date must be in the future"
+      }
+    ]
+  }
+}
+```
+
+## Time Format
+
+All timestamps are represented as **epoch milliseconds** (Unix time in milliseconds):
+
+- Example: `1726652400000` represents September 18, 2025, 00:00:00 GMT
+- Backend should use `time.Now().UnixMilli()` in Go
+- Frontend should use `Date.now()` in JavaScript/TypeScript
+
+## Request ID
+
+Each response includes a unique `request_id` (UUID) for:
+
+- Request tracking and debugging
+- Log correlation
+- Support ticket reference
+- Distributed tracing
+
 ## Best Practices
 
-1. **Always include timestamp** in epoch milliseconds
-2. **Generate unique request_id** for each request
-3. **Use consistent status codes** across all endpoints
-4. **Provide clear error messages** for debugging
-5. **Include field-level errors** for validation failures
-6. **Use pagination for list endpoints** to prevent large responses
-7. **Never expose sensitive data** in error messages
-8. **Log request_id** for debugging and tracing
+1. **Consistency**: Always use the standard response format
+2. **Error Messages**: Provide clear, actionable error messages
+3. **Validation**: Return field-specific validation errors
+4. **Timestamps**: Use epoch milliseconds consistently
+5. **Request IDs**: Generate unique IDs for each request
+6. **Pagination**: Include pagination metadata for list endpoints
+7. **Null Handling**: Use `null` for empty data in error responses
+
+## Related Documentation
+
+- [OpenAPI 3.1 Specification](./openapi.yaml) - Complete API contract
+- [Product Requirements Document](../project/prd.md) - API architecture overview
+- [Backend Architecture](../architecture/backend-ddd.md) - Implementation details
