@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: taskmanager-postgres
+    environment:
+      POSTGRES_DB: taskmanager_db_dev
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev -d taskmanager_db_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - taskmanager-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: taskmanager-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - taskmanager-network
+
+  # Backend API (for development)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: taskmanager-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=dev
+      - DB_PASSWORD=dev
+      - DB_NAME=taskmanager_db_dev
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - GIN_MODE=debug
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - taskmanager-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+networks:
+  taskmanager-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
