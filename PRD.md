@@ -1,8 +1,8 @@
 # Product Requirements Document (PRD)
 ## Advanced Task Manager
 
-**Version**: 1.0a  
-**Date**: 2025-09-18  
+**Version**: 1.1a  
+**Date**: 2025-09-19  
 **Status**: Draft
 
 ---
