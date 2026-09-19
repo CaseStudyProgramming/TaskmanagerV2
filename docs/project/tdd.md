@@ -508,42 +508,71 @@ See detailed response format testing examples in:
 - [Backend Response Format Tests](docs/testing/backend-examples.md#response-format-tests)
 - [Frontend Response Format Tests](docs/testing/frontend-examples.md#api-response-format-tests)
 
-### 4.5 Coverage Requirements (Data-Driven Decision Making)
+### 4.5 Coverage Requirements (Hierarchical Strategy)
 
-#### Overall Target
-- **Target Overall Coverage**: 90%+
-- **Coverage Report**: Must run and analyze before considering test suite complete
+#### Coverage Philosophy
+**Business quality over coverage numbers.** We use hierarchical thresholds to ensure critical code is well-tested.
+
+#### Coverage Strategy
+- **Overall Baseline**: 85% (warning if below, doesn't block)
+- **Critical Threshold**: 93% (blocks CI if below - business logic, services, entities, helpers)
+- **Important Threshold**: 85% (warning if below - API handlers, repositories, UI components)
+- **Excluded Files**: Type definitions, error pages, boilerplate, auto-generated (not counted)
 
 #### Coverage Analysis Process
 1. **Run Coverage Report**
-2. **Analyze Low Coverage Files**
-3. **File Type Categorization & Thresholds**
+2. **Analyze Coverage by File Type** (using coverage_analyzer.py)
+3. **Check Hierarchical Thresholds**
+4. **Generate Coverage Report**
 
-   | File Type | Coverage Threshold | Action Required |
-   |-----------|-------------------|------------------|
-   | **Type Definitions** | Exclude | No tests required (interfaces, types, DTOs) |
-   | **Error Pages** | Exclude | No tests required (404, 500 pages) |
-   | **Boilerplate Code** | Exclude | No tests required (generated code, configs) |
-   | **Business Logic** | 90%+ | **Mandatory** - Add tests to reach 90%+ |
-   | **API Handlers** | 85%+ | Add tests for critical paths |
-   | **Services/Use Cases** | 90%+ | **Mandatory** - Add tests to reach 90%+ |
-   | **Domain Entities** | 90%+ | **Mandatory** - Add tests to reach 90%+ |
-   | **Value Objects** | 90%+ | **Mandatory** - Add tests to reach 90%+ |
-   | **Repository Implementation** | 80%+ | Add integration tests |
-   | **Components (UI)** | 80%+ | Add component tests |
-   | **Utilities/Helpers** | 90%+ | **Mandatory** - Add tests to reach 90%+ |
-   | **Middleware** | 75%+ | Add tests for security-critical middleware |
-   | **Mixed Cases** | Case-by-case | Evaluate based on criticality |
+#### File Type Classification & Thresholds
 
-4. **Business Logic Files (90%+ Mandatory)**
-5. **Excluded Files**
-6. **Mixed Cases Evaluation**
+   | File Type | Coverage Threshold | Enforcement | Action Required |
+   |-----------|-------------------|-------------|------------------|
+   | **Business Logic** | 93% | Block | **Mandatory** - Add tests to reach 93%+ |
+   | **Services/Use Cases** | 93% | Block | **Mandatory** - Add tests to reach 93%+ |
+   | **Domain Entities** | 93% | Block | **Mandatory** - Add tests to reach 93%+ |
+   | **Value Objects** | 93% | Block | **Mandatory** - Add tests to reach 93%+ |
+   | **Utilities/Helpers** | 93% | Block | **Mandatory** - Add tests to reach 93%+ |
+   | **API Handlers** | 85% | Warn | Add tests for critical paths |
+   | **Repository Implementation** | 80% | Warn | Add integration tests |
+   | **Components (UI)** | 80% | Warn | Add component tests |
+   | **Middleware** | 75% | Warn | Add tests for security-critical middleware |
+   | **Type Definitions** | Exclude | N/A | No tests required (interfaces, types, DTOs) |
+   | **Error Pages** | Exclude | N/A | No tests required (404, 500 pages) |
+   | **Boilerplate Code** | Exclude | N/A | No tests required (generated code, configs) |
+   | **Auto-generated** | Exclude | N/A | No tests required |
+
+#### Coverage Enforcement Logic
+```python
+if critical_coverage < 93%:
+    FAIL_CI  # Block even if overall coverage is good
+elif overall_coverage < 85%:
+    WARN     # Warning only, don't block
+elif important_coverage < 85%:
+    WARN     # Warning only, don't block
+else:
+    PASS
+```
+
+#### Coverage Analysis Tool
+Use `scripts/coverage_analyzer.py` to analyze coverage by file type:
+```bash
+python3 scripts/coverage_analyzer.py coverage.out
+```
+
+This tool:
+- Classifies files by type (critical, important, excluded)
+- Calculates coverage per category
+- Enforces hierarchical thresholds
+- Generates detailed coverage report
 
 #### Coverage Enforcement
-- CI/CD pipeline fails if overall coverage < 90%
-- Pull requests must show coverage diff
-- New business logic files must have 90%+ coverage
+- CI/CD pipeline fails if critical coverage < 93% (regardless of overall)
+- Pull requests must show coverage by category
+- New business logic files must have 93%+ coverage
 - Manual review required for excluded files
+- Coverage report artifacts saved for analysis
 
 ---
 

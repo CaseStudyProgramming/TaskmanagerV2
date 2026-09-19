@@ -1,0 +1,32 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks..."
+
+# Frontend checks
+if [ -d "frontend" ]; then
+  echo "📦 Frontend checks..."
+  cd frontend
+  if [ -f "package.json" ]; then
+    npm run format:check
+    npm run lint
+    npm run type-check
+    npm run test:unit
+  fi
+  cd ..
+fi
+
+# Backend checks
+if [ -d "backend" ]; then
+  echo "🔧 Backend checks..."
+  cd backend
+  if [ -f "go.mod" ]; then
+    gofmt -l . | exit $(wc -l)
+    golangci-lint run
+    go vet ./...
+    go test ./... -short
+  fi
+  cd ..
+fi
+
+echo "✅ All pre-commit checks passed!"

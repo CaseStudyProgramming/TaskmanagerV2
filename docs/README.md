@@ -1,47 +1,56 @@
 # Documentation
 
-This directory contains comprehensive documentation for the Advanced Task Manager project.
+This directory contains comprehensive documentation for the Advanced Task Manager project following global standards for senior developers.
 
 ## Structure
 
 ```
 docs/
 ├── README.md                    # This file
+├── project/                     # Project-level documentation
+│   ├── dependencies.md         # Dependency version specifications
+│   ├── prd.md                  # Product Requirements Document
+│   └── tdd.md                  # Test-Driven Development Guidelines
+├── architecture/               # Architecture documentation
+│   ├── backend-ddd.md          # Backend DDD architecture
+│   ├── frontend-fsd.md         # Frontend FSD architecture
+│   └── container-strategy.md   # Container platform strategy
+├── api/                         # API documentation
+│   └── standard-response-format.md  # API response format
 ├── testing/                     # Testing documentation
 │   ├── backend-examples.md     # Backend testing examples
 │   └── frontend-examples.md    # Frontend testing examples
 ├── ci-cd/                       # CI/CD documentation
 │   └── github-actions.md       # GitHub Actions configuration
-├── architecture/               # Architecture documentation
-│   ├── backend-ddd.md          # Backend DDD architecture
-│   └── frontend-fsd.md         # Frontend FSD architecture
-├── api/                         # API documentation
-│   └── standard-response-format.md  # API response format
 └── quality-reliability/        # System Quality & Reliability
     ├── backend-quality-reliability.md  # Backend quality requirements
     ├── frontend-quality-reliability.md # Frontend quality requirements
-    └── container-recommendations.md   # Container and Alpine recommendations
+    └── container-recommendations.md   # Container and Alpine Linux recommendations
 ```
 
 ## Quick Links
 
-### Product & Requirements
-- [PRD.md](../PRD.md) - Product Requirements Document
-- [TDD.md](../TDD.md) - Test-Driven Development Guidelines
+### Project Documentation
+- [Product Requirements Document (PRD)](./project/prd.md) - Product requirements and specifications
+- [Test-Driven Development (TDD)](./project/tdd.md) - Testing guidelines and standards
+- [Dependency Versions](./project/dependencies.md) - Backend and frontend dependency versions
+
+### Architecture
+- [Backend DDD Architecture](./architecture/backend-ddd.md) - Domain-Driven Design for backend
+- [Frontend FSD Architecture](./architecture/frontend-fsd.md) - Feature-Sliced Design for frontend
+- [Container Strategy](./architecture/container-strategy.md) - Container platform strategy (Docker/Podman, CI/CD, Production)
+
+### API
+- [Standard Response Format](./api/standard-response-format.md) - API response specification
 
 ### Testing
 - [Backend Testing Examples](./testing/backend-examples.md) - Go testing examples
 - [Frontend Testing Examples](./testing/frontend-examples.md) - TypeScript/Svelte testing examples
 
 ### CI/CD
-- [GitHub Actions Configuration](./ci-cd/github-actions.md) - Complete CI/CD pipeline setup
-
-### Architecture
-- [Backend DDD Architecture](./architecture/backend-ddd.md) - Domain-Driven Design for backend
-- [Frontend FSD Architecture](./architecture/frontend-fsd.md) - Feature-Sliced Design for frontend
-
-### API
-- [Standard Response Format](./api/standard-response-format.md) - API response specification
+- [Development Workflow](./ci-cd/workflow.md) - Complete development workflow and quality gates
+- [Coverage Strategy](./ci-cd/coverage-strategy.md) - Hierarchical coverage thresholds and enforcement
+- [GitHub Actions Configuration](./ci-cd/github-actions.md) - CI/CD pipeline configuration
 
 ### Quality & Reliability
 - [Backend Quality & Reliability](./quality-reliability/backend-quality-reliability.md) - Backend system quality requirements
@@ -77,7 +86,7 @@ docs/
 
 When adding new documentation:
 
-1. Choose the appropriate directory (testing, ci-cd, architecture, api, quality-reliability)
+1. Choose the appropriate directory (project, architecture, api, testing, ci-cd, quality-reliability)
 2. Use clear, descriptive filenames
 3. Include a table of contents for longer documents
 4. Add cross-references to related documentation

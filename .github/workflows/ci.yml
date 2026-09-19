@@ -1,0 +1,364 @@
+name: CI/CD Pipeline
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop, feature/*]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME_BACKEND: ${{ github.repository }}/taskmanager-backend
+  TEST_DB_NAME: taskmanager_db_testing
+
+jobs:
+  # Stage 1: Quality Checks (Fast)
+  quality-checks:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Frontend format check
+        working-directory: ./frontend
+        run: |
+          if [ -f "package.json" ]; then
+            npm run format:check
+          fi
+
+      - name: Frontend lint check
+        working-directory: ./frontend
+        run: |
+          if [ -f "package.json" ]; then
+            npm run lint
+          fi
+
+      - name: Frontend type check
+        working-directory: ./frontend
+        run: |
+          if [ -f "package.json" ]; then
+            npm run type-check
+          fi
+
+      - name: Backend format check
+        working-directory: ./backend
+        run: |
+          if [ -f "go.mod" ]; then
+            gofmt -l . | tee /dev/stderr | exit $(wc -l)
+          fi
+
+      - name: Backend lint check
+        working-directory: ./backend
+        run: |
+          if [ -f "go.mod" ]; then
+            golangci-lint run
+          fi
+
+      - name: Backend vet check
+        working-directory: ./backend
+        run: |
+          if [ -f "go.mod" ]; then
+            go vet ./...
+          fi
+
+  # Stage 2: Unit Tests (Fast)
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: quality-checks
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Frontend unit tests
+        working-directory: ./frontend
+        run: |
+          if [ -f "package.json" ]; then
+            npm ci
+            npm run test:unit -- --coverage
+          fi
+
+      - name: Backend unit tests
+        working-directory: ./backend
+        run: |
+          if [ -f "go.mod" ]; then
+            go test ./... -short -cover
+          fi
+
+  # Stage 3: Integration Tests (Medium)
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: taskmanager_db_testing
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Backend integration tests
+        working-directory: ./backend
+        run: |
+          if [ -f "go.mod" ]; then
+            go test ./... -cover
+          fi
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: test
+          DB_PASSWORD: test
+          DB_NAME: ${{ env.TEST_DB_NAME }}
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+
+  # Stage 4: Coverage Analysis (Medium)
+  coverage-report:
+    name: Coverage Analysis
+    runs-on: ubuntu-latest
+    needs: integration-tests
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Frontend coverage
+        working-directory: ./frontend
+        run: |
+          if [ -f "package.json" ]; then
+            npm ci
+            npm run test:coverage
+          fi
+
+      - name: Backend coverage
+        working-directory: ./backend
+        run: |
+          if [ -f "go.mod" ]; then
+            go test ./... -coverprofile=coverage.out
+            go tool cover -func=coverage.out
+          fi
+
+      - name: Analyze coverage by category
+        run: |
+          if [ -f "backend/coverage.out" ]; then
+            python3 scripts/coverage_analyzer.py backend/coverage.out
+          elif [ -f "frontend/coverage/coverage.json" ]; then
+            python3 scripts/coverage_analyzer.py frontend/coverage/coverage.json
+          fi
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage_report.json
+
+  # Stage 5: Security Scan (Medium)
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Snyk (Frontend)
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        with:
+          command: test
+          args: --severity-threshold=high
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Run Snyk (Backend)
+        uses: snyk/actions/golang@master
+        continue-on-error: true
+        with:
+          command: test
+          args: --severity-threshold=high
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+  # Stage 6: E2E Tests (Slow)
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: [coverage-report, security-scan]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.20.0'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: |
+          if [ -f "package.json" ]; then
+            npm ci
+          fi
+
+      - name: Install Playwright
+        working-directory: ./frontend
+        run: |
+          if [ -f "package.json" ]; then
+            npx playwright install --with-deps
+          fi
+
+      - name: Run E2E tests
+        working-directory: ./frontend
+        run: |
+          if [ -f "package.json" ]; then
+            npm run test:e2e
+          fi
+
+  # Stage 7: Performance Check (Slow)
+  performance-check:
+    name: Performance Check
+    runs-on: ubuntu-latest
+    needs: [coverage-report, security-scan]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.20.0'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: |
+          if [ -f "package.json" ]; then
+            npm ci
+          fi
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: |
+          if [ -f "package.json" ]; then
+            npm run build
+          fi
+
+      - name: Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+          urls: |
+            http://localhost:3000
+
+  # Stage 8: Build and Push
+  build-push:
+    name: Build and Push
+    runs-on: ubuntu-latest
+    needs: [coverage-report, security-scan]
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for backend
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+  # Stage 9: Deploy
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build-push
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+      url: ${{ github.ref == 'refs/heads/main' && 'https://production.example.com' || 'https://staging.example.com' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy notification
+        run: |
+          echo "Deploying to ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}"
+          echo "Branch: ${{ github.ref }}"
+          echo "Commit: ${{ github.sha }}"
+
+      # Add actual deployment steps here when infrastructure is set up
+      # - name: Deploy to Vercel (frontend)
+      # - name: Deploy to Koyeb (backend)
