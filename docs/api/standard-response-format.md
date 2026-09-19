@@ -14,7 +14,7 @@ All API responses follow a consistent structure to ensure predictability and eas
 {
   "status": {
     "code": 200,
-    "message": "Success",1
+    "message": "Success",
     "is_success": true
   },
   "data": {
