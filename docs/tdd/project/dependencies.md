@@ -15,7 +15,6 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 | **Node.js** | v24.20.0 | JavaScript runtime (must be used across development, testing, and production) |
 | **TypeScript** | ^5.6.0 | Type-safe JavaScript |
 | **SvelteKit** | ^2.8.0 | Web framework |
-| **Svelte** | ^5.20.0 | UI framework |
 | **Vite** | ^6.0.0 | Build tool and dev server |
 
 ### Package Manager
@@ -28,9 +27,8 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| **Tailwind CSS** | ^4.0.0 | Utility-first CSS framework |
-| **PostCSS** | ^8.4.49 | CSS transformation |
-| **Autoprefixer** | ^10.4.20 | CSS vendor prefixing |
+| **Tailwind CSS** | ^4.3.3 | Utility-first CSS framework |
+
 
 ### Validation & Schema
 
@@ -42,7 +40,6 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| **Biome.js** | ^2.0.0 | Linting and formatting (ESLint/Prettier replacement) |
 | **@biomejs/biome** | ^2.0.0 | Biome CLI tool |
 
 ### Testing
@@ -65,9 +62,7 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 ### API & HTTP
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **axios** | ^1.7.9 | HTTP client (optional, can use native fetch) |
+use fetch
 
 ### Offline & Storage
 
