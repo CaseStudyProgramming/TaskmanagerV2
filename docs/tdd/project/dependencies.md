@@ -21,7 +21,7 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| **bun** | ^1.2.0 | Fast package manager and runtime |
+| **bun** | ^1.4.2 | Fast package manager and runtime |
 
 ### Styling
 
