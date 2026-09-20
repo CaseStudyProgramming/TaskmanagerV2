@@ -18,18 +18,20 @@ src/app/
 ├── providers/
 │   ├── auth-provider.svelte       # Authentication provider
 │   ├── theme-provider.svelte     # Theme provider
-│   └── query-client-provider.svelte # React Query client
+│   └── query-client-provider.svelte # API client provider
 ├── routes/
 │   └── routes.ts                 # Route configuration
-└── styles/
-    └── global.css                 # Global styles
+├── styles/
+│   └── global.css                 # Global styles
+└── store/
+    └── app-store.ts              # Global application state
 ```
 
 
 
 ### 2. Pages Layer
 
-Page-level components and routing.
+Page-level components and routing, following vertical slice pattern.
 
 #### Structure
 ```
@@ -37,24 +39,34 @@ src/pages/
 ├── home/
 │   ├── ui/
 │   │   └── HomePage.svelte
+│   ├── model/
+│   │   └── home-page.model.ts
 │   └── index.ts
 ├── auth/
 │   ├── login/
 │   │   ├── ui/
 │   │   │   └── LoginPage.svelte
+│   │   ├── model/
+│   │   │   └── login-page.model.ts
 │   │   └── index.ts
 │   └── callback/
 │       ├── ui/
 │       │   └── CallbackPage.svelte
+│       ├── model/
+│       │   └── callback-page.model.ts
 │       └── index.ts
 └── tasks/
     ├── list/
     │   ├── ui/
     │   │   └── TaskListPage.svelte
+    │   ├── model/
+    │   │   └── task-list-page.model.ts
     │   └── index.ts
     └── detail/
         ├── ui/
         │   └── TaskDetailPage.svelte
+        ├── model/
+        │   └── task-detail-page.model.ts
         └── index.ts
 ```
 
@@ -62,15 +74,16 @@ src/pages/
 
 ### 3. Features Layer
 
-Feature-specific business logic, API integration, and UI components.
+Feature-specific business logic, API integration, and UI components organized as vertical slices.
 
 #### Structure
 ```
 src/features/
 ├── task-create/
 │   ├── model/
-│   │   ├── task-create.model.ts      # Business logic
-│   │   └── task-create.model.spec.ts
+│   │   ├── task-create.store.ts      # State management
+│   │   ├── task-create.store.spec.ts
+│   │   └── task-create.schema.ts     # Validation schemas
 │   ├── api/
 │   │   ├── task-create.api.ts        # API calls
 │   │   └── task-create.api.spec.ts
@@ -79,8 +92,9 @@ src/features/
 │       └── TaskCreateForm.spec.ts
 ├── task-edit/
 │   ├── model/
-│   │   ├── task-edit.model.ts
-│   │   └── task-edit.model.spec.ts
+│   │   ├── task-edit.store.ts
+│   │   ├── task-edit.store.spec.ts
+│   │   └── task-edit.schema.ts
 │   ├── api/
 │   │   ├── task-edit.api.ts
 │   │   └── task-edit.api.spec.ts
@@ -89,8 +103,8 @@ src/features/
 │       └── TaskEditForm.spec.ts
 ├── task-delete/
 │   ├── model/
-│   │   ├── task-delete.model.ts
-│   │   └── task-delete.model.spec.ts
+│   │   ├── task-delete.store.ts
+│   │   └── task-delete.store.spec.ts
 │   ├── api/
 │   │   ├── task-delete.api.ts
 │   │   └── task-delete.api.spec.ts
@@ -99,8 +113,9 @@ src/features/
 │       └── TaskDeleteButton.spec.ts
 ├── task-filter/
 │   ├── model/
-│   │   ├── task-filter.model.ts
-│   │   └── task-filter.model.spec.ts
+│   │   ├── task-filter.store.ts
+│   │   ├── task-filter.store.spec.ts
+│   │   └── task-filter.schema.ts
 │   ├── api/
 │   │   ├── task-filter.api.ts
 │   │   └── task-filter.api.spec.ts
@@ -119,8 +134,8 @@ src/features/
 │       └── PriorityBadge.spec.ts
 ├── auth-google/
 │   ├── model/
-│   │   ├── google-auth.model.ts
-│   │   └── google-auth.model.spec.ts
+│   │   ├── google-auth.store.ts
+│   │   └── google-auth.store.spec.ts
 │   ├── api/
 │   │   ├── google-auth.api.ts
 │   │   └── google-auth.api.spec.ts
@@ -129,8 +144,8 @@ src/features/
 │       └── GoogleLoginButton.spec.ts
 ├── export-import/
 │   ├── model/
-│   │   ├── export-import.model.ts
-│   │   └── export-import.model.spec.ts
+│   │   ├── export-import.store.ts
+│   │   └── export-import.store.spec.ts
 │   ├── api/
 │   │   ├── export-import.api.ts
 │   │   └── export-import.api.spec.ts
@@ -141,8 +156,8 @@ src/features/
 │       └── ImportButton.spec.ts
 └── offline-sync/
     ├── model/
-    │   ├── sync-queue.model.ts
-    │   └── sync-queue.model.spec.ts
+    │   ├── sync-queue.store.ts
+    │   └── sync-queue.store.spec.ts
     ├── api/
     │   ├── offline-sync.api.ts
     │   └── offline-sync.api.spec.ts
@@ -159,28 +174,31 @@ src/features/
 
 ### 4. Entities Layer
 
-Domain entities and their business logic.
+Domain entities and their business logic, shared across features.
 
 #### Structure
 ```
 src/entities/
 ├── task/
 │   ├── model/
-│   │   ├── task.ts               # Task entity
+│   │   ├── task.ts               # Task entity interface
+│   │   ├── task.factory.ts      # Task factory functions
 │   │   └── task.spec.ts
 │   └── lib/
 │       ├── task-utils.ts         # Task utilities
 │       └── task-utils.spec.ts
 ├── user/
 │   ├── model/
-│   │   ├── user.ts               # User entity
+│   │   ├── user.ts               # User entity interface
+│   │   ├── user.factory.ts      # User factory functions
 │   │   └── user.spec.ts
 │   └── lib/
 │       ├── user-utils.ts
 │       └── user-utils.spec.ts
 └── auth/
     ├── model/
-    │   ├── session.ts            # Session entity
+    │   ├── session.ts            # Session entity interface
+    │   ├── session.factory.ts   # Session factory functions
     │   └── session.spec.ts
     └── lib/
         ├── auth-utils.ts
@@ -191,32 +209,50 @@ src/entities/
 
 ### 5. Shared Layer
 
-Shared utilities, API clients, and UI components.
+Shared utilities, API clients, and UI components that are generic and reusable across the application.
 
 #### Structure
 ```
 src/shared/
 ├── api/
 │   ├── client.ts                 # Shared API client
-│   └── client.spec.ts
+│   ├── client.spec.ts
+│   └── interceptors.ts           # Request/response interceptors
 ├── config/
-│   ├── config.ts                 # Configuration
+│   ├── config.ts                 # Application configuration
 │   └── config.spec.ts
 ├── lib/
-│   ├── validation.ts             # Validation utilities
-│   ├── validation.spec.ts
-│   ├── time-helpers.ts           # Time helper functions
-│   ├── time-helpers.spec.ts
-│   ├── response-helpers.ts       # Response helper functions
-│   ├── response-helpers.spec.ts
-│   └── string-helpers.ts
+│   ├── validation/
+│   │   ├── schema-builder.ts     # Validation schema utilities
+│   │   └── schema-builder.spec.ts
+│   ├── time/
+│   │   ├── time-helpers.ts       # Time helper functions
+│   │   └── time-helpers.spec.ts
+│   ├── response/
+│   │   ├── response-helpers.ts   # Response helper functions
+│   │   └── response-helpers.spec.ts
+│   └── string/
+│       ├── string-helpers.ts
+│       └── string-helpers.spec.ts
 ├── ui/
-│   ├── Button.svelte             # Shared UI components
-│   ├── Button.spec.ts
-│   ├── Input.svelte
-│   ├── Input.spec.ts
-│   ├── Select.svelte
-│   └── Select.spec.ts
+│   ├── button/
+│   │   ├── Button.svelte         # Shared UI components
+│   │   └── Button.spec.ts
+│   ├── input/
+│   │   ├── Input.svelte
+│   │   └── Input.spec.ts
+│   ├── select/
+│   │   ├── Select.svelte
+│   │   └── Select.spec.ts
+│   └── modal/
+│       ├── Modal.svelte
+│       └── Modal.spec.ts
+├── segments/
+│   ├── ui/                       # UI segments (header, footer, etc.)
+│   │   ├── Header.svelte
+│   │   └── Footer.svelte
+│   └── layout/                   # Layout components
+│       └── MainLayout.svelte
 └── types/
     └── index.ts                   # Shared TypeScript types
 ```
@@ -225,44 +261,80 @@ src/shared/
 
 ### 6. Widgets Layer
 
-Reusable UI components that can be used across multiple features.
+Reusable UI components that can be used across multiple features, following vertical slice pattern with their own logic.
 
 #### Structure
 ```
 src/widgets/
 ├── task-card/
-│   ├── TaskCard.svelte
-│   └── TaskCard.spec.ts
+│   ├── ui/
+│   │   ├── TaskCard.svelte
+│   │   └── TaskCard.spec.ts
+│   └── index.ts
 ├── task-list/
-│   ├── TaskList.svelte
-│   └── TaskList.spec.ts
+│   ├── ui/
+│   │   ├── TaskList.svelte
+│   │   └── TaskList.spec.ts
+│   └── index.ts
 ├── priority-badge/
-│   ├── PriorityBadge.svelte
-│   └── PriorityBadge.spec.ts
+│   ├── ui/
+│   │   ├── PriorityBadge.svelte
+│   │   └── PriorityBadge.spec.ts
+│   └── index.ts
 └── offline-indicator/
-    ├── OfflineIndicator.svelte
-    └── OfflineIndicator.spec.ts
+    ├── ui/
+    │   ├── OfflineIndicator.svelte
+    │   └── OfflineIndicator.spec.ts
+    └── index.ts
 ```
 
 
 
-## Vertical Slice Pattern
+## Vertical Slice Pattern Integration
 
-Each feature is organized as a vertical slice:
+Vertical slices are applied within the FSD layers to ensure feature-focused organization:
 
+### Feature Vertical Slice
 ```
 task-create/
-├── model/     # Business logic
-├── api/       # API integration
-└── ui/        # UI components
+├── model/              # State management and business logic
+│   ├── task-create.store.ts
+│   ├── task-create.store.spec.ts
+│   └── task-create.schema.ts
+├── api/                # API integration
+│   ├── task-create.api.ts
+│   └── task-create.api.spec.ts
+└── ui/                 # UI components
+    ├── TaskCreateForm.svelte
+    └── TaskCreateForm.spec.ts
+```
+
+### Page Vertical Slice
+```
+tasks/list/
+├── ui/                 # Page UI components
+│   └── TaskListPage.svelte
+├── model/              # Page-specific logic
+│   └── task-list-page.model.ts
+└── index.ts            # Public API
+```
+
+### Widget Vertical Slice
+```
+task-card/
+├── ui/                 # Widget UI components
+│   ├── TaskCard.svelte
+│   └── TaskCard.spec.ts
+└── index.ts            # Public API
 ```
 
 ### Benefits
-- **Feature-focused development**
-- **Easy to locate related code**
-- **Independent feature testing**
-- **Clear separation of concerns**
-- **Easy to add/remove features**
+- **Feature-focused development**: All related code for a feature is co-located
+- **Easy to locate related code**: Developers can find all code for a feature in one place
+- **Independent feature testing**: Each feature can be tested in isolation
+- **Clear separation of concerns**: FSD layers provide boundaries while vertical slices provide organization
+- **Easy to add/remove features**: Features can be added or removed without affecting other parts of the application
+- **Better code reusability**: Shared and entities layers provide reusable components and logic
 
 ## Component Interactions
 
