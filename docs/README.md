@@ -110,5 +110,4 @@ Documentation maintenance is part of the development process:
 - Review documentation monthly for accuracy
 - Update documentation when APIs change
 - Remove deprecated documentation
-- Keep examples current with latest codebase
 - Document known issues and workarounds
