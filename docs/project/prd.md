@@ -260,7 +260,7 @@ Tag Weight: SUM(tag_weights) (max 15)
 - **CI/CD**: GitHub Actions
 
 #### Development
-- **Node.js**: v24.20.0
+- **Node.js**: v24.20.0 (must be used across development, production, and testing environments)
 - **Package Manager**: bun
 - **Version Control**: Git
 - **API Documentation**: OpenAPI/Swagger
@@ -721,6 +721,7 @@ Benefits:
 
 #### Platform Selection
 - **Frontend**: Vercel (Free tier)
+  - Node.js v24.20.0 runtime
   - 100GB bandwidth/month
   - Unlimited deployments
   - Global edge network
@@ -801,6 +802,12 @@ Benefits:
 7. **Security Scan** (Snyk, OWASP)
 8. **Deploy** (Vercel, Koyeb)
 
+#### Environment Configuration
+- **Development**: Node.js v24.20.0 (local development)
+- **Testing**: Node.js v24.20.0 (CI/CD, test environments)
+- **Production**: Node.js v24.20.0 (Vercel deployment)
+- **Consistency**: Same Node.js version across all environments to ensure consistency
+
 ---
 
 ## 8. Data Privacy & Compliance
@@ -841,6 +848,7 @@ Benefits:
 - **API**: Postman/Newman, httpexpect
 - **Security**: OWASP ZAP, Snyk
 - **Performance**: Lighthouse, k6
+- **Runtime**: Node.js v24.20.0 (consistent across development, testing, and production)
 
 ### 9.3 Test Categories
 - Unit tests (functions, components)
@@ -849,6 +857,12 @@ Benefits:
 - Contract tests (OpenAPI compliance)
 - Security tests (vulnerabilities)
 - Performance tests (load, stress)
+
+### 9.4 Testing Environment
+- **Runtime Environment**: Node.js v24.20.0
+- **Testing Database**: `taskmanager_db_testing` (mandatory for all test environments)
+- **Test Isolation**: Each test runs in isolated environment
+- **Consistency**: Same Node.js version as development and production
 
 ---
 

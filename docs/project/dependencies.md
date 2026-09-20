@@ -12,7 +12,7 @@ This document specifies the exact dependency versions for the Advanced Task Mana
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| **Node.js** | v24.20.0 | JavaScript runtime |
+| **Node.js** | v24.20.0 | JavaScript runtime (must be used across development, testing, and production) |
 | **TypeScript** | ^5.6.0 | Type-safe JavaScript |
 | **SvelteKit** | ^2.8.0 | Web framework |
 | **Svelte** | ^5.20.0 | UI framework |
@@ -605,10 +605,19 @@ jobs:
 
 | Component | Frontend | Backend | Infrastructure |
 |-----------|----------|---------|----------------|
-| Node.js | 24.20.0 | N/A | N/A |
+| Node.js | 24.20.0 (development, testing, production) | N/A | N/A |
 | Go | N/A | 1.25+ | N/A |
 | PostgreSQL | N/A | Compatible with 16.x | 16.x |
 | Redis | N/A | Compatible with 7.x | 7.x |
+
+### Node.js Version Consistency
+
+**Important**: Node.js v24.20.0 must be used consistently across all environments:
+- **Development**: Local development environment
+- **Testing**: CI/CD pipelines and test environments
+- **Production**: Vercel deployment runtime
+
+This ensures consistency and prevents environment-specific issues.
 
 ---
 

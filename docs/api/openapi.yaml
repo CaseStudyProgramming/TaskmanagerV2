@@ -41,6 +41,7 @@ paths:
         Handles Google OAuth callback. Creates or updates user session.
         Exchanges authorization code for access tokens and creates user session.
       operationId: googleOAuthCallback
+      security: []
       requestBody:
         required: true
         content:
@@ -95,6 +96,7 @@ paths:
         Refreshes the access token using a valid refresh token.
         Returns new access and refresh tokens.
       operationId: refreshToken
+      security: []
       requestBody:
         required: true
         content:
@@ -765,9 +767,10 @@ components:
         status:
           $ref: '#/components/schemas/ResponseStatus'
         data:
-          type: object
+          type:
+            - object
+            - "null"
           description: Response data (can be object, array, or null)
-          nullable: true
         meta:
           $ref: '#/components/schemas/ResponseMeta'
 
@@ -883,10 +886,11 @@ components:
           description: Task title
           example: "Complete project documentation"
         description:
-          type: string
+          type:
+            - string
+            - "null"
           description: Task description (rich text supported)
           example: "Write comprehensive documentation for the project"
-          nullable: true
         status:
           type: string
           enum: [todo, in-progress, completed]
@@ -898,11 +902,12 @@ components:
           description: Task priority
           example: "high"
         due_date:
-          type: integer
+          type:
+            - integer
+            - "null"
           format: int64
           description: Due date in epoch milliseconds
           example: 1726738800000
-          nullable: true
         tags:
           type: array
           description: Task tags
@@ -920,11 +925,12 @@ components:
           description: Last update timestamp in epoch milliseconds
           example: 1726652400000
         completed_at:
-          type: integer
+          type:
+            - integer
+            - "null"
           format: int64
           description: Completion timestamp in epoch milliseconds
           example: 1726652500000
-          nullable: true
         priority_score:
           type: integer
           description: Calculated priority score (0-100+)
@@ -1022,51 +1028,6 @@ components:
         data:
           $ref: '#/components/schemas/Task'
           description: Task data (for create/update actions)
-
-    User:
-      type: object
-      required:
-        - id
-        - email
-        - name
-        - created_at
-        - updated_at
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: User unique identifier
-          example: "550e8400-e29b-41d4-a716-446655440000"
-        google_id:
-          type: string
-          description: Google OAuth ID
-          example: "1234567890"
-          nullable: true
-        email:
-          type: string
-          format: email
-          description: User email
-          example: "user@example.com"
-        name:
-          type: string
-          description: User display name
-          example: "John Doe"
-        avatar_url:
-          type: string
-          format: uri
-          description: User avatar URL
-          example: "https://example.com/avatar.jpg"
-          nullable: true
-        created_at:
-          type: integer
-          format: int64
-          description: Account creation timestamp (epoch milliseconds)
-          example: 1726652400000
-        updated_at:
-          type: integer
-          format: int64
-          description: Last update timestamp (epoch milliseconds)
-          example: 1726652400000
 
   responses:
     BadRequest:

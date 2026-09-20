@@ -54,8 +54,8 @@ on:
     branches: [main, develop]
 
 env:
-  NODE_VERSION: '24.20.0'
-  GO_VERSION: '1.21'
+  NODE_VERSION: '24.20.0'  # Must be used across development, testing, and production
+  GO_VERSION: '1.25'
   TEST_DB_NAME: taskmanager_db_testing
 
 jobs:
