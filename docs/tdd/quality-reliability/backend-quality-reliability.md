@@ -638,6 +638,171 @@ CMD ["./main"]
 
 ---
 
+## Caching Strategy
+
+### Multi-Level Caching Architecture
+
+The backend implements a multi-level caching strategy to optimize performance and reduce database load:
+
+```
+Browser Cache → CDN Cache → Application Cache (Redis) → Database Cache (PostgreSQL)
+```
+
+#### Cache Layers
+
+**Application Cache (Redis)**
+- **Scope**: Task data, user sessions, frequently accessed data
+- **TTL**: 5 minutes for task data, 15 minutes for sessions
+- **Invalidation**: Write-through, manual invalidation
+- **Implementation**: Redis via Upstash
+
+**Database Cache (PostgreSQL)**
+- **Scope**: Query results, execution plans
+- **TTL**: Automatic database cache management
+- **Invalidation**: Automatic based on data changes
+- **Implementation**: PostgreSQL built-in query cache
+
+### Cache Key Patterns
+
+```go
+// Cache key patterns
+const (
+    TaskKey           = "task:%s:%s"              // task:{user_id}:{task_id}
+    UserTasksKey      = "tasks:%s"                // tasks:{user_id}
+    UserSessionKey    = "session:%s"              // session:{session_id}
+    UserKey           = "user:%s"                 // user:{user_id}
+    PriorityTasksKey  = "tasks:%s:prioritized"    // tasks:{user_id}:prioritized
+)
+```
+
+### Cache-Aside Pattern Implementation
+
+```go
+// Cache-aside implementation
+func (r *TaskRepository) GetTask(ctx context.Context, userID, taskID string) (*Task, error) {
+    // Try cache first
+    cacheKey := fmt.Sprintf("task:%s:%s", userID, taskID)
+    cached, err := r.cache.Get(ctx, cacheKey)
+    if err == nil && cached != nil {
+        var task Task
+        if err := json.Unmarshal(cached, &task); err == nil {
+            return &task, nil
+        }
+    }
+
+    // Fallback to database
+    task, err := r.db.GetTask(ctx, userID, taskID)
+    if err != nil {
+        return nil, err
+    }
+
+    // Update cache
+    taskJSON, _ := json.Marshal(task)
+    r.cache.Set(ctx, cacheKey, taskJSON, 5*time.Minute)
+
+    return task, nil
+}
+
+func (r *TaskRepository) UpdateTask(ctx context.Context, task *Task) error {
+    // Update database
+    err := r.db.UpdateTask(ctx, task)
+    if err != nil {
+        return err
+    }
+
+    // Invalidate cache
+    cacheKey := fmt.Sprintf("task:%s:%s", task.UserID, task.ID)
+    r.cache.Delete(ctx, cacheKey)
+
+    // Invalidate user tasks cache
+    userTasksKey := fmt.Sprintf("tasks:%s", task.UserID)
+    r.cache.Delete(ctx, userTasksKey)
+
+    return nil
+}
+```
+
+### Cache Invalidation Strategies
+
+#### Write-Through Caching
+```go
+func (r *TaskRepository) CreateTask(ctx context.Context, task *Task) error {
+    // Update database
+    err := r.db.CreateTask(ctx, task)
+    if err != nil {
+        return err
+    }
+
+    // Update cache synchronously
+    cacheKey := fmt.Sprintf("task:%s:%s", task.UserID, task.ID)
+    taskJSON, _ := json.Marshal(task)
+    r.cache.Set(ctx, cacheKey, taskJSON, 5*time.Minute)
+
+    return nil
+}
+```
+
+#### Manual Invalidation
+```go
+func (s *TaskService) DeleteTask(ctx context.Context, userID, taskID string) error {
+    // Delete from database
+    if err := s.repository.DeleteTask(ctx, userID, taskID); err != nil {
+        return err
+    }
+
+    // Invalidate all related caches
+    s.cache.InvalidateTask(ctx, userID, taskID)
+    s.cache.InvalidateUserTasks(ctx, userID)
+    s.cache.InvalidatePrioritizedTasks(ctx, userID)
+
+    return nil
+}
+```
+
+### Cache Performance Monitoring
+
+**Metrics to Track**:
+- Cache hit rate (target: >80%)
+- Cache miss rate
+- Average cache response time
+- Cache memory usage
+- Cache eviction rate
+
+**Monitoring Implementation**:
+```go
+// Cache metrics
+var (
+    cacheHits = prometheus.NewCounterVec(
+        prometheus.CounterOpts{
+            Name: "cache_hits_total",
+            Help: "Total number of cache hits",
+        },
+        []string{"cache_type"},
+    )
+    
+    cacheMisses = prometheus.NewCounterVec(
+        prometheus.CounterOpts{
+            Name: "cache_misses_total",
+            Help: "Total number of cache misses",
+        },
+        []string{"cache_type"},
+    )
+)
+
+func (c *CacheRepository) Get(ctx context.Context, key string) ([]byte, error) {
+    data, err := c.client.Get(ctx, key).Bytes()
+    if err == nil && data != nil {
+        cacheHits.WithLabelValues("redis").Inc()
+        return data, nil
+    }
+    
+    cacheMisses.WithLabelValues("redis").Inc()
+    return nil, err
+}
+```
+
+---
+
 ## Conclusion
 
 This quality and reliability framework ensures the Advanced Task Manager backend meets production-grade standards while operating within free-tier constraints. The implementation should be iterative, starting with MVP requirements and gradually adding advanced features as the system grows.

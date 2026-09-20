@@ -1,4 +1,4 @@
-# Test-Driven Development (TDD) Guidelines
+# Test-Driven Development Guidelines
 ## Advanced Task Manager
 
 **Version**: 1.0  
@@ -419,10 +419,10 @@ tests/
 ### 3.3 Test Naming Conventions
 
 #### Frontend (Vitest)
-Use descriptive test names that read like requirements. See examples in [Frontend Testing Examples](docs/testing/frontend-examples.md).
+Use descriptive test names that read like requirements. See examples in [Frontend Testing Examples](../testing/frontend-examples.md).
 
 #### Backend (Go)
-Use table-driven tests for multiple scenarios. See examples in [Backend Testing Examples](docs/testing/backend-examples.md).
+Use table-driven tests for multiple scenarios. See examples in [Backend Testing Examples](../testing/backend-examples.md).
 
 ---
 
@@ -487,12 +487,12 @@ All helper functions MUST have comprehensive tests with 93%+ coverage (critical 
 #### Testing Examples
 
 See detailed testing examples in:
-- [Backend Testing Examples](docs/testing/backend-examples.md)
-- [Frontend Testing Examples](docs/testing/frontend-examples.md)
+- [Backend Testing Examples](../testing/backend-examples.md)
+- [Frontend Testing Examples](../testing/frontend-examples.md)
 
 ### 4.4 API Response Format Testing
 
-All API endpoints MUST return responses in the standard format defined in [API Standard Response Format](docs/api/standard-response-format.md).
+All API endpoints MUST return responses in the standard format defined in [API Standard Response Format](../api/standard-response-format.md).
 
 #### Required Response Tests
 
@@ -505,8 +505,8 @@ All API endpoints MUST return responses in the standard format defined in [API S
 #### Testing Examples
 
 See detailed response format testing examples in:
-- [Backend Response Format Tests](docs/testing/backend-examples.md#response-format-tests)
-- [Frontend Response Format Tests](docs/testing/frontend-examples.md#api-response-format-tests)
+- [Backend Response Format Tests](../testing/backend-examples.md#response-format-tests)
+- [Frontend Response Format Tests](../testing/frontend-examples.md#api-response-format-tests)
 
 ### 4.5 Coverage Requirements (Hierarchical Strategy)
 
@@ -580,7 +580,7 @@ This tool:
 
 ### 5.1 Component Testing with Testing Library
 
-Component testing should follow Testing Library best practices. See detailed examples in [Frontend Testing Examples](docs/testing/frontend-examples.md#component-tests).
+Component testing should follow Testing Library best practices. See detailed examples in [Frontend Testing Examples](../testing/frontend-examples.md#component-tests).
 
 #### Rules
 - Test user behavior, not implementation details
@@ -591,19 +591,19 @@ Component testing should follow Testing Library best practices. See detailed exa
 
 ### 5.2 Store Testing
 
-Store testing should verify state management logic. See examples in [Frontend Testing Examples](docs/testing/frontend-examples.md#store-tests).
+Store testing should verify state management logic. See examples in [Frontend Testing Examples](../testing/frontend-examples.md#store-tests).
 
 ### 5.3 Utility Function Testing
 
-Utility function testing should cover edge cases and error scenarios. See examples in [Frontend Testing Examples](docs/testing/frontend-examples.md#utility-function-tests).
+Utility function testing should cover edge cases and error scenarios. See examples in [Frontend Testing Examples](../testing/frontend-examples.md#utility-function-tests).
 
 ### 5.4 API Client Testing
 
-API client testing should mock HTTP requests and responses. See examples in [Frontend Testing Examples](docs/testing/frontend-examples.md#api-client-tests).
+API client testing should mock HTTP requests and responses. See examples in [Frontend Testing Examples](../testing/frontend-examples.md#api-client-tests).
 
 ### 5.5 E2E Testing with Playwright
 
-E2E tests should cover critical user journeys. See detailed examples in [Frontend Testing Examples](docs/testing/frontend-examples.md#e2e-tests).
+E2E tests should cover critical user journeys. See detailed examples in [Frontend Testing Examples](../testing/frontend-examples.md#e2e-tests).
 
 #### Required E2E Test Scenarios
 - User authentication flow (Google OAuth)
@@ -619,7 +619,7 @@ E2E tests should cover critical user journeys. See detailed examples in [Fronten
 
 ### 6.1 Unit Testing
 
-Backend unit tests should follow Go testing best practices. See detailed examples in [Backend Testing Examples](docs/testing/backend-examples.md).
+Backend unit tests should follow Go testing best practices. See detailed examples in [Backend Testing Examples](../testing/backend-examples.md).
 
 #### Required Unit Test Categories
 - Domain entity tests (entities, value objects)
@@ -631,7 +631,7 @@ Backend unit tests should follow Go testing best practices. See detailed example
 
 ### 6.2 Integration Testing
 
-Integration tests should test the interaction between components. See detailed examples in [Backend Testing Examples](docs/testing/backend-examples.md#integration-tests).
+Integration tests should test the interaction between components. See detailed examples in [Backend Testing Examples](../testing/backend-examples.md#integration-tests).
 
 #### Required Integration Test Categories
 - API endpoint integration tests
@@ -642,10 +642,10 @@ Integration tests should test the interaction between components. See detailed e
 ### 6.3 Testing Patterns
 
 #### Table-Driven Tests
-Use table-driven tests for multiple scenarios. See examples in [Backend Testing Examples](docs/testing/backend-examples.md#table-driven-tests).
+Use table-driven tests for multiple scenarios. See examples in [Backend Testing Examples](../testing/backend-examples.md#table-driven-tests).
 
 #### Mocking
-Use Testify for mocking dependencies. See examples in [Backend Testing Examples](docs/testing/backend-examples.md#mocking-with-testify).
+Use Testify for mocking dependencies. See examples in [Backend Testing Examples](../testing/backend-examples.md#mocking-with-testify).
 
 ---
 
@@ -654,12 +654,12 @@ Use Testify for mocking dependencies. See examples in [Backend Testing Examples]
 ### 7.1 Fixtures
 
 Use fixtures for consistent test data. See examples in:
-- [Frontend Fixtures](docs/testing/frontend-examples.md#fixtures)
-- [Backend Fixtures](docs/testing/backend-examples.md#fixtures)
+- [Frontend Fixtures](../testing/frontend-examples.md#fixtures)
+- [Backend Fixtures](../testing/backend-examples.md#fixtures)
 
 ### 7.2 Test Database Setup
 
-Test database setup MUST use `taskmanager_db_testing`. See detailed setup in [Backend Testing Examples](docs/testing/backend-examples.md#test-database-setup).
+Test database setup MUST use `taskmanager_db_testing`. See detailed setup in [Backend Testing Examples](../testing/backend-examples.md#test-database-setup).
 
 ---
 
@@ -677,19 +677,19 @@ All testing environments MUST use the following database naming convention:
 
 ### 8.2 Database Verification
 
-Tests must verify they are using the correct database. See implementation in [Backend Testing Examples](docs/testing/backend-examples.md#test-database-setup).
+Tests must verify they are using the correct database. See implementation in [Backend Testing Examples](../testing/backend-examples.md#test-database-setup).
 
 ### 8.3 Environment Configuration
 
-Set the test database name via environment variable. See examples in [GitHub Actions Documentation](docs/ci-cd/github-actions.md#environment-configuration).
+Set the test database name via environment variable. See examples in [GitHub Actions Documentation](../ci-cd/github-actions.md#environment-configuration).
 
 ### 8.4 CI/CD Configuration
 
-GitHub Actions configuration for test database. See full configuration in [GitHub Actions Documentation](docs/ci-cd/github-actions.md).
+GitHub Actions configuration for test database. See full configuration in [GitHub Actions Documentation](../ci-cd/github-actions.md).
 
 ### 8.5 Connection String Examples
 
-Connection strings for different environments. See examples in [GitHub Actions Documentation](docs/ci-cd/github-actions.md).
+Connection strings for different environments. See examples in [GitHub Actions Documentation](../ci-cd/github-actions.md).
 
 ---
 
@@ -698,8 +698,8 @@ Connection strings for different environments. See examples in [GitHub Actions D
 ### 9.1 OWASP Top 10 Coverage
 
 Security tests must cover OWASP Top 10 vulnerabilities. See detailed examples in:
-- [Backend Security Tests](docs/testing/backend-examples.md#security-tests)
-- [Frontend Security Tests](docs/testing/frontend-examples.md#security-tests)
+- [Backend Security Tests](../testing/backend-examples.md#security-tests)
+- [Frontend Security Tests](../testing/frontend-examples.md#security-tests)
 
 #### Required Security Tests
 - SQL injection prevention
@@ -711,7 +711,7 @@ Security tests must cover OWASP Top 10 vulnerabilities. See detailed examples in
 
 ### 9.2 Security Scanning
 
-Security scanning is automated in CI/CD. See configuration in [GitHub Actions Documentation](docs/ci-cd/github-actions.md#security).
+Security scanning is automated in CI/CD. See configuration in [GitHub Actions Documentation](../ci-cd/github-actions.md#security).
 
 #### Security Tools
 - Snyk (dependency scanning)
@@ -725,7 +725,7 @@ Security scanning is automated in CI/CD. See configuration in [GitHub Actions Do
 
 ### 10.1 Load Testing
 
-Load testing ensures performance under stress. See configuration in [GitHub Actions Documentation](docs/ci-cd/github-actions.md#performance-testing).
+Load testing ensures performance under stress. See configuration in [GitHub Actions Documentation](../ci-cd/github-actions.md#performance-testing).
 
 #### Performance Requirements
 - API response time < 200ms (p95)
@@ -734,13 +734,13 @@ Load testing ensures performance under stress. See configuration in [GitHub Acti
 
 ### 10.2 Frontend Performance
 
-Frontend performance is monitored via Lighthouse CI. See configuration in [GitHub Actions Documentation](docs/ci-cd/github-actions.md#performance-budgets).
+Frontend performance is monitored via Lighthouse CI. See configuration in [GitHub Actions Documentation](../ci-cd/github-actions.md#performance-budgets).
 
 ---
 
 ## 11. CI/CD Integration
 
-CI/CD pipeline configuration and setup. See complete documentation in [GitHub Actions Documentation](docs/ci-cd/github-actions.md).
+CI/CD pipeline configuration and setup. See complete documentation in [GitHub Actions Documentation](../ci-cd/github-actions.md).
 
 ### 11.1 Pipeline Stages
 
@@ -761,11 +761,11 @@ CI/CD pipeline configuration and setup. See complete documentation in [GitHub Ac
 
 ### 11.2 Coverage Enforcement
 
-Coverage thresholds are enforced in CI/CD. See configuration in [GitHub Actions Documentation](docs/ci-cd/github-actions.md#coverage-configuration).
+Coverage thresholds are enforced in CI/CD. See configuration in [GitHub Actions Documentation](../ci-cd/github-actions.md#coverage-configuration).
 
 ### 11.3 Pre-commit Hooks
 
-Pre-commit hooks configuration. See detailed setup in [GitHub Actions Documentation](docs/ci-cd/github-actions.md#pre-commit-hooks).
+Pre-commit hooks configuration. See detailed setup in [GitHub Actions Documentation](../ci-cd/github-actions.md#pre-commit-hooks).
 
 ---
 
@@ -846,11 +846,11 @@ Pre-commit hooks configuration. See detailed setup in [GitHub Actions Documentat
 
 ### 14.3 Coverage Analysis Tools
 
-Coverage analysis tools and configuration. See detailed setup in [GitHub Actions Documentation](docs/ci-cd/github-actions.md#coverage-analysis-tools).
+Coverage analysis tools and configuration. See detailed setup in [GitHub Actions Documentation](../ci-cd/github-actions.md#coverage-analysis-tools).
 
 ### 14.4 Coverage Enforcement
 
-Coverage threshold enforcement scripts and configuration. See detailed setup in [GitHub Actions Documentation](docs/ci-cd/github-actions.md#coverage-enforcement).
+Coverage threshold enforcement scripts and configuration. See detailed setup in [GitHub Actions Documentation](../ci-cd/github-actions.md#coverage-enforcement).
 
 ---
 

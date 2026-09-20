@@ -560,6 +560,102 @@ func main() {
 }
 ```
 
+## Component Interactions
+
+### Backend Request Flow
+
+The backend follows a layered request flow:
+
+```
+HTTP Request → Nginx → Chi Router → Middleware → Handler → Service → Repository → Database
+                              ↓                                 ↓
+                         Auth/Rate Limit                        SQLBoiler
+                              ↓                                 ↓
+                         Validation                          PostgreSQL
+```
+
+#### Layer Responsibilities
+
+1. **Nginx Layer**
+   - Reverse proxy functionality
+   - SSL/TLS termination
+   - Rate limiting (global and per-user)
+   - Load balancing (future scaling)
+
+2. **Chi Router Layer**
+   - Route matching and dispatching
+   - HTTP method validation
+   - Path parameter extraction
+   - Query string parsing
+
+3. **Middleware Layer**
+   - Authentication: JWT token validation
+   - Authorization: User permission checks
+   - Logging: Request/response logging
+   - CORS: Cross-origin resource sharing
+   - Request ID: Unique identifier generation
+
+4. **Handler Layer**
+   - Request validation (input validation)
+   - Response formatting (standard format)
+   - Error handling (proper status codes)
+   - Business logic delegation to services
+
+5. **Service Layer**
+   - Business logic orchestration
+   - Domain operations coordination
+   - Transaction management
+   - Domain event publishing
+
+6. **Repository Layer**
+   - Data access operations
+   - SQL query execution via SQLBoiler
+   - Result mapping to domain entities
+   - Transaction handling
+
+7. **Database Layer**
+   - PostgreSQL data persistence
+   - Query execution and optimization
+   - Transaction management
+   - Data integrity enforcement
+
+### Data Flow Examples
+
+#### Task Creation Flow
+```
+User → Frontend → API Client → Backend API → PostgreSQL → Redis
+                              ↓                              ↓
+                         Priority Calc                   Cache
+```
+
+1. **User Action**: User fills task creation form
+2. **Frontend Validation**: Frontend validates form (Zod schema)
+3. **API Request**: Frontend sends POST `/api/v1/tasks` with task data
+4. **Backend Validation**: Backend validates request (input validation, business rules)
+5. **Priority Calculation**: Backend calculates priority score using smart algorithm
+6. **Database Storage**: Backend stores task in PostgreSQL with generated UUID
+7. **Cache Update**: Backend caches task in Redis for quick retrieval
+8. **Response**: Backend returns standardized response with task data
+9. **UI Update**: Frontend updates UI with new task data
+
+#### Authentication Flow
+```
+User → Frontend → Google OAuth → Supabase Auth → Backend → JWT Token
+                ↑                                           ↓
+                └───────────────────────────────────────────┘
+```
+
+1. **User Action**: User clicks "Login with Google" button
+2. **Frontend Redirect**: Frontend redirects to Google OAuth consent screen
+3. **Google OAuth**: User authenticates with Google, grants permissions
+4. **OAuth Callback**: Google OAuth redirects back with authorization code
+5. **Frontend Request**: Frontend sends POST `/api/v1/auth/google` with authorization code
+6. **Backend Validation**: Backend validates code with Google OAuth API
+7. **User Creation/Update**: Backend creates or updates user in PostgreSQL
+8. **Token Generation**: Backend generates JWT access token (15min) and refresh token (7 days)
+9. **Token Response**: Backend returns tokens to frontend in standard response format
+10. **Token Storage**: Frontend stores tokens securely in httpOnly cookies
+
 ## Best Practices
 
 1. **Domain First**: Start with domain entities and value objects

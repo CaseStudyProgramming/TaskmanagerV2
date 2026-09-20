@@ -678,6 +678,131 @@ task-create/
 - **Clear separation of concerns**
 - **Easy to add/remove features**
 
+## Component Interactions
+
+### Frontend Request Flow
+
+The frontend follows a layered request flow:
+
+```
+User Action → Component → Store → API Client → HTTP Request → Response Parser → State Update
+                    ↓           ↓           ↓              ↓                 ↓
+                 Validation  State Mgmt  Standard Format  Error Handling   UI Update
+```
+
+#### Layer Responsibilities
+
+1. **Component Layer**
+   - User interaction handling
+   - UI rendering and updates
+   - Event emission and handling
+   - Form validation display
+
+2. **Store Layer**
+   - State management
+   - Business logic implementation
+   - State persistence (localStorage)
+   - Reactivity management
+
+3. **API Client Layer**
+   - HTTP request construction
+   - Authentication token management
+   - Request/response interception
+   - Error handling and retry logic
+
+4. **HTTP Request Layer**
+   - Network communication
+   - Request/response handling
+   - Timeout management
+   - Retry logic for failed requests
+
+5. **Response Parser Layer**
+   - Standard response format parsing
+   - Error extraction and handling
+   - Data extraction and typing
+   - Meta information processing
+
+6. **State Update Layer**
+   - Store state updates
+   - Reactivity triggers
+   - Component re-rendering
+   - UI updates
+
+### Offline Data Flow
+
+The frontend supports offline operations with a dedicated data flow:
+
+```
+User Action → Component → IndexedDB → Optimistic UI → Sync Queue → Background Sync
+                    ↓           ↓             ↓              ↓               ↓
+                 Validation  Local Store   UI Update     Queue Mgmt     Network Monitor
+```
+
+#### Layer Responsibilities
+
+1. **Component Layer**
+   - User interaction handling
+   - Offline status display
+   - Form validation
+   - Optimistic UI updates
+
+2. **IndexedDB Layer**
+   - Local data storage
+   - Data retrieval and querying
+   - Transaction management
+   - Schema versioning
+
+3. **Optimistic UI Layer**
+   - Immediate UI updates
+   - Error rollback on failure
+   - Loading states management
+   - Success/error feedback
+
+4. **Sync Queue Layer**
+   - Operation queuing
+   - Queue ordering (FIFO)
+   - Retry logic with backoff
+   - Conflict detection
+
+5. **Background Sync Layer**
+   - Network status monitoring
+   - Queue processing triggers
+   - Batch operation optimization
+   - Error handling and recovery
+
+### Data Flow Examples
+
+#### Task Creation Flow (Online)
+```
+User → Frontend → API Client → Backend API → PostgreSQL → Redis
+                              ↓                              ↓
+                         Priority Calc                   Cache
+```
+
+1. **User Action**: User fills task creation form
+2. **Frontend Validation**: Frontend validates form using Zod schema
+3. **API Request**: Frontend sends POST `/api/v1/tasks` with task data
+4. **Backend Processing**: Backend validates, calculates priority, stores in database
+5. **Cache Update**: Backend caches task in Redis
+6. **Response**: Backend returns standardized response
+7. **UI Update**: Frontend updates UI with new task
+
+#### Task Creation Flow (Offline)
+```
+User → Frontend → IndexedDB → Sync Queue → API (when online)
+```
+
+1. **User Action**: User fills task creation form
+2. **Frontend Validation**: Frontend validates form using Zod schema
+3. **Local Storage**: Frontend stores task in IndexedDB
+4. **Sync Queue**: Frontend adds task to sync queue
+5. **UI Update**: Frontend updates UI with new task (optimistic)
+6. **Network Monitor**: Service Worker monitors network status
+7. **Online Detection**: When connection restored, sync triggers
+8. **Queue Processing**: Frontend processes sync queue
+9. **API Sync**: Frontend sends queued tasks to API
+10. **ID Update**: Backend returns server IDs, frontend updates local data
+
 ## Best Practices
 
 1. **Feature First**: Organize by feature, not by type

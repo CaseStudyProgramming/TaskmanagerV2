@@ -232,6 +232,8 @@ Tag Weight: SUM(tag_weights) (max 15)
 
 ### 6.1 Technology Stack
 
+> **Note**: For specific version requirements, see [Dependency Versions](./dependencies.md)
+
 #### Frontend
 - **Framework**: SvelteKit
 - **Language**: TypeScript (strict mode)
@@ -243,11 +245,11 @@ Tag Weight: SUM(tag_weights) (max 15)
 - **Testing**: Vitest, Playwright (E2E)
 
 #### Backend
-- **Language**: Go 1.25+
+- **Language**: Go
 - **Framework**: Chi (idiomatic HTTP router)
 - **Architecture**: Domain-Driven Design (DDD) + Vertical Slices
 - **ORM**: SQLBoiler
-- **API Spec**: OpenAPI 3.0+ (oapi-codegen 2.80+)
+- **API Spec**: OpenAPI (oapi-codegen)
 - **Validation**: Go validator
 - **Crypto**: Standard library crypto packages
 
@@ -260,7 +262,7 @@ Tag Weight: SUM(tag_weights) (max 15)
 - **CI/CD**: GitHub Actions
 
 #### Development
-- **Node.js**: v24.20.0 (must be used across development, production, and testing environments)
+- **Node.js**: See dependencies.md for version requirements
 - **Package Manager**: bun
 - **Version Control**: Git
 - **API Documentation**: OpenAPI/Swagger
@@ -367,6 +369,7 @@ CREATE TABLE sessions (
 - **Testing Database**: `taskmanager_db_testing` (mandatory for all test environments)
 - **Local Development**: `taskmanager_db_dev`
 - **Migration files**: Use timestamp-based naming (`YYYYMMDDHHMMSS_description.sql`)
+- **Database Version**: PostgreSQL (see dependencies.md for version requirements)
 
 ### 6.4 API Architecture
 
@@ -385,8 +388,8 @@ CREATE TABLE sessions (
 - `GET /api/v1/tasks/prioritize` - Get prioritized tasks
 
 #### OpenAPI Specification
-- All endpoints documented in OpenAPI 3.0+
-- Code generation using oapi-codegen 2.80+
+- All endpoints documented in OpenAPI
+- Code generation using oapi-codegen
 - Type-safe client generation
 
 #### Standard API Response Format
@@ -719,30 +722,28 @@ Benefits:
 
 ### 7.1 Free Tier Architecture
 
+> **Note**: For specific version requirements and platform limits, see [Dependency Versions](./dependencies.md)
+
 #### Platform Selection
 - **Frontend**: Vercel (Free tier)
-  - Node.js v24.20.0 runtime
-  - 100GB bandwidth/month
+  - Node.js runtime (see dependencies.md for version)
+  - Bandwidth/month (see dependencies.md for limits)
   - Unlimited deployments
   - Global edge network
   - Automatic HTTPS
 
 - **Backend**: Koyeb (Free tier)
-  - 512MB RAM
-  - 0.5 vCPU
-  - 1GB persistent storage
+  - RAM, vCPU, storage (see dependencies.md for limits)
   - Auto-scaling available
   - Global deployment
 
 - **Database**: Supabase (Free tier)
-  - 500MB PostgreSQL database
-  - 50,000 Monthly Active Users
-  - 1GB file storage
+  - PostgreSQL database (see dependencies.md for version)
+  - Database and storage limits (see dependencies.md)
   - Real-time subscriptions
 
 - **Redis**: Upstash (Free tier)
-  - 10,000 commands/day
-  - 256MB storage
+  - Commands/day and storage limits (see dependencies.md)
   - Global edge Redis
   - REST API
 
@@ -803,10 +804,10 @@ Benefits:
 8. **Deploy** (Vercel, Koyeb)
 
 #### Environment Configuration
-- **Development**: Node.js v24.20.0 (local development)
-- **Testing**: Node.js v24.20.0 (CI/CD, test environments)
-- **Production**: Node.js v24.20.0 (Vercel deployment)
-- **Consistency**: Same Node.js version across all environments to ensure consistency
+- **Development**: Node.js (see dependencies.md for version requirements)
+- **Testing**: Node.js (see dependencies.md for version requirements)
+- **Production**: Node.js (see dependencies.md for version requirements)
+- **Consistency**: Same Node.js version across all environments (see dependencies.md)
 
 ---
 
@@ -848,7 +849,7 @@ Benefits:
 - **API**: Postman/Newman, httpexpect
 - **Security**: OWASP ZAP, Snyk
 - **Performance**: Lighthouse, k6
-- **Runtime**: Node.js v24.20.0 (consistent across development, testing, and production)
+- **Runtime**: Node.js (see dependencies.md for version requirements)
 
 ### 9.3 Test Categories
 - Unit tests (functions, components)
@@ -859,10 +860,10 @@ Benefits:
 - Performance tests (load, stress)
 
 ### 9.4 Testing Environment
-- **Runtime Environment**: Node.js v24.20.0
+- **Runtime Environment**: Node.js (see dependencies.md for version requirements)
 - **Testing Database**: `taskmanager_db_testing` (mandatory for all test environments)
 - **Test Isolation**: Each test runs in isolated environment
-- **Consistency**: Same Node.js version as development and production
+- **Consistency**: Same Node.js version as development and production (see dependencies.md)
 
 ---
 

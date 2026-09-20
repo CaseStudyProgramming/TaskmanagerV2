@@ -4,6 +4,8 @@
 
 This document specifies the exact dependency versions for the Advanced Task Manager project's backend and frontend. All versions are the latest stable releases as of September 2025, ensuring compatibility, security, and performance.
 
+**Important**: This is the single source of truth for all version requirements. The PRD document contains only technology names without version details - always refer to this document for specific version requirements.
+
 ---
 
 ## Frontend Dependencies
@@ -149,7 +151,7 @@ This document specifies the exact dependency versions for the Advanced Task Mana
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| **Go** | 1.25+ | Programming language |
+| **Go** | 1.27+ | Programming language |
 | **Chi** | ^5.1.0 | Idiomatic HTTP router |
 | **Standard Library** | Go 1.25+ | Built-in packages (crypto, http, etc.) |
 
@@ -165,7 +167,7 @@ This document specifies the exact dependency versions for the Advanced Task Mana
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| **oapi-codegen** | ^2.5.0 | OpenAPI 3.0+ code generation |
+| **oapi-codegen** | ^2.80+ | OpenAPI 3.1+ code generation |
 
 ### Validation
 
@@ -224,7 +226,7 @@ This document specifies the exact dependency versions for the Advanced Task Mana
 ```go
 module github.com/yourusername/taskmanager-backend
 
-go 1.25
+go 1.27
 
 require (
     github.com/go-chi/chi/v5 v5.1.0
@@ -266,6 +268,16 @@ require (
 | **PostgreSQL** | 16.x | Primary database (via Supabase) |
 | **Redis** | 7.x | Caching layer (via Upstash) |
 
+### Database Limits (Free Tier)
+
+| Service | Resource | Limit |
+|---------|----------|-------|
+| **Supabase** | PostgreSQL database | 500MB |
+| **Supabase** | Monthly Active Users | 50,000 |
+| **Supabase** | File storage | 1GB |
+| **Upstash** | Commands/day | 10,000 |
+| **Upstash** | Storage | 256MB |
+
 ### Reverse Proxy
 
 | Dependency | Version | Purpose |
@@ -292,6 +304,17 @@ require (
 | Dependency | Version | Purpose |
 |------------|---------|---------|
 | **GitHub Actions** | Latest | CI/CD automation |
+
+### Platform Limits (Free Tier)
+
+| Platform | Resource | Limit |
+|----------|----------|-------|
+| **Vercel** | Bandwidth/month | 100GB |
+| **Vercel** | Node.js runtime | See Node.js version in Frontend Dependencies |
+| **Koyeb** | RAM | 512MB |
+| **Koyeb** | vCPU | 0.5 |
+| **Koyeb** | Persistent storage | 1GB |
+| **Grafana** | Cloud Grafana | Free tier |
 
 ---
 
@@ -605,8 +628,8 @@ jobs:
 
 | Component | Frontend | Backend | Infrastructure |
 |-----------|----------|---------|----------------|
-| Node.js | 24.20.0 (development, testing, production) | N/A | N/A |
-| Go | N/A | 1.25+ | N/A |
+| Node.js | 24.20.0  | N/A | N/A |
+| Go | N/A | 1.27+ | N/A |
 | PostgreSQL | N/A | Compatible with 16.x | 16.x |
 | Redis | N/A | Compatible with 7.x | 7.x |
 
@@ -831,6 +854,224 @@ go mod verify
 - [Supabase Documentation](https://supabase.com/docs)
 - [Upstash Documentation](https://upstash.com/docs)
 - [Container Strategy](../architecture/container-strategy.md) - Container platform strategy
+
+---
+
+## Technology Decision Rationale
+
+This section explains the rationale behind key technology choices, including the trade-offs and benefits considered during the selection process.
+
+### Frontend Technology Choices
+
+#### SvelteKit
+**Rationale**: 
+- Excellent performance with small bundle sizes
+- Built-in routing and server-side rendering
+- Great developer experience with hot module replacement
+- Growing ecosystem and community support
+
+**Trade-offs**:
+- Smaller ecosystem compared to React
+- Fewer third-party libraries
+- Steeper learning curve for developers unfamiliar with Svelte
+
+#### TypeScript (Strict Mode)
+**Rationale**:
+- Type safety catches errors at compile time
+- Better IDE support with autocomplete and refactoring
+- Improved code maintainability
+- Industry standard for large-scale applications
+
+**Trade-offs**:
+- Additional build step
+- More verbose code compared to JavaScript
+- Initial learning curve for team
+
+#### Tailwind CSS
+**Rationale**:
+- Utility-first approach for rapid development
+- Small bundle size with tree shaking
+- Consistent design system
+- Easy customization and theming
+
+**Trade-offs**:
+- HTML can become verbose with utility classes
+- Initial setup and configuration
+- Less traditional CSS approach
+
+#### Biome.js
+**Rationale**:
+- Faster than ESLint/Prettier combination
+- Single tool for linting and formatting
+- Modern JavaScript/TypeScript support
+- Active development and improvement
+
+**Trade-offs**:
+- Newer tool, less mature ecosystem
+- Fewer plugins compared to ESLint
+- Breaking changes between versions
+
+### Backend Technology Choices
+
+#### Go Language
+**Rationale**:
+- Excellent performance and concurrency
+- Strong typing and compile-time error checking
+- Built-in comprehensive standard library
+- Great for microservices and cloud-native applications
+- Easy deployment with single binary
+
+**Trade-offs**:
+- Steeper learning curve compared to interpreted languages
+- Less expressive than dynamically typed languages
+- Smaller ecosystem compared to JavaScript/Python
+- Verbosity for some operations
+
+#### Chi Router
+**Rationale**:
+- Idiomatic Go router following Go standard library patterns
+- Lightweight and fast
+- Composable middleware
+- No external dependencies
+- Excellent documentation
+
+**Trade-offs**:
+- Fewer built-in features compared to larger frameworks
+- Less community support compared to Gin or Echo
+- Manual implementation for some common features
+
+#### SQLBoiler
+**Rationale**:
+- Type-safe database operations
+- Code generation reduces boilerplate
+- Excellent performance
+- Support for complex queries
+- Active maintenance
+
+**Trade-offs**:
+- Generated code can be verbose
+- Requires code generation step
+- Less flexibility compared to raw SQL
+- Learning curve for template system
+
+#### OpenAPI + oapi-codegen
+**Rationale**:
+- API-first design approach
+- Type-safe client generation
+- Single source of truth for API contract
+- Automatic documentation
+- Industry standard
+
+**Trade-offs**:
+- Additional build step
+- Schema changes require regeneration
+- Less flexibility for dynamic APIs
+- Overhead for simple APIs
+
+### Infrastructure Technology Choices
+
+#### Supabase (PostgreSQL)
+**Rationale**:
+- Managed PostgreSQL with built-in features
+- Built-in authentication (Google OAuth)
+- Real-time subscriptions
+- Generous free tier
+- Easy to use and quick setup
+
+**Trade-offs**:
+- Vendor lock-in
+- Free tier limitations
+- Less control compared to self-hosted
+- Potential pricing changes
+
+#### Upstash (Redis)
+**Rationale**:
+- Managed Redis with global edge network
+- Generous free tier
+- REST API for easy integration
+- Global low latency
+- Easy setup
+
+**Trade-offs**:
+- Vendor lock-in
+- Free tier command limits
+- Less control compared to self-hosted
+- Potential pricing changes
+
+#### Vercel (Frontend Hosting)
+**Rationale**:
+- Excellent developer experience
+- Global CDN with edge network
+- Automatic HTTPS
+- Generous free tier
+- Built-in preview deployments
+
+**Trade-offs**:
+- Vendor lock-in
+- Free tier limitations
+- Less control compared to self-hosted
+- Potential pricing changes
+
+#### Koyeb (Backend Hosting)
+**Rationale**:
+- Container-based deployment
+- Global deployment
+- Generous free tier
+- Built-in scaling
+- Easy Docker integration
+
+**Trade-offs**:
+- Vendor lock-in
+- Newer platform, smaller ecosystem
+- Free tier limitations
+- Potential pricing changes
+
+### Development Tool Choices
+
+#### Bun (Package Manager)
+**Rationale**:
+- Faster than npm/yarn
+- Native TypeScript support
+- All-in-one tool (package manager, test runner, bundler)
+- Modern and actively developed
+- Compatible with npm ecosystem
+
+**Trade-offs**:
+- Newer tool, less mature
+- Smaller ecosystem
+- Potential compatibility issues
+- Learning curve for team
+
+#### Docker/Podman (Containerization)
+**Rationale**:
+- Consistent development environment
+- Easy deployment
+- Industry standard
+- Great for microservices
+- Cross-platform compatibility
+
+**Trade-offs**:
+- Resource overhead
+- Learning curve
+- Additional complexity for simple applications
+- Security considerations
+
+### Decision Summary
+
+| Technology | Primary Benefit | Key Trade-off | Mitigation |
+|-------------|-----------------|---------------|------------|
+| SvelteKit | Performance, DX | Smaller ecosystem | Use standard web APIs |
+| TypeScript | Type safety | Verbosity | Strict mode enforcement |
+| Tailwind CSS | Rapid development | Verbose HTML | Component abstraction |
+| Biome.js | Performance | Newer tool | Gradual adoption |
+| Go | Performance, concurrency | Learning curve | Training and documentation |
+| Chi | Idiomatic, lightweight | Fewer features | Custom middleware |
+| SQLBoiler | Type-safe | Generated code | Code review standards |
+| Supabase | Managed features | Vendor lock-in | Standard technologies |
+| Upstash | Global Redis | Command limits | Caching strategy |
+| Vercel | DX, CDN | Vendor lock-in | Standard deployment |
+| Koyeb | Container hosting | Newer platform | Monitoring and backup |
+| Bun | Performance | Newer tool | npm fallback |
 
 ---
 
