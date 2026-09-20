@@ -17,7 +17,8 @@ docs/
 │   └── container-strategy.md   # Container platform strategy
 ├── api/                         # API documentation
 │   ├── openapi.yaml             # OpenAPI 3.1 specification
-│   └── standard-response-format.md  # API response format
+│   ├── standard-response-format.md  # API response format
+│   └── API_VALIDATION.md        # API validation rules and guidelines
 ├── testing/                     # Testing documentation
 │   ├── backend-examples.md     # Backend testing examples
 │   └── frontend-examples.md    # Frontend testing examples
@@ -44,6 +45,7 @@ docs/
 ### API
 - [OpenAPI 3.1 Specification](./api/openapi.yaml) - Complete API contract
 - [Standard Response Format](./api/standard-response-format.md) - API response specification
+- [API Validation](./api/API_VALIDATION.md) - API validation rules and guidelines
 
 ### Testing
 - [Backend Testing Examples](./testing/backend-examples.md) - Go testing examples
