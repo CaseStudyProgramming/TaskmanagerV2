@@ -25,56 +25,7 @@ src/app/
     └── global.css                 # Global styles
 ```
 
-#### Auth Provider Example
-```typescript
-// src/app/providers/auth-provider.svelte
-import { writable } from 'svelte/store';
-import { browser } from '$app/environment';
 
-interface AuthState {
-  isAuthenticated: boolean;
-  user: User | null;
-  token: string | null;
-}
-
-function createAuthStore() {
-  const { subscribe, set, update } = writable<AuthState>({
-    isAuthenticated: false,
-    user: null,
-    token: null,
-  });
-
-  return {
-    subscribe,
-    login: (user: User, token: string) => {
-      if (browser) {
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-      }
-      set({ isAuthenticated: true, user, token });
-    },
-    logout: () => {
-      if (browser) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      }
-      set({ isAuthenticated: false, user: null, token: null });
-    },
-    init: () => {
-      if (browser) {
-        const token = localStorage.getItem('token');
-        const userStr = localStorage.getItem('user');
-        if (token && userStr) {
-          const user = JSON.parse(userStr);
-          set({ isAuthenticated: true, user, token });
-        }
-      }
-    },
-  };
-}
-
-export const auth = createAuthStore();
-```
 
 ### 2. Pages Layer
 
@@ -107,32 +58,7 @@ src/pages/
         └── index.ts
 ```
 
-#### Page Example
-```svelte
-<!-- src/pages/tasks/list/ui/TaskListPage.svelte -->
-<script lang="ts">
-  import { onMount } from 'svelte';
-  import { taskStore } from '$features/task-list/model';
-  import TaskList from '$widgets/task-list/TaskList.svelte';
-  import TaskFilter from '$features/task-filter/ui/TaskFilter.svelte';
-  import CreateTaskButton from '$features/task-create/ui/CreateTaskButton.svelte';
 
-  onMount(() => {
-    taskStore.loadTasks();
-  });
-</script>
-
-<div class="task-list-page">
-  <header>
-    <h1>My Tasks</h1>
-    <CreateTaskButton />
-  </header>
-
-  <TaskFilter />
-
-  <TaskList tasks={$taskStore.tasks} />
-</div>
-```
 
 ### 3. Features Layer
 
@@ -225,193 +151,11 @@ src/features/
         └── OfflineIndicator.spec.ts
 ```
 
-#### Feature Model Example
-```typescript
-// src/features/task-create/model/task-create.model.ts
-import { writable } from 'svelte/store';
-import { taskApi } from './api/task-create.api';
-import { z } from 'zod';
 
-const taskSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(200, 'Title too long'),
-  description: z.string().optional(),
-  priority: z.enum(['low', 'medium', 'high', 'urgent']),
-  dueDate: z.number().optional(),
-  tags: z.array(z.string()).optional(),
-});
 
-type TaskFormData = z.infer<typeof taskSchema>;
 
-interface CreateTaskState {
-  formData: TaskFormData;
-  isSubmitting: boolean;
-  error: string | null;
-}
 
-function createTaskStore() {
-  const { subscribe, set, update } = writable<CreateTaskState>({
-    formData: {
-      title: '',
-      description: '',
-      priority: 'medium',
-      dueDate: undefined,
-      tags: [],
-    },
-    isSubmitting: false,
-    error: null,
-  });
 
-  return {
-    subscribe,
-    updateFormData: (field: keyof TaskFormData, value: any) => {
-      update((state) => ({
-        ...state,
-        formData: { ...state.formData, [field]: value },
-        error: null,
-      }));
-    },
-    submit: async () => {
-      update((state) => ({ ...state, isSubmitting: true, error: null }));
-
-      try {
-        // Validate form data
-        const validatedData = taskSchema.parse(this.formData);
-
-        // Call API
-        const result = await taskApi.createTask(validatedData);
-
-        if (result.success) {
-          // Reset form
-          set({
-            formData: {
-              title: '',
-              description: '',
-              priority: 'medium',
-              dueDate: undefined,
-              tags: [],
-            },
-            isSubmitting: false,
-            error: null,
-          });
-          return { success: true };
-        } else {
-          update((state) => ({
-            ...state,
-            isSubmitting: false,
-            error: result.message,
-          }));
-          return { success: false, error: result.message };
-        }
-      } catch (error) {
-        update((state) => ({
-          ...state,
-          isSubmitting: false,
-          error: error instanceof Error ? error.message : 'Validation failed',
-        }));
-        return { success: false, error: 'Validation failed' };
-      }
-    },
-  };
-}
-
-export const taskCreateStore = createTaskStore();
-```
-
-#### Feature API Example
-```typescript
-// src/features/task-create/api/task-create.api.ts
-import { extractData, isSuccess } from '$shared/lib/response-helpers';
-
-interface CreateTaskRequest {
-  title: string;
-  description?: string;
-  priority: string;
-  dueDate?: number;
-  tags?: string[];
-}
-
-interface StandardResponse<T> {
-  status: {
-    code: number;
-    message: string;
-    is_success: boolean;
-  };
-  data: T;
-  meta: {
-    timestamp: number;
-    request_id: string;
-  };
-}
-
-export const taskApi = {
-  async createTask(data: CreateTaskRequest) {
-    const response = await fetch('/api/v1/tasks', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: JSON.stringify(data),
-    });
-
-    const result: StandardResponse<any> = await response.json();
-
-    if (isSuccess(result)) {
-      return { success: true, data: extractData(result) };
-    } else {
-      return { success: false, message: result.status.message };
-    }
-  },
-};
-```
-
-#### Feature UI Example
-```svelte
-<!-- src/features/task-create/ui/TaskCreateForm.svelte -->
-<script lang="ts">
-  import { taskCreateStore } from '../model/task-create.model';
-  import Button from '$shared/ui/Button.svelte';
-  import Input from '$shared/ui/Input.svelte';
-  import Select from '$shared/ui/Select.svelte';
-
-  let formData = $taskCreateStore.formData;
-  let isSubmitting = $taskCreateStore.isSubmitting;
-  let error = $taskCreateStore.error;
-
-  function handleSubmit() {
-    taskCreateStore.submit();
-  }
-</script>
-
-<form on:submit|preventDefault={handleSubmit}>
-  <Input
-    label="Title"
-    value={formData.title}
-    on:input={(e) => taskCreateStore.updateFormData('title', e.detail)}
-    required
-  />
-
-  <Select
-    label="Priority"
-    value={formData.priority}
-    options={[
-      { value: 'low', label: 'Low' },
-      { value: 'medium', label: 'Medium' },
-      { value: 'high', label: 'High' },
-      { value: 'urgent', label: 'Urgent' },
-    ]}
-    on:change={(e) => taskCreateStore.updateFormData('priority', e.detail)}
-  />
-
-  {#if error}
-    <div class="error">{error}</div>
-  {/if}
-
-  <Button type="submit" disabled={isSubmitting}>
-    {isSubmitting ? 'Creating...' : 'Create Task'}
-  </Button>
-</form>
-```
 
 ### 4. Entities Layer
 
@@ -443,64 +187,7 @@ src/entities/
         └── auth-utils.spec.ts
 ```
 
-#### Entity Example
-```typescript
-// src/entities/task/model/task.ts
-export interface Task {
-  id: string;
-  userId: string;
-  title: string;
-  description?: string;
-  status: 'todo' | 'in-progress' | 'completed';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  dueDate?: number; // Epoch milliseconds
-  tags: string[];
-  createdAt: number; // Epoch milliseconds
-  updatedAt: number; // Epoch milliseconds
-  completedAt?: number; // Epoch milliseconds
-  priorityScore: number;
-}
 
-export function createTask(data: Partial<Task>): Task {
-  const now = Date.now();
-  return {
-    id: crypto.randomUUID(),
-    userId: data.userId || '',
-    title: data.title || '',
-    description: data.description,
-    status: data.status || 'todo',
-    priority: data.priority || 'medium',
-    dueDate: data.dueDate,
-    tags: data.tags || [],
-    createdAt: now,
-    updatedAt: now,
-    completedAt: data.completedAt,
-    priorityScore: data.priorityScore || 0,
-  };
-}
-
-export function isTaskOverdue(task: Task): boolean {
-  if (!task.dueDate || task.status === 'completed') {
-    return false;
-  }
-  return Date.now() > task.dueDate;
-}
-
-export function getTaskPriorityWeight(priority: Task['priority']): number {
-  switch (priority) {
-    case 'urgent':
-      return 100;
-    case 'high':
-      return 75;
-    case 'medium':
-      return 50;
-    case 'low':
-      return 25;
-    default:
-      return 0;
-  }
-}
-```
 
 ### 5. Shared Layer
 
@@ -534,34 +221,7 @@ src/shared/
     └── index.ts                   # Shared TypeScript types
 ```
 
-#### Shared Helpers Example
-```typescript
-// src/shared/lib/time-helpers.ts
-export function epochToDate(epoch: number): Date {
-  return new Date(epoch);
-}
 
-export function dateToEpoch(date: Date): number {
-  return date.getTime();
-}
-
-export function nowEpoch(): number {
-  return Date.now();
-}
-
-export function formatEpoch(epoch: number, format: string): string {
-  const date = new Date(epoch);
-  
-  switch (format) {
-    case 'YYYY-MM-DD':
-      return date.toISOString().split('T')[0];
-    case 'HH:mm':
-      return date.toTimeString().split(' ')[0].substring(0, 5);
-    default:
-      return date.toISOString();
-  }
-}
-```
 
 ### 6. Widgets Layer
 
@@ -584,81 +244,7 @@ src/widgets/
     └── OfflineIndicator.spec.ts
 ```
 
-#### Widget Example
-```svelte
-<!-- src/widgets/task-card/TaskCard.svelte -->
-<script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-  import { isTaskOverdue } from '$entities/task/model/task';
-  import PriorityBadge from './priority-badge/PriorityBadge.svelte';
 
-  export let task: Task;
-
-  const dispatch = createEventDispatcher();
-
-  function handleComplete() {
-    dispatch('complete', { taskId: task.id });
-  }
-
-  function handleDelete() {
-    dispatch('delete', { taskId: task.id });
-  }
-
-  $: isOverdue = isTaskOverdue(task);
-</script>
-
-<div class="task-card" class:overdue={isOverdue}>
-  <div class="task-header">
-    <h3>{task.title}</h3>
-    <PriorityBadge priority={task.priority} />
-  </div>
-
-  {#if task.description}
-    <p class="task-description">{task.description}</p>
-  {/if}
-
-  <div class="task-meta">
-    {#if task.dueDate}
-      <span class="due-date">
-        Due: {formatEpoch(task.dueDate, 'YYYY-MM-DD')}
-      </span>
-    {/if}
-    <span class="status">{task.status}</span>
-  </div>
-
-  <div class="task-actions">
-    <button on:click={handleComplete}>Complete</button>
-    <button on:click={handleDelete}>Delete</button>
-  </div>
-</div>
-
-<style>
-  .task-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 8px;
-  }
-
-  .task-card.overdue {
-    border-color: #ff6b6b;
-    background-color: #fff5f5;
-  }
-
-  .task-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-
-  .task-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 12px;
-  }
-</style>
-```
 
 ## Vertical Slice Pattern
 
