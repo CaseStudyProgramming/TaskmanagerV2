@@ -29,7 +29,7 @@
 ```
 
 ### 1.3 Quality Standards
-- **Unit Test Coverage**: >90% overall (data-driven approach)
+- **Unit Test Coverage**: Hierarchical thresholds (critical >=93%, overall >=85%)
 - **Integration Test Coverage**: Critical paths 100%
 - **E2E Test Coverage**: Main user flows 100%
 - **Build Status**: Must pass all checks
@@ -260,9 +260,9 @@ src/
 │   │   ├── validation.ts
 │   │   ├── validation.spec.ts             # Utility tests
 │   │   ├── time-helpers.ts
-│   │   ├── time-helpers.spec.ts           # Time helper tests (90%+ mandatory)
+│   │   ├── time-helpers.spec.ts           # Time helper tests (93%+ mandatory)
 │   │   ├── response-helpers.ts
-│   │   ├── response-helpers.spec.ts       # Response helper tests (90%+ mandatory)
+│   │   ├── response-helpers.spec.ts       # Response helper tests (93%+ mandatory)
 │   │   └── string-helpers.ts
 │   ├── ui/
 │   │   ├── Button.svelte
@@ -377,13 +377,13 @@ internal/
 └── shared/
     ├── time/
     │   ├── epoch.go
-    │   └── epoch_test.go                 # Time helper tests (90%+ mandatory)
+    │   └── epoch_test.go                 # Time helper tests (93%+ mandatory)
     ├── response/
     │   ├── response.go
-    │   └── response_test.go             # Response helper tests (90%+ mandatory)
+    │   └── response_test.go             # Response helper tests (93%+ mandatory)
     ├── validation/
     │   ├── validators.go
-    │   └── validators_test.go            # Validation helper tests (90%+ mandatory)
+    │   └── validators_test.go            # Validation helper tests (93%+ mandatory)
     └── utils/
         ├── string.go
         └── string_test.go
@@ -470,7 +470,7 @@ Every PR must pass:
 
 ### 4.3 Helper Functions Testing Requirements
 
-All helper functions MUST have comprehensive tests with 90%+ coverage.
+All helper functions MUST have comprehensive tests with 93%+ coverage (critical category).
 
 #### Required Helper Functions
 
@@ -755,7 +755,7 @@ CI/CD pipeline configuration and setup. See complete documentation in [GitHub Ac
 - All pre-commit checks
 - Full test suite (including integration)
 - E2E tests
-- Coverage report (90%+ required)
+- Coverage report (hierarchical thresholds: critical >=93%, overall >=85%)
 - Security scan
 - Performance check
 

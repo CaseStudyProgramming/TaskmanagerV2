@@ -353,7 +353,7 @@ if __name__ == '__main__':
 
 | Scenario | Overall | Critical | Decision | Rationale |
 |----------|---------|----------|----------|-----------|
-| Case 1 | 90% | 95% | ✅ PASS | All thresholds met |
+| Case 1 | 87% | 95% | ✅ PASS | All thresholds met |
 | Case 2 | 86% | 80% | ❌ FAIL | Critical below 93% (regardless of overall) |
 | Case 3 | 80% | 95% | ⚠️ WARN | Overall below baseline, but critical good |
 | Case 4 | 70% | 70% | ❌ FAIL | Both below thresholds |

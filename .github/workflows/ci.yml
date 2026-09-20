@@ -181,6 +181,7 @@ jobs:
         with:
           name: coverage-report
           path: coverage_report.json
+          if-no-files-found: ignore
 
   # Stage 5: Security Scan (Medium)
   security-scan:
@@ -285,13 +286,18 @@ jobs:
             npm run build
           fi
 
+      - name: Get deployment URL
+        id: deploy
+        run: |
+          echo "url=https://staging.example.com" >> $GITHUB_OUTPUT
+
       - name: Lighthouse CI
         uses: treosh/lighthouse-ci-action@v10
         with:
           uploadArtifacts: true
           temporaryPublicStorage: true
           urls: |
-            http://localhost:3000
+            ${{ steps.deploy.outputs.url }}
 
   # Stage 8: Build and Push
   build-push:

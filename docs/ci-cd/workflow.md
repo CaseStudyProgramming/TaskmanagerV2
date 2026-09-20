@@ -25,7 +25,7 @@ This document defines the complete development workflow from local development t
 │     ├── Type check                                           │
 │     ├── Unit tests                                           │
 │     ├── Integration tests                                    │
-│     ├── Coverage analysis (90%+)                             │
+│     ├── Coverage analysis (hierarchical thresholds)         │
 │     ├── Security scan                                        │
 │     └── Performance check (on main/develop)                   │
 │                                                               │
@@ -177,7 +177,7 @@ develop:
 - Type check
 - Unit tests
 - Integration tests
-- Coverage report (90%+)
+- Coverage report (hierarchical thresholds: critical >=93%, overall >=85%)
 - Security scan
 - Build and push to GHCR
 # SKIP: E2E tests (on merge to main)
@@ -191,7 +191,7 @@ develop:
 - Type check
 - Unit tests
 - Integration tests
-- Coverage report (90%+)
+- Coverage report (hierarchical thresholds: critical >=93%, overall >=85%)
 - Security scan
 - E2E tests (critical user flows)
 - Performance check
@@ -335,7 +335,7 @@ Brief description of changes
 - [ ] Documentation updated
 - [ ] No new warnings generated
 - [ ] Tests pass locally
-- [ ] Coverage requirements met (90%+)
+- [ ] Coverage requirements met (critical >=93%, overall >=85%)
 ```
 
 ### Review Process
@@ -374,7 +374,7 @@ git push origin feature/task-prioritization
 - All CI/CD checks pass
 - At least 1 code review approval
 - No merge conflicts
-- Coverage >= 90%
+- Coverage critical >=93%, overall >=85%
 - No security vulnerabilities
 
 # Merge method:
@@ -390,7 +390,7 @@ git push origin feature/task-prioritization
 - At least 1 code review approval
 - E2E tests pass
 - Performance checks pass
-- Coverage >= 90%
+- Coverage critical >=93%, overall >=85%
 - No security vulnerabilities
 - Manual approval from maintainer
 
@@ -497,7 +497,7 @@ develop_branch_gates:
   - type_check: zero type errors
   - unit_tests: 100% pass rate
   - integration_tests: 100% pass rate
-  - coverage: overall >=85% (warn), critical >=93% (block)
+  - coverage: overall >=85% (warn), critical >=93% (block), important >=85% (warn)
   - security: zero high/critical vulnerabilities
   - build: successful build
 
@@ -544,7 +544,7 @@ go test ./... -short
 - Type check
 - Unit tests
 - Integration tests
-- Coverage analysis (90%+)
+- Coverage analysis (hierarchical thresholds: critical >=93%, overall >=85%)
 - Security scan
 - Build and push
 
@@ -559,7 +559,7 @@ go test ./... -short
 - Type check
 - Unit tests
 - Integration tests
-- Coverage analysis (90%+)
+- Coverage analysis (hierarchical thresholds: critical >=93%, overall >=85%)
 - Security scan
 - E2E tests (critical flows)
 - Performance check

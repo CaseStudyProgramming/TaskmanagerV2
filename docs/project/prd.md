@@ -799,7 +799,7 @@ Benefits:
 5. **E2E Tests** (Playwright)
 6. **Build** (Frontend and Backend)
 7. **Security Scan** (Snyk, OWASP)
-8. **Deploy** (Vercel, Railway)
+8. **Deploy** (Vercel, Koyeb)
 
 ---
 
@@ -827,7 +827,10 @@ Benefits:
 ## 9. Testing Strategy
 
 ### 9.1 Test Coverage Requirements
-- Unit tests: >80% coverage
+- Unit tests: Hierarchical coverage thresholds
+  - Critical files (business logic, services, entities, helpers): >=93% (blocks CI)
+  - Important files (API handlers, repositories, UI components): >=85% (warning)
+  - Overall baseline: >=85% (warning)
 - Integration tests: Critical paths
 - E2E tests: User journeys
 - Security tests: OWASP Top 10
@@ -863,7 +866,7 @@ Benefits:
 - 100 registered users in first month
 - 90% uptime
 - <200ms API response time (p95)
-- 80% test coverage
+- Hierarchical coverage: critical >=93%, overall >=85%
 - Zero critical security vulnerabilities
 
 ---
@@ -934,7 +937,7 @@ Benefits:
 - **Risk**: Low user adoption
   - **Mitigation**: Focus on UX, gather early feedback, iterate quickly
 
-- **Risk**: Supabase/Railway free tier changes
+- **Risk**: Supabase/Koyeb free tier changes
   - **Mitigation**: Architecture portability, vendor-neutral design
 
 ---

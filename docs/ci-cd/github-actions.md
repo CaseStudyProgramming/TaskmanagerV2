@@ -34,7 +34,7 @@ Every PR must pass these checks:
 # Format, Lint, Type Check
 # Full Test Suite (including integration)
 # E2E Tests
-# Coverage Report (90%+ required)
+# Coverage Report (hierarchical thresholds: critical >=93%, overall >=85%)
 # Security Scan
 # Performance Check
 ```
@@ -257,13 +257,13 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
           working-directory: ./frontend
-      
-      - name: Deploy Backend to Railway
-        uses: railwayapp/cli-action@v1
+
+      - name: Deploy Backend to Koyeb
+        uses: koyeb/action-deploy@v2
         with:
-          railway-token: ${{ secrets.RAILWAY_TOKEN }}
-          service: ${{ secrets.RAILWAY_SERVICE_ID }}
-          command: "up"
+          api-token: ${{ secrets.KOYEB_API_TOKEN }}
+          service-id: ${{ secrets.KOYEB_SERVICE_ID }}
+          pattern: main
 
   deploy-production:
     name: Deploy to Production
@@ -283,13 +283,13 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
           working-directory: ./frontend
-      
-      - name: Deploy Backend to Railway
-        uses: railwayapp/cli-action@v1
+
+      - name: Deploy Backend to Koyeb
+        uses: koyeb/action-deploy@v2
         with:
-          railway-token: ${{ secrets.RAILWAY_TOKEN }}
-          service: ${{ secrets.RAILWAY_SERVICE_ID }}
-          command: "up"
+          api-token: ${{ secrets.KOYEB_API_TOKEN }}
+          service-id: ${{ secrets.KOYEB_SERVICE_ID }}
+          pattern: main
 ```
 
 ## Pre-Commit Hooks
@@ -343,10 +343,10 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
-      lines: 90,
-      functions: 90,
-      branches: 90,
-      statements: 90,
+      lines: 85, // Overall baseline
+      functions: 85,
+      branches: 85,
+      statements: 85,
       exclude: [
         'node_modules/',
         'src/shared/types/',
@@ -361,6 +361,11 @@ export default defineConfig({
 });
 ```
 
+**Note**: Hierarchical coverage thresholds are enforced via coverage_analyzer.py script:
+- Critical files (business logic, services, entities, helpers): >=93% (blocks CI)
+- Important files (API handlers, repositories, UI components): >=85% (warning)
+- Overall baseline: >=85% (warning)
+
 ### Backend Coverage (Go)
 
 ```bash
@@ -368,7 +373,7 @@ export default defineConfig({
 # scripts/check-coverage.sh
 
 COVERAGE=$(go test ./... -cover | grep total | awk '{print $3}' | sed 's/%//')
-THRESHOLD=90
+THRESHOLD=85
 
 if (( $(echo "$COVERAGE < $THRESHOLD" | bc -l) )); then
     echo "Coverage $COVERAGE% is below threshold $THRESHOLD%"
@@ -377,6 +382,11 @@ fi
 
 echo "Coverage $COVERAGE% meets threshold $THRESHOLD%"
 ```
+
+**Note**: Hierarchical coverage thresholds are enforced via coverage_analyzer.py script:
+- Critical files (business logic, services, entities, helpers): >=93% (blocks CI)
+- Important files (API handlers, repositories, UI components): >=85% (warning)
+- Overall baseline: >=85% (warning)
 
 ## Secrets Management
 
@@ -389,8 +399,8 @@ VERCEL_ORG_ID:                 # Vercel organization ID
 VERCEL_PROJECT_ID:             # Vercel project ID
 
 # Backend Deployment
-RAILWAY_TOKEN:                 # Railway API token
-RAILWAY_SERVICE_ID:            # Railway service ID
+KOYEB_API_TOKEN:               # Koyeb API token
+KOYEB_SERVICE_ID:              # Koyeb service ID
 
 # Security
 SNYK_TOKEN:                    # Snyk API token
@@ -508,8 +518,8 @@ fi
 # Rollback frontend
 vercel rollback $VERSION
 
-# Rollback backend
-railway rollback $VERSION
+# Rollback backend (Koyeb)
+koyeb deployments redeploy --service-id $KOYEB_SERVICE_ID --deployment-id $VERSION
 ```
 
 ## Monitoring
