@@ -10,73 +10,134 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 ### Core Framework & Language
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **Node.js** | v24.20.0 | JavaScript runtime (must be used across development, testing, and production) |
-| **TypeScript** | ^7.0.2 | Type-safe JavaScript |
-| **SvelteKit** | ^2.8.0 | Web framework |
-| **Vite** | ^6.0.0 | Build tool and dev server |
+**Node.js**
+- version: v24.20.0
+- purpose: JavaScript runtime (must be used across development, testing, and production)
+- doc link: https://nodejs.org/en/download
+
+**TypeScript**
+- version: 7.0.2
+- purpose: Type-safe JavaScript
+- doc link: https://github.com/microsoft/TypeScript/releases
+
+**SvelteKit**
+- version: ^2.8.0
+- purpose: Web framework
+- doc link: https://kit.svelte.dev/docs
+
+**Svelte**
+- version: svelte@5.57.1
+- purpose: Web framework
+- doc link: https://github.com/sveltejs/svelte/releases
+
+**Vite**
+- version: ^6.0.0
+- purpose: Build tool and dev server
+- doc link: https://vitejs.dev/
 
 ### Package Manager
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **bun** | ^1.4.2 | Fast package manager and runtime |
+**bun**
+- version: ^1.4.2
+- purpose: Fast package manager and runtime
+- doc link: https://bun.sh/docs
 
 ### Styling
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **Tailwind CSS** | ^4.3.3 | Utility-first CSS framework |
+**Tailwind CSS**
+- version: ^4.3.3
+- purpose: Utility-first CSS framework
+- doc link: https://tailwindcss.com/docs
 
 
 ### Validation & Schema
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **Zod** | ^4.0.0 | Schema validation and type inference |
+**Zod**
+- version: ^4.0.0
+- purpose: Schema validation and type inference
+- doc link: https://zod.dev/
 
 ### Code Quality
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **@biomejs/biome** | ^2.0.0 | Biome CLI tool |
+**@biomejs/biome**
+- version: ^2.0.0
+- purpose: Biome CLI tool
+- doc link: https://biomejs.dev/
 
 ### Testing
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **Vitest** | ^3.0.0 | Unit testing framework |
-| **@testing-library/svelte** | ^5.0.0 | Component testing utilities |
-| **@testing-library/jest-dom** | ^6.6.0 | Custom Jest matchers |
-| **Playwright** | ^1.50.0 | E2E testing framework |
-| **@playwright/test** | ^1.50.0 | Playwright test runner |
+**Vitest**
+- version: ^3.0.0
+- purpose: Unit testing framework
+- doc link: https://vitest.dev/
+
+**@testing-library/svelte**
+- version: ^5.0.0
+- purpose: Component testing utilities
+- doc link: https://testing-library.com/docs/svelte-testing-library/intro/
+
+**@testing-library/jest-dom**
+- version: ^6.6.0
+- purpose: Custom Jest matchers
+- doc link: https://github.com/testing-library/jest-dom
+
+**Playwright**
+- version: ^1.50.0
+- purpose: E2E testing framework
+- doc link: https://playwright.dev/
+
+**@playwright/test**
+- version: ^1.50.0
+- purpose: Playwright test runner
+- doc link: https://playwright.dev/docs/api/class-test
 
 ### Build & Development Tools
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **svelte-preprocess** | ^6.0.0 | Svelte preprocessor for TypeScript/PostCSS |
-| **@sveltejs/adapter-vercel** | ^5.0.0 | Vercel deployment adapter |
-| **@sveltejs/adapter-static** | ^3.0.0 | Static site generation adapter |
+**svelte-preprocess**
+- version: ^6.0.0
+- purpose: Svelte preprocessor for TypeScript/PostCSS
+- doc link: https://github.com/sveltejs/svelte-preprocess
+
+**@sveltejs/adapter-vercel**
+- version: ^5.0.0
+- purpose: Vercel deployment adapter
+- doc link: https://vercel.com/docs/frameworks/sveltekit
+
+**@sveltejs/adapter-static**
+- version: ^3.0.0
+- purpose: Static site generation adapter
+- doc link: https://kit.svelte.dev/docs/adapter-static
 
 ### API & HTTP
 
-use fetch
+**Fetch API**
+- version: Built-in
+- purpose: Native browser API for HTTP requests
+- doc link: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
 
 ### Offline & Storage
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **idb** | ^8.0.0 | IndexedDB wrapper for offline storage |
-| **workbox-window** | ^7.3.0 | Service worker registration |
+**idb**
+- version: ^8.0.0
+- purpose: IndexedDB wrapper for offline storage
+- doc link: https://github.com/jakearchibald/idb
+
+**workbox-window**
+- version: ^7.3.0
+- purpose: Service worker registration
+- doc link: https://developer.chrome.com/docs/workbox/
 
 ### Utilities
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **date-fns** | ^4.1.0 | Date manipulation utilities |
-| **clsx** | ^2.1.1 | Conditional className utility |
+**date-fns**
+- version: ^4.1.0
+- purpose: Date manipulation utilities
+- doc link: https://date-fns.org/
+
+**clsx**
+- version: ^2.1.1
+- purpose: Conditional className utility
+- doc link: https://github.com/lukeed/clsx
 
 ---
 
@@ -84,77 +145,143 @@ use fetch
 
 ### Core Language & Framework
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **Go** | 1.27+ | Programming language |
-| **Chi** | ^5.1.0 | Idiomatic HTTP router |
-| **Standard Library** | Go 1.25+ | Built-in packages (crypto, http, etc.) |
+**Go**
+- version: 1.27+
+- purpose: Programming language
+- doc link: https://go.dev/dl/
+
+**Chi**
+- version: ^5.1.0
+- purpose: Idiomatic HTTP router
+- doc link: https://github.com/go-chi/chi
+
+**Standard Library**
+- version: Go 1.25+
+- purpose: Built-in packages (crypto, http, etc.)
+- doc link: https://pkg.go.dev/std
 
 ### ORM & Database
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **SQLBoiler** | ^4.17.0 | ORM for code generation |
-| **lib/pq** | ^1.10.9 | PostgreSQL driver |
-| **pgx** | ^5.7.0 | PostgreSQL driver (alternative, higher performance) |
+**SQLBoiler**
+- version: ^4.17.0
+- purpose: ORM for code generation
+- doc link: https://github.com/volatiletech/sqlboiler
+
+**lib/pq**
+- version: ^1.10.9
+- purpose: PostgreSQL driver
+- doc link: https://github.com/lib/pq
+
+**pgx**
+- version: ^5.7.0
+- purpose: PostgreSQL driver (alternative, higher performance)
+- doc link: https://github.com/jackc/pgx
 
 ### API Specification
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **oapi-codegen** | ^2.80+ | OpenAPI 3.1+ code generation |
+**oapi-codegen**
+- version: ^2.80+
+- purpose: OpenAPI 3.1+ code generation
+- doc link: https://github.com/oapi-codegen/oapi-codegen
 
 ### Validation
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **go-playground/validator** | ^10.23.0 | Struct validation |
-| **go-validator** | ^10.23.0 | Alternative validation package |
+**go-playground/validator**
+- version: ^10.23.0
+- purpose: Struct validation
+- doc link: https://github.com/go-playground/validator
+
+**go-validator**
+- version: ^10.23.0
+- purpose: Alternative validation package
+- doc link: https://github.com/asaskevich/govalidator
 
 ### Authentication & Security
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **golang-jwt/jwt** | ^5.2.0 | JWT token generation and validation |
-| **golang.org/x/oauth2** | ^0.24.0 | OAuth2 client (Google OAuth) |
-| **golang.org/x/crypto** | ^0.31.0 | Cryptographic functions |
+**golang-jwt/jwt**
+- version: ^5.2.0
+- purpose: JWT token generation and validation
+- doc link: https://github.com/golang-jwt/jwt
+
+**golang.org/x/oauth2**
+- version: ^0.24.0
+- purpose: OAuth2 client (Google OAuth)
+- doc link: https://pkg.go.dev/golang.org/x/oauth2
+
+**golang.org/x/crypto**
+- version: ^0.31.0
+- purpose: Cryptographic functions
+- doc link: https://pkg.go.dev/golang.org/x/crypto
 
 ### Caching
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **redis/go-redis** | ^9.7.0 | Redis client |
+**redis/go-redis**
+- version: ^9.7.0
+- purpose: Redis client
+- doc link: https://github.com/redis/go-redis
 
 ### HTTP & Utilities
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **stretchr/testify** | ^1.9.0 | Testing assertions and mocking |
-| **golang/mock** | ^1.6.0 | Interface mocking |
-| **testcontainers-go** | ^0.33.0 | Container-based testing |
+**stretchr/testify**
+- version: ^1.9.0
+- purpose: Testing assertions and mocking
+- doc link: https://github.com/stretchr/testify
+
+**golang/mock**
+- version: ^1.6.0
+- purpose: Interface mocking
+- doc link: https://github.com/golang/mock
+
+**testcontainers-go**
+- version: ^0.33.0
+- purpose: Container-based testing
+- doc link: https://golang.testcontainers.org/
 
 ### Logging & Monitoring
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **uber-go/zap** | ^1.27.0 | Structured logging |
-| **prometheus/client_golang** | ^1.20.0 | Prometheus metrics |
-| **opentelemetry-go** | ^1.32.0 | OpenTelemetry tracing |
+**uber-go/zap**
+- version: ^1.27.0
+- purpose: Structured logging
+- doc link: https://github.com/uber-go/zap
+
+**prometheus/client_golang**
+- version: ^1.20.0
+- purpose: Prometheus metrics
+- doc link: https://github.com/prometheus/client_golang
+
+**opentelemetry-go**
+- version: ^1.32.0
+- purpose: OpenTelemetry tracing
+- doc link: https://github.com/open-telemetry/opentelemetry-go
 
 ### Configuration
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **spf13/viper** | ^1.19.0 | Configuration management |
-| **kelseyhightower/envconfig** | ^1.4.0 | Environment variable parsing |
+**spf13/viper**
+- version: ^1.19.0
+- purpose: Configuration management
+- doc link: https://github.com/spf13/viper
+
+**kelseyhightower/envconfig**
+- version: ^1.4.0
+- purpose: Environment variable parsing
+- doc link: https://github.com/kelseyhightower/envconfig
 
 ### Code Quality
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **golangci-lint** | ^1.62.0 | Go linting aggregator |
-| **gofmt** | Built-in | Go formatter |
-| **go vet** | Built-in | Go static analysis |
+**golangci-lint**
+- version: ^1.62.0
+- purpose: Go linting aggregator
+- doc link: https://golangci-lint.run/
+
+**gofmt**
+- version: Built-in
+- purpose: Go formatter
+- doc link: https://pkg.go.dev/cmd/gofmt
+
+**go vet**
+- version: Built-in
+- purpose: Go static analysis
+- doc link: https://pkg.go.dev/cmd/vet
 
 ---
 
@@ -162,58 +289,83 @@ use fetch
 
 ### Database
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **PostgreSQL** | 16.x | Primary database (via Supabase) |
-| **Redis** | 7.x | Caching layer (via Upstash) |
+**PostgreSQL**
+- version: 16.x
+- purpose: Primary database (via Supabase)
+- doc link: https://www.postgresql.org/docs/
+
+**Redis**
+- version: 7.x
+- purpose: Caching layer (via Upstash)
+- doc link: https://redis.io/docs/
 
 ### Database Limits (Free Tier)
 
-| Service | Resource | Limit |
-|---------|----------|-------|
-| **Supabase** | PostgreSQL database | 500MB |
-| **Supabase** | Monthly Active Users | 50,000 |
-| **Supabase** | File storage | 1GB |
-| **Upstash** | Commands/day | 10,000 |
-| **Upstash** | Storage | 256MB |
+**Supabase**
+- PostgreSQL database: 500MB
+- Monthly Active Users: 50,000
+- File storage: 1GB
+
+**Upstash**
+- Commands/day: 10,000
+- Storage: 256MB
 
 ### Reverse Proxy
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **Nginx** | 1.27.x | Reverse proxy and load balancer |
+**Nginx**
+- version: 1.27.x
+- purpose: Reverse proxy and load balancer
+- doc link: https://nginx.org/en/docs/
 
 ### Monitoring
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **Grafana** | 11.x | Monitoring and visualization (Free tier) |
-| **Prometheus** | 3.x | Metrics collection (optional, can use Grafana Cloud) |
+**Grafana**
+- version: 11.x
+- purpose: Monitoring and visualization (Free tier)
+- doc link: https://grafana.com/docs/
+
+**Prometheus**
+- version: 3.x
+- purpose: Metrics collection (optional, can use Grafana Cloud)
+- doc link: https://prometheus.io/docs/
 
 ### Containerization
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **Docker** | 27.x | Container platform (primary recommendation) |
-| **Podman** | 5.x | Alternative container platform (recommended for development) |
-| **podman-compose** | ^1.2.0 | Docker Compose alternative for Podman |
+**Docker**
+- version: 27.x
+- purpose: Container platform (primary recommendation)
+- doc link: https://docs.docker.com/
+
+**Podman**
+- version: 5.x
+- purpose: Alternative container platform (recommended for development)
+- doc link: https://docs.podman.io/
+
+**podman-compose**
+- version: ^1.2.0
+- purpose: Docker Compose alternative for Podman
+- doc link: https://github.com/containers/podman-compose
 
 ### CI/CD
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **GitHub Actions** | Latest | CI/CD automation |
+**GitHub Actions**
+- version: Latest
+- purpose: CI/CD automation
+- doc link: https://docs.github.com/en/actions
 
 ### Platform Limits (Free Tier)
 
-| Platform | Resource | Limit |
-|----------|----------|-------|
-| **Vercel** | Bandwidth/month | 100GB |
-| **Vercel** | Node.js runtime | See Node.js version in Frontend Dependencies |
-| **Koyeb** | RAM | 512MB |
-| **Koyeb** | vCPU | 0.5 |
-| **Koyeb** | Persistent storage | 1GB |
-| **Grafana** | Cloud Grafana | Free tier |
+**Vercel**
+- Bandwidth/month: 100GB
+- Node.js runtime: See Node.js version in Frontend Dependencies
+
+**Koyeb**
+- RAM: 512MB
+- vCPU: 0.5
+- Persistent storage: 1GB
+
+**Grafana**
+- Cloud Grafana: Free tier
 
 ---
 
@@ -221,40 +373,65 @@ use fetch
 
 ### Version Control
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **Git** | 2.47+ | Version control system |
+**Git**
+- version: 2.47+
+- purpose: Version control system
+- doc link: https://git-scm.com/doc
 
 ### API Documentation
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **Swagger/OpenAPI** | 3.0+ | API specification |
+**Swagger/OpenAPI**
+- version: 3.0+
+- purpose: API specification
+- doc link: https://swagger.io/specification/
 
 ### Security Scanning
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **Snyk** | Latest | Dependency vulnerability scanning |
-| **gitleaks** | ^8.21.0 | Secret scanning |
+**Snyk**
+- version: Latest
+- purpose: Dependency vulnerability scanning
+- doc link: https://snyk.io/docs/
+
+**gitleaks**
+- version: ^8.21.0
+- purpose: Secret scanning
+- doc link: https://github.com/gitleaks/gitleaks
 
 ### Performance Testing
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **k6** | ^0.55.0 | Load testing |
-| **Lighthouse CI** | ^0.17.0 | Performance testing |
+**k6**
+- version: ^0.55.0
+- purpose: Load testing
+- doc link: https://k6.io/docs/
+
+**Lighthouse CI**
+- version: ^0.17.0
+- purpose: Performance testing
+- doc link: https://github.com/GoogleChrome/lighthouse-ci
 
 ---
 
 ## Compatibility Matrix
 
-| Component | Frontend | Backend | Infrastructure |
-|-----------|----------|---------|----------------|
-| Node.js | 24.20.0  | N/A | N/A |
-| Go | N/A | 1.27+ | N/A |
-| PostgreSQL | N/A | Compatible with 16.x | 16.x |
-| Redis | N/A | Compatible with 7.x | 7.x |
+**Node.js**
+- Frontend: 24.20.0
+- Backend: N/A
+- Infrastructure: N/A
+
+**Go**
+- Frontend: N/A
+- Backend: 1.27+
+- Infrastructure: N/A
+
+**PostgreSQL**
+- Frontend: N/A
+- Backend: Compatible with 16.x
+- Infrastructure: 16.x
+
+**Redis**
+- Frontend: N/A
+- Backend: Compatible with 7.x
+- Infrastructure: 7.x
 
 ---
 
@@ -289,7 +466,14 @@ use fetch
 
 ## Change Log
 
-| Date | Version | Changes |
-|------|---------|---------|
-| 2025-09-19 | 1.0.0 | Initial dependency version documentation with latest stable versions |
-| 2025-09-20 | 1.1.0 | Simplified to focus only on dependency versions |
+**2025-09-19**
+- version: 1.0.0
+- changes: Initial dependency version documentation with latest stable versions
+
+**2025-09-20**
+- version: 1.1.0
+- changes: Simplified to focus only on dependency versions
+
+**2025-09-21**
+- version: 1.2.0
+- changes: Converted from table format to bullet point format with version, purpose, and doc link
