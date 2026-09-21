@@ -13,7 +13,7 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 | Dependency | Version | Purpose |
 |------------|---------|---------|
 | **Node.js** | v24.20.0 | JavaScript runtime (must be used across development, testing, and production) |
-| **TypeScript** | ^5.6.0 | Type-safe JavaScript |
+| **TypeScript** | ^7.0.2 | Type-safe JavaScript |
 | **SvelteKit** | ^2.8.0 | Web framework |
 | **Vite** | ^6.0.0 | Build tool and dev server |
 
