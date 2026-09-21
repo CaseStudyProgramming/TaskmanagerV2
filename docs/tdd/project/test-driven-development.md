@@ -97,8 +97,8 @@
 - **SAST**: SonarQube (optional)
 
 ### 2.4 Performance Testing
-- **Load Testing**: k6
-- **Frontend Performance**: Lighthouse CI
+- **Load Testing**: k6 (API performance, throughput, concurrent users)
+- **Frontend Performance**: Lighthouse CI (Chrome-based, FCP, LCP, CLS, bundle size)
 - **API Performance**: Apache Bench (ab) or wrk
 
 ---

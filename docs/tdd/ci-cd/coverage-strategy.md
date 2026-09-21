@@ -208,7 +208,7 @@ coverage-analysis:
   steps:
     - name: Generate coverage report
       run: |
-        npm run test:coverage
+        bun run test:coverage
         go test ./... -coverprofile=coverage.out
     
     - name: Analyze coverage by file type

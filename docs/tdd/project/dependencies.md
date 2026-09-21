@@ -64,6 +64,11 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 - purpose: Biome CLI tool
 - doc link: https://github.com/biomejs/biome/releases
 
+**@lhci/cli**
+- version: ^0.15.1
+- purpose: Lighthouse CI for frontend performance testing
+- doc link: https://github.com/GoogleChrome/lighthouse-ci
+
 ### Testing
 
 **Vitest**
@@ -403,11 +408,6 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 - version: ^0.55.0
 - purpose: Load testing
 - doc link: https://k6.io/docs/
-
-**Lighthouse CI**
-- version: ^0.17.0
-- purpose: Performance testing
-- doc link: https://github.com/GoogleChrome/lighthouse-ci
 
 ---
 

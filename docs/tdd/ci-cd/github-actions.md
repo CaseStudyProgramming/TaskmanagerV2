@@ -236,7 +236,7 @@ jobs:
       
       - name: API Performance Test
         run: |
-          npm install -g k6
+          bun install -g k6
           k6 run tests/load/api-load-test.js
 
   deploy-staging:
@@ -459,6 +459,40 @@ REDIS_PORT:                    # Redis port
 }
 ```
 
+### Lighthouse CI Usage
+
+**Browser Support**: Chrome/Chromium-based only (uses Chrome DevTools Protocol)
+
+**Local Testing**:
+```bash
+# Run Lighthouse CI locally
+bun run lighthouse
+
+# Manual Lighthouse CI with custom configuration
+lhci autorun --collect.url=http://localhost:3000
+```
+
+**Configuration**: Create `lighthouserc.json` in project root:
+```json
+{
+  "ci": {
+    "collect": {
+      "url": ["http://localhost:3000"],
+      "numberOfRuns": 3
+    },
+    "upload": {
+      "target": "temporary-public-storage"
+    }
+  }
+}
+```
+
+**When to Use**:
+- Manual performance checks during development
+- Critical milestone performance validation
+- Production-ready phase (can be added to CI/CD)
+- Different from k6 (API load) and Playwright (functional testing)
+
 ## Load Testing
 
 ### k6 Configuration
@@ -634,8 +668,11 @@ echo $TEST_DB_NAME  # Should be taskmanager_db_testing
 
 #### Performance Budget Failing
 ```bash
-# Run Lighthouse locally
+# Run Lighthouse CI locally
 bun run lighthouse
+
+# Run Lighthouse CI with custom URL
+lhci autorun --collect.url=http://localhost:3000
 
 # Check budget configuration
 cat .github/lighthouse-budget.json
