@@ -61,7 +61,6 @@ services:
       - taskmanager-network
     volumes:
       - ./backend:/app
-      - /app/node_modules
 
 networks:
   taskmanager-network:

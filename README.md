@@ -27,7 +27,7 @@ taskmanagerV2/
 
 ### Prerequisites
 
-- **Node.js**: v24.20.0
+- **Node.js**: v24.20.0 (required across development, testing, and production)
 - **Go**: 1.25+
 - **Docker** or **Podman**: For local development
 - **Bun**: Package manager (optional)
@@ -72,6 +72,7 @@ See [Container Strategy](docs/architecture/container-strategy.md) for details.
 
 ### API
 - [Standard Response Format](docs/api/standard-response-format.md)
+- [API Contract Validation](docs/api/API_VALIDATION.md)
 
 ### Testing
 - [Backend Testing Examples](docs/testing/backend-examples.md)
@@ -129,6 +130,9 @@ See [GitHub Actions Configuration](docs/ci-cd/github-actions.md) for details.
 ### Pre-Commit Checklist
 
 ```bash
+# API Validation (if API contract changed)
+npx @redocly/cli lint docs/api/openapi.yaml
+
 # Frontend
 bun run format:check
 bun run lint
