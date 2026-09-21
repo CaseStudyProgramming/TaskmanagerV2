@@ -226,7 +226,7 @@ This document identifies and assesses technical, security, and business risks fo
 - Parameterized queries via SQLBoiler
 - Input validation at multiple layers
 - Least privilege database access
-- Regular security scanning (Snyk, npm audit)
+- Regular security scanning (Snyk, bun audit)
 - SQL injection testing in security suite
 - Database query logging and monitoring
 
