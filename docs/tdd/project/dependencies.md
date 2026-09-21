@@ -21,92 +21,92 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 - doc link: https://github.com/microsoft/TypeScript/releases
 
 **SvelteKit**
-- version: ^2.8.0
+- version: @sveltejs/kit@2.70.3
 - purpose: Web framework
-- doc link: https://kit.svelte.dev/docs
+- doc link: https://github.com/sveltejs/kit
 
 **Svelte**
 - version: svelte@5.57.1
 - purpose: Web framework
-- doc link: https://github.com/sveltejs/svelte/releases
+- doc link: https://github.com/sveltejs/svelte
 
 **Vite**
-- version: ^6.0.0
+- version: 8.3.0 
 - purpose: Build tool and dev server
-- doc link: https://vitejs.dev/
+- doc link: https://vite.dev/releases
 
 ### Package Manager
 
 **bun**
 - version: ^1.4.2
 - purpose: Fast package manager and runtime
-- doc link: https://bun.sh/docs
+- doc link: https://github.com/oven-sh/bun
 
 ### Styling
 
 **Tailwind CSS**
 - version: ^4.3.3
 - purpose: Utility-first CSS framework
-- doc link: https://tailwindcss.com/docs
+- doc link: https://github.com/tailwindlabs/tailwindcss/releases
 
 
 ### Validation & Schema
 
 **Zod**
-- version: ^4.0.0
+- version: 4.6.5 
 - purpose: Schema validation and type inference
-- doc link: https://zod.dev/
+- doc link: https://github.com/colinhacks/zod/releases
 
 ### Code Quality
 
 **@biomejs/biome**
-- version: ^2.0.0
+- version: 2.5.14
 - purpose: Biome CLI tool
-- doc link: https://biomejs.dev/
+- doc link: https://github.com/biomejs/biome/releases
 
 ### Testing
 
 **Vitest**
-- version: ^3.0.0
+- version: 5.0.1 
 - purpose: Unit testing framework
-- doc link: https://vitest.dev/
+- doc link: https://github.com/vitest-dev/vitest
 
 **@testing-library/svelte**
-- version: ^5.0.0
+- version: 5.4.2
 - purpose: Component testing utilities
-- doc link: https://testing-library.com/docs/svelte-testing-library/intro/
+- doc link: https://github.com/testing-library/svelte-testing-library
 
 **@testing-library/jest-dom**
-- version: ^6.6.0
+- version: v7.0.1
 - purpose: Custom Jest matchers
 - doc link: https://github.com/testing-library/jest-dom
 
 **Playwright**
-- version: ^1.50.0
+- version: 1.63.0 
 - purpose: E2E testing framework
-- doc link: https://playwright.dev/
+- doc link: https://github.com/microsoft/playwright/releases
 
 **@playwright/test**
-- version: ^1.50.0
+- version: ^1.63.0
 - purpose: Playwright test runner
-- doc link: https://playwright.dev/docs/api/class-test
+- doc link: https://github.com/microsoft/playwright
 
 ### Build & Development Tools
 
 **svelte-preprocess**
-- version: ^6.0.0
+- version: ^6.0.5
 - purpose: Svelte preprocessor for TypeScript/PostCSS
 - doc link: https://github.com/sveltejs/svelte-preprocess
 
 **@sveltejs/adapter-vercel**
-- version: ^5.0.0
+- version: 6.3.4
 - purpose: Vercel deployment adapter
 - doc link: https://vercel.com/docs/frameworks/sveltekit
 
 **@sveltejs/adapter-static**
-- version: ^3.0.0
+- version: ^3.0.10
 - purpose: Static site generation adapter
-- doc link: https://kit.svelte.dev/docs/adapter-static
+- doc link: https://svelte-changelog.dev/package/@sveltejs/adapter-static
 
 ### API & HTTP
 
@@ -118,21 +118,21 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 ### Offline & Storage
 
 **idb**
-- version: ^8.0.0
+- version: ^8.0.3
 - purpose: IndexedDB wrapper for offline storage
-- doc link: https://github.com/jakearchibald/idb
+- doc link: https://www.npmjs.com/package/idb
 
 **workbox-window**
-- version: ^7.3.0
+- version: v7.4.1
 - purpose: Service worker registration
-- doc link: https://developer.chrome.com/docs/workbox/
+- doc link: https://github.com/GoogleChrome/workbox
 
 ### Utilities
 
 **date-fns**
-- version: ^4.1.0
+- version: ^4.4.0
 - purpose: Date manipulation utilities
-- doc link: https://date-fns.org/
+- doc link: https://github.com/date-fns/date-fns
 
 **clsx**
 - version: ^2.1.1
