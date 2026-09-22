@@ -14,10 +14,10 @@ Every commit must pass these checks before being pushed:
 
 ```bash
 # Frontend
-npm run format:check    # Biome format check
-npm run lint           # Biome lint
-npm run type-check     # TypeScript type check
-npm run test:unit      # Unit tests
+bun run format:check    # Biome format check
+bun run lint           # Biome lint
+bun run type-check     # TypeScript type check
+bun run test:unit      # Unit tests
 
 # Backend
 gofmt -l .             # Go format check
@@ -71,22 +71,22 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: 'bun'
       
       - name: Install dependencies
-        run: npm ci
+        run: bun install
       
       - name: Format check
-        run: npm run format:check
+        run: bun run format:check
       
       - name: Lint check
-        run: npm run lint
+        run: bun run lint
       
       - name: Type check
-        run: npm run type-check
+        run: bun run type-check
       
       - name: Unit tests
-        run: npm run test:unit -- --coverage
+        run: bun run test:unit -- --coverage
       
       - name: Upload coverage
         uses: codecov/codecov-action@v4
@@ -96,10 +96,10 @@ jobs:
           fail_ci_if_error: true
       
       - name: E2E tests
-        run: npm run test:e2e
+        run: bun run test:e2e
       
       - name: Build
-        run: npm run build
+        run: bun run build
 
   backend:
     name: Backend CI
@@ -217,13 +217,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: 'bun'
       
       - name: Install dependencies
-        run: npm ci
+        run: bun install
       
       - name: Build application
-        run: npm run build
+        run: bun run build
       
       - name: Run Lighthouse CI
         uses: treosh/lighthouse-ci-action@v10
@@ -236,7 +236,7 @@ jobs:
       
       - name: API Performance Test
         run: |
-          npm install -g k6
+          bun install -g k6
           k6 run tests/load/api-load-test.js
 
   deploy-staging:
@@ -298,9 +298,9 @@ jobs:
 
 ```bash
 # Install Husky
-npm install husky -D
-npx husky install
-npx husky add .husky/pre-commit
+bun install husky -D
+bunx husky install
+bunx husky add .husky/pre-commit
 ```
 
 ### Pre-Commit Hook Script
@@ -312,10 +312,10 @@ npx husky add .husky/pre-commit
 # Frontend checks
 echo "Running frontend checks..."
 cd frontend
-npm run format:check
-npm run lint
-npm run type-check
-npm run test:unit
+bun run format:check
+bun run lint
+bun run type-check
+bun run test:unit
 cd ..
 
 # Backend checks
@@ -458,6 +458,40 @@ REDIS_PORT:                    # Redis port
   ]
 }
 ```
+
+### Lighthouse CI Usage
+
+**Browser Support**: Chrome/Chromium-based only (uses Chrome DevTools Protocol)
+
+**Local Testing**:
+```bash
+# Run Lighthouse CI locally
+bun run lighthouse
+
+# Manual Lighthouse CI with custom configuration
+lhci autorun --collect.url=http://localhost:3000
+```
+
+**Configuration**: Create `lighthouserc.json` in project root:
+```json
+{
+  "ci": {
+    "collect": {
+      "url": ["http://localhost:3000"],
+      "numberOfRuns": 3
+    },
+    "upload": {
+      "target": "temporary-public-storage"
+    }
+  }
+}
+```
+
+**When to Use**:
+- Manual performance checks during development
+- Critical milestone performance validation
+- Production-ready phase (can be added to CI/CD)
+- Different from k6 (API load) and Playwright (functional testing)
 
 ## Load Testing
 
@@ -606,7 +640,7 @@ services:
 docker-compose -f docker-compose.ci.yml up -d
 
 # Run full CI pipeline
-npm run ci:local
+bun run ci:local
 ```
 
 ## Troubleshooting
@@ -619,7 +653,7 @@ npm run ci:local
 ls -la coverage/
 
 # Generate coverage manually
-npm run test:coverage
+bun run test:coverage
 go test ./... -coverprofile=coverage.out
 ```
 
@@ -634,8 +668,11 @@ echo $TEST_DB_NAME  # Should be taskmanager_db_testing
 
 #### Performance Budget Failing
 ```bash
-# Run Lighthouse locally
-npm run lighthouse
+# Run Lighthouse CI locally
+bun run lighthouse
+
+# Run Lighthouse CI with custom URL
+lhci autorun --collect.url=http://localhost:3000
 
 # Check budget configuration
 cat .github/lighthouse-budget.json

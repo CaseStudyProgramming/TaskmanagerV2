@@ -153,7 +153,7 @@ def evaluate_coverage(coverage_report):
 
 ```bash
 # Frontend coverage
-npm run test:coverage
+bun run test:coverage
 
 # Backend coverage
 go test ./... -coverprofile=coverage.out
@@ -208,7 +208,7 @@ coverage-analysis:
   steps:
     - name: Generate coverage report
       run: |
-        npm run test:coverage
+        bun run test:coverage
         go test ./... -coverprofile=coverage.out
     
     - name: Analyze coverage by file type
@@ -245,7 +245,7 @@ coverage-analysis:
     - name: Generate coverage reports
       run: |
         # Frontend
-        cd frontend && npm run test:coverage
+        cd frontend && bun run test:coverage
         # Backend
         cd backend && go test ./... -coverprofile=coverage.out
     

@@ -52,9 +52,9 @@ This document defines the complete development workflow from local development t
 **Install pre-commit hooks:**
 ```bash
 # Install Husky for pre-commit hooks
-npm install husky -D
-npx husky install
-npx husky add .husky/pre-commit
+bun install husky -D
+bunx husky install
+bunx husky add .husky/pre-commit
 ```
 
 ### Pre-Commit Checklist (Automated)
@@ -70,10 +70,10 @@ echo "🔍 Running pre-commit checks..."
 # Frontend checks
 echo "📦 Frontend checks..."
 cd frontend
-npm run format:check    # Biome format check
-npm run lint           # Biome lint
-npm run type-check     # TypeScript type check
-npm run test:unit      # Unit tests
+bun run format:check    # Biome format check
+bun run lint           # Biome lint
+bun run type-check     # TypeScript type check
+bun run test:unit      # Unit tests
 cd ..
 
 # Backend checks
@@ -518,7 +518,7 @@ main_branch_gates:
 ### Local Development
 ```bash
 # Unit tests only (fast feedback)
-npm run test:unit
+bun run test:unit
 go test ./... -short
 
 # Skip integration and E2E tests for speed
@@ -647,19 +647,19 @@ alerts:
 **Pre-commit hook failures:**
 ```bash
 # Format issues
-npm run format:check
-npm run format:write  # Auto-fix
+bun run format:check
+bun run format:write  # Auto-fix
 
 # Lint issues
-npm run lint
+bun run lint
 # Fix lint errors manually
 
 # Type errors
-npm run type-check
+bun run type-check
 # Fix type errors
 
 # Test failures
-npm run test:unit
+bun run test:unit
 # Fix failing tests
 ```
 
@@ -676,7 +676,7 @@ npm run test:unit
 **Coverage failures:**
 ```bash
 # Generate coverage report
-npm run test:coverage
+bun run test:coverage
 go test ./... -cover
 
 # Analyze low coverage files
@@ -717,7 +717,7 @@ go test ./... -cover
 ```json
 {
   "scripts": {
-    "pre-commit": "npm run format:check && npm run lint && npm run type-check && npm run test:unit",
+    "pre-commit": "bun run format:check && bun run lint && bun run type-check && bun run test:unit",
     "format:check": "biome check",
     "format:write": "biome check --write",
     "lint": "biome lint",

@@ -24,21 +24,21 @@ jobs:
         working-directory: ./frontend
         run: |
           if [ -f "package.json" ]; then
-            npm run format:check
+            bun run format:check
           fi
 
       - name: Frontend lint check
         working-directory: ./frontend
         run: |
           if [ -f "package.json" ]; then
-            npm run lint
+            bun run lint
           fi
 
       - name: Frontend type check
         working-directory: ./frontend
         run: |
           if [ -f "package.json" ]; then
-            npm run type-check
+            bun run type-check
           fi
 
       - name: Backend format check
@@ -75,8 +75,8 @@ jobs:
         working-directory: ./frontend
         run: |
           if [ -f "package.json" ]; then
-            npm ci
-            npm run test:unit -- --coverage
+            bun install
+            bun run test:unit -- --coverage
           fi
 
       - name: Backend unit tests
@@ -155,8 +155,8 @@ jobs:
         working-directory: ./frontend
         run: |
           if [ -f "package.json" ]; then
-            npm ci
-            npm run test:coverage
+            bun install
+            bun run test:coverage
           fi
 
       - name: Backend coverage
@@ -231,28 +231,28 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24.20.0'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
+          cache: 'bun'
+          cache-dependency-path: frontend/bun.lock
 
       - name: Install frontend dependencies
         working-directory: ./frontend
         run: |
           if [ -f "package.json" ]; then
-            npm ci
+            bun install
           fi
 
       - name: Install Playwright
         working-directory: ./frontend
         run: |
           if [ -f "package.json" ]; then
-            npx playwright install --with-deps
+            bunx playwright install --with-deps
           fi
 
       - name: Run E2E tests
         working-directory: ./frontend
         run: |
           if [ -f "package.json" ]; then
-            npm run test:e2e
+            bun run test:e2e
           fi
 
   # Stage 7: Performance Check (Slow)
@@ -269,21 +269,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24.20.0'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
+          cache: 'bun'
+          cache-dependency-path: frontend/bun.lock
 
       - name: Install frontend dependencies
         working-directory: ./frontend
         run: |
           if [ -f "package.json" ]; then
-            npm ci
+            bun install
           fi
 
       - name: Build frontend
         working-directory: ./frontend
         run: |
           if [ -f "package.json" ]; then
-            npm run build
+            bun run build
           fi
 
       - name: Get deployment URL

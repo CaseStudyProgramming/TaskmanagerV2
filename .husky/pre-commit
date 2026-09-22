@@ -8,10 +8,10 @@ if [ -d "frontend" ]; then
   echo "📦 Frontend checks..."
   cd frontend
   if [ -f "package.json" ]; then
-    npm run format:check
-    npm run lint
-    npm run type-check
-    npm run test:unit
+    bun run format:check
+    bun run lint
+    bun run type-check
+    bun run test:unit
   fi
   cd ..
 fi

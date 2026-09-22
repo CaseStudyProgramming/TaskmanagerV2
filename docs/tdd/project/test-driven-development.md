@@ -92,13 +92,13 @@
 
 ### 2.3 Security Testing
 - **Tool**: OWASP ZAP
-- **Dependency Scanning**: Snyk or npm audit
+- **Dependency Scanning**: Snyk or bun audit
 - **Secret Scanning**: gitleaks
 - **SAST**: SonarQube (optional)
 
 ### 2.4 Performance Testing
-- **Load Testing**: k6
-- **Frontend Performance**: Lighthouse CI
+- **Load Testing**: k6 (API performance, throughput, concurrent users)
+- **Frontend Performance**: Lighthouse CI (Chrome-based, FCP, LCP, CLS, bundle size)
 - **API Performance**: Apache Bench (ab) or wrk
 
 ---
@@ -444,11 +444,11 @@ Every commit must pass:
    - Backend: `go vet ./...`
 
 4. ✅ **Unit Tests**
-   - Frontend: `npm run test:unit`
+   - Frontend: `bun run test:unit`
    - Backend: `go test ./... -short`
 
 5. ✅ **Build Check**
-   - Frontend: `npm run build`
+   - Frontend: `bun run build`
    - Backend: `go build ./...`
 
 ### 4.2 CI/CD Pipeline Checks
@@ -456,14 +456,14 @@ Every commit must pass:
 Every PR must pass:
 1. ✅ All pre-commit checks
 2. ✅ **Full Test Suite** (including integration)
-   - Frontend: `npm run test:ci`
+   - Frontend: `bun run test:ci`
    - Backend: `go test ./... -cover`
 3. ✅ **E2E Tests**
-   - `npm run test:e2e`
+   - `bun run test:e2e`
 4. ✅ **Coverage Report**
    - Minimum 80% coverage
 5. ✅ **Security Scan**
-   - `npm audit` or `snyk test`
+   - `bun audit` or `snyk test`
 6. ✅ **Performance Check**
    - Lighthouse CI (frontend)
    - API response time < 200ms (p95)
@@ -715,7 +715,7 @@ Security scanning is automated in CI/CD. See configuration in [GitHub Actions Do
 
 #### Security Tools
 - Snyk (dependency scanning)
-- npm audit (frontend dependencies)
+- bun audit (frontend dependencies)
 - gitleaks (secret scanning)
 - OWASP ZAP (security scanning)
 
