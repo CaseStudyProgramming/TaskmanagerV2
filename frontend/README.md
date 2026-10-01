@@ -8,7 +8,7 @@ If you're seeing this, you've probably already done this step. Congrats!
 
 ```sh
 # create a new project
-npx sv create my-app12
+npx sv create my-app123
 ```
 
 To recreate this project with the same configuration:
