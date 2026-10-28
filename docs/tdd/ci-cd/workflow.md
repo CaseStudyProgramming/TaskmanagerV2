@@ -414,7 +414,7 @@ checks:
   - No performance checks
 deployment:
   - Vercel (frontend)
-  - Koyeb (backend)
+  - OCI (backend, 2 OCPU + 12GB RAM, Nginx)
   - Supabase (database - staging)
   - Upstash (cache - staging)
 ```
@@ -431,7 +431,7 @@ checks:
   - Security scan
 deployment:
   - Vercel (frontend)
-  - Koyeb (backend)
+  - OCI (backend, 2 OCPU + 12GB RAM, Nginx)
   - Supabase (database - production)
   - Upstash (cache - production)
 ```
@@ -589,7 +589,7 @@ automatic_rollback_conditions:
 
 # 2. Rollback to previous version
 # GitHub Actions rollback
-# Or manual Koyeb rollback
+# Or manual OCI rollback
 
 # 3. Create hotfix branch
 git checkout -b hotfix/critical-issue

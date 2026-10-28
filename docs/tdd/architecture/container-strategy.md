@@ -104,7 +104,7 @@ ghcr.io/yourusername/taskmanager-backend:1.0.0
 **Authentication:**
 - CI/CD: Automatic via `GITHUB_TOKEN`
 - Local: `docker login ghcr.io -u USERNAME -p TOKEN`
-- Production (Koyeb): GitHub Personal Access Token (PAT)
+- Production (OCI): GitHub Personal Access Token (PAT) or OCI credentials
 
 ## Production Deployment
 
@@ -114,7 +114,7 @@ ghcr.io/yourusername/taskmanager-backend:1.0.0
 
 ```
 Frontend: Vercel (managed deployment from Git)
-Backend:  Koyeb (pulls from GHCR, manages container runtime)
+Backend:  OCI (Oracle Cloud Infrastructure, 2 OCPU + 12GB RAM, Nginx proxy)
 Database: Supabase (managed PostgreSQL)
 Cache:    Upstash (managed Redis)
 ```
@@ -130,19 +130,22 @@ git push origin main
 # - Docker pushes to GHCR
 # - Tests run in Docker containers
 
-# 3. Koyeb automatically pulls latest image from GHCR
-# - Koyeb handles container runtime
-# - Koyeb manages scaling and health checks
+# 3. OCI pulls latest image from GHCR
+# - OCI handles container runtime
+# - OCI manages scaling and health checks
+# - Nginx configured as reverse proxy
 
 # 4. No Docker/Podman installation on production servers
 ```
 
-### Koyeb Configuration
+### OCI Configuration
 
 **Image Source:**
 - Registry: GitHub Container Registry
 - Image: `ghcr.io/yourusername/taskmanager-backend:latest`
-- Authentication: GitHub username + PAT
+- Authentication: GitHub username + PAT or OCI credentials
+- Instance Type: 2 OCPU + 12GB RAM
+- Reverse Proxy: Nginx
 
 **No manual Docker commands needed on production servers.**
 
@@ -264,7 +267,7 @@ permissions:
 - [Podman Documentation](https://docs.podman.io/)
 - [GitHub Container Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
 - [GitHub Actions Docker](https://github.com/docker/build-push-action)
-- [Koyeb Documentation](https://www.koyeb.com/docs)
+- [Oracle Cloud Infrastructure Documentation](https://docs.oracle.com/en-us/iaas/)
 
 ## Questions?
 

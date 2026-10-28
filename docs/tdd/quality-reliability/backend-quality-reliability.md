@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document defines the system quality and reliability requirements for the Advanced Task Manager backend, focusing on production-grade deployment with Koyeb, Nginx, Grafana, and other infrastructure components.
+This document defines the system quality and reliability requirements for the Advanced Task Manager backend, focusing on production-grade deployment with Oracle Cloud Infrastructure (OCI), Nginx, Grafana, and other infrastructure components.
 
 ---
 
@@ -82,7 +82,7 @@ type LogEntry struct {
 ### High Availability Architecture
 
 #### Redundancy Strategy
-- **Horizontal Scaling**: Auto-scaling based on CPU/memory metrics (Koyeb auto-scaling)
+- **Horizontal Scaling**: Auto-scaling based on CPU/memory metrics (OCI auto-scaling)
 - **Load Balancing**: Nginx as reverse proxy with health checks
 - **Database Redundancy**: Supabase managed PostgreSQL with automatic failover
 - **Cache Redundancy**: Upstash Redis with automatic failover and global distribution
@@ -147,8 +147,8 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 ### Infrastructure Resiliency
 
 #### Container Orchestration
-- **Koyeb Platform**: Managed container orchestration with auto-scaling
-- **Resource Limits**: CPU limit 0.5 vCPU, memory limit 512MB
+- **OCI Platform**: Managed container orchestration with auto-scaling
+- **Resource Limits**: 2 OCPU + 12GB RAM (backend only)
 - **Health Checks**: Container health checks for auto-recovery
 - **Rolling Updates**: Zero-downtime deployments with rolling updates
 

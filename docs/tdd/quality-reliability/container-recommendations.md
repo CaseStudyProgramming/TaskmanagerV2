@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides detailed recommendations for container configuration, particularly focusing on whether to use Alpine Linux for the Advanced Task Manager project's Go backend deployment on Koyeb.
+This document provides detailed recommendations for container configuration, particularly focusing on whether to use Alpine Linux for the Advanced Task Manager project's Go backend deployment on Oracle Cloud Infrastructure (OCI).
 
 ---
 
@@ -115,7 +115,7 @@ Alpine Linux is a security-oriented, lightweight Linux distribution based on mus
    - Alpine's small size complements Go's efficiency
 
 2. **Free-Tier Optimization**
-   - Koyeb free tier has 512MB RAM limit
+   - OCI free tier provides 2 OCPU + 12GB RAM (backend only)
    - Alpine's lower memory usage leaves more room for the application
    - Smaller image size reduces deployment time and bandwidth
 
@@ -255,7 +255,7 @@ CMD ["./main"]
 - Optimize build flags for smaller binary size
 - Implement advanced security features
 - Add comprehensive health checks
-- Optimize for Koyeb platform specifics
+- Optimize for OCI platform specifics
 
 ### Phase 3: Advanced Features (Future)
 - Consider distroless for production if team expertise allows
@@ -362,7 +362,7 @@ CMD ["./main"]
 ### Summary of Benefits
 
 1. **Perfect Fit for Go**: Alpine's characteristics align perfectly with Go's static compilation
-2. **Free-Tier Optimized**: Small size and low memory usage ideal for Koyeb free tier
+2. **Free-Tier Optimized**: Small size and low memory usage ideal for OCI free tier
 3. **Security Enhanced**: Smaller attack surface and regular security updates
 4. **Performance Optimized**: Faster startup and lower resource usage
 5. **Cost Effective**: Reduced storage and bandwidth costs

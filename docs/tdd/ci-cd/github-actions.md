@@ -258,11 +258,11 @@ jobs:
           vercel-args: '--prod'
           working-directory: ./frontend
 
-      - name: Deploy Backend to Koyeb
-        uses: koyeb/action-deploy@v2
+      - name: Deploy Backend to OCI
+        uses: oracle-actions/oci-deploy@v1
         with:
-          api-token: ${{ secrets.KOYEB_API_TOKEN }}
-          service-id: ${{ secrets.KOYEB_SERVICE_ID }}
+          api-token: ${{ secrets.OCI_API_TOKEN }}
+          service-id: ${{ secrets.OCI_SERVICE_ID }}
           pattern: main
 
   deploy-production:
@@ -284,11 +284,11 @@ jobs:
           vercel-args: '--prod'
           working-directory: ./frontend
 
-      - name: Deploy Backend to Koyeb
-        uses: koyeb/action-deploy@v2
+      - name: Deploy Backend to OCI
+        uses: oracle-actions/oci-deploy@v1
         with:
-          api-token: ${{ secrets.KOYEB_API_TOKEN }}
-          service-id: ${{ secrets.KOYEB_SERVICE_ID }}
+          api-token: ${{ secrets.OCI_API_TOKEN }}
+          service-id: ${{ secrets.OCI_SERVICE_ID }}
           pattern: main
 ```
 
@@ -399,8 +399,8 @@ VERCEL_ORG_ID:                 # Vercel organization ID
 VERCEL_PROJECT_ID:             # Vercel project ID
 
 # Backend Deployment
-KOYEB_API_TOKEN:               # Koyeb API token
-KOYEB_SERVICE_ID:              # Koyeb service ID
+OCI_API_TOKEN:                 # OCI API token
+OCI_SERVICE_ID:                # OCI service ID
 
 # Security
 SNYK_TOKEN:                    # Snyk API token
@@ -552,8 +552,9 @@ fi
 # Rollback frontend
 vercel rollback $VERSION
 
-# Rollback backend (Koyeb)
-koyeb deployments redeploy --service-id $KOYEB_SERVICE_ID --deployment-id $VERSION
+# Rollback backend (OCI)
+oci compute instance-action --instance-id $OCI_INSTANCE_ID --action STOP
+oci compute instance-action --instance-id $OCI_INSTANCE_ID --action START
 ```
 
 ## Monitoring

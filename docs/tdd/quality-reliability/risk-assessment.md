@@ -26,7 +26,7 @@ This document identifies and assesses technical, security, and business risks fo
 - Supabase free tier: 500MB database, 50k MAU, 1GB storage
 - Upstash free tier: 10k commands/day, 256MB storage
 - Vercel free tier: 100GB bandwidth/month
-- Koyeb free tier: 512MB RAM, 0.5 vCPU, 1GB storage
+- OCI free tier: 2 OCPU + 12GB RAM (backend only)
 
 **Mitigation**:
 - Monitor usage closely with custom metrics
@@ -334,7 +334,7 @@ This document identifies and assesses technical, security, and business risks fo
 - Supabase dependency for database and auth
 - Vercel dependency for frontend hosting
 - Upstash dependency for caching
-- Koyeb dependency for backend hosting
+- OCI dependency for backend hosting
 
 **Mitigation**:
 - Use standard technologies (PostgreSQL, Redis)

@@ -364,10 +364,10 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 - Bandwidth/month: 100GB
 - Node.js runtime: See Node.js version in Frontend Dependencies
 
-**Koyeb**
-- RAM: 512MB
-- vCPU: 0.5
-- Persistent storage: 1GB
+**Oracle Cloud Infrastructure (OCI)**
+- Backend only: 2 OCPU + 12GB RAM
+- Nginx reverse proxy
+- Always Free tier available
 
 **Grafana**
 - Cloud Grafana: Free tier

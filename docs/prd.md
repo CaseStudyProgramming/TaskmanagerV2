@@ -289,10 +289,11 @@ Tag Weight: SUM(tag_weights) (max 15)
 │                  Application Layer                       │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
 │  │   Frontend   │  │   Backend    │  │   Auth       │  │
-│  │  (Vercel)    │  │  (Koyeb)     │  │  (Supabase)  │  │
+│  │  (Vercel)    │  │  (OCI)       │  │  (Supabase)  │  │
 │  │  SvelteKit   │  │  Go + Chi    │  │  Google OAuth│  │
 │  └──────────────┘  │  + Nginx     │  └──────────────┘  │
 │                     │  (Proxy)     │                   │
+│                     │  2 OCPU+12GB │                   │
 │                     └──────────────┘                   │
 └─────────────────────────────────────────────────────────┘
                           │
@@ -732,8 +733,9 @@ Benefits:
   - Global edge network
   - Automatic HTTPS
 
-- **Backend**: Koyeb (Free tier)
-  - RAM, vCPU, storage (see dependencies.md for limits)
+- **Backend**: Oracle Cloud Infrastructure (OCI)
+  - 2 OCPU + 12GB RAM (backend only)
+  - Nginx reverse proxy
   - Auto-scaling available
   - Global deployment
 
@@ -788,7 +790,7 @@ Benefits:
 
 #### GitHub Actions
 - Frontend: Build, test, deploy to Vercel
-- Backend: Build, test, deploy to Koyeb
+- Backend: Build, test, deploy to OCI
 - Database migrations (manual initially)
 - Security scanning (OWASP ZAP, Snyk)
 - Performance monitoring
@@ -801,7 +803,7 @@ Benefits:
 5. **E2E Tests** (Playwright)
 6. **Build** (Frontend and Backend)
 7. **Security Scan** (Snyk, OWASP)
-8. **Deploy** (Vercel, Koyeb)
+8. **Deploy** (Vercel, OCI)
 
 #### Environment Configuration
 - **Development**: Node.js (see dependencies.md for version requirements)
@@ -952,7 +954,7 @@ Benefits:
 - **Risk**: Low user adoption
   - **Mitigation**: Focus on UX, gather early feedback, iterate quickly
 
-- **Risk**: Supabase/Koyeb free tier changes
+- **Risk**: Supabase/OCI free tier changes
   - **Mitigation**: Architecture portability, vendor-neutral design
 
 ---
