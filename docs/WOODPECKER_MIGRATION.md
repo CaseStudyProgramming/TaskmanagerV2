@@ -30,8 +30,8 @@ This document summarizes the migration from GitHub Actions to Woodpecker CI/CD f
 - **Auto-Cleanup**: Session cleanup after pipeline completion (success or failure)
 
 ### 4. Frontend Runtime
-- **From**: Node.js
-- **To**: Bun (package manager and runtime)
+- **From**: Node.js (JavaScript runtime)
+- **To**: Bun (package manager and primary runtime for frontend build and production)
 
 ### 5. Storage Strategy
 - **Metadata**: Supabase (PostgreSQL) - text metadata + links to VM storage

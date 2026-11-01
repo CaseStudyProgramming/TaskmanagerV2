@@ -54,7 +54,7 @@ on:
     branches: [main, develop]
 
 env:
-  NODE_VERSION: '24.20.0'  # Must be used across development, testing, and production
+  BUN_VERSION: '1.4.2'  # Primary runtime for frontend build and production
   GO_VERSION: '1.25'
   TEST_DB_NAME: taskmanager_db_testing
 
@@ -67,11 +67,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'bun'
+          bun-version: ${{ env.BUN_VERSION }}
       
       - name: Install dependencies
         run: bun install
@@ -213,11 +212,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'bun'
+          bun-version: ${{ env.BUN_VERSION }}
       
       - name: Install dependencies
         run: bun install

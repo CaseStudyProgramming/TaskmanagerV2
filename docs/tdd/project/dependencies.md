@@ -10,11 +10,6 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 ### Core Framework & Language
 
-**Node.js**
-- version: v24.20.0
-- purpose: JavaScript runtime (must be used across development, testing, and production)
-- doc link: https://nodejs.org/en/download
-
 **TypeScript**
 - version: 7.0.2
 - purpose: Type-safe JavaScript
@@ -31,7 +26,7 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 - doc link: https://github.com/sveltejs/svelte
 
 **Vite**
-- version: 8.3.0 
+- version: 8.3.0
 - purpose: Build tool and dev server
 - doc link: https://vite.dev/releases
 
@@ -39,8 +34,14 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 **bun**
 - version: ^1.4.2
-- purpose: Fast package manager and runtime (replaces Node.js for frontend build and runtime)
+- purpose: Fast package manager and runtime (primary runtime for frontend build and production)
 - doc link: https://github.com/oven-sh/bun
+
+**Node.js** (Optional, for compatibility)
+- version: v24.20.0
+- purpose: JavaScript runtime (optional, only for tools that require Node.js specifically)
+- doc link: https://nodejs.org/en/download
+- note: Bun is the primary runtime for this project
 
 ### Styling
 
@@ -367,14 +368,13 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 **Vercel**
 - Bandwidth/month: 100GB
-- Node.js runtime: See Node.js version in Frontend Dependencies
+- Bun runtime: See Bun version in Frontend Dependencies (primary runtime)
 
 **Oracle Cloud Infrastructure (OCI)**
 - Backend only: 2 OCPU + 12GB RAM
 - Nginx reverse proxy
 - VM Storage: 200GB (for media files)
-- OCI Object Storage: 20GB free (for CI/CD artifacts)
-- Always Free tier available
+- OCI Object Storage: 10GB Standard tier PAYG (for CI/CD artifacts)
 
 **Grafana**
 - Cloud Grafana: Free tier
@@ -420,8 +420,13 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 ## Compatibility Matrix
 
-**Node.js**
-- Frontend: 24.20.0
+**Bun**
+- Frontend: 1.4.2 (primary runtime)
+- Backend: N/A
+- Infrastructure: N/A
+
+**Node.js** (Optional)
+- Frontend: 24.20.0 (optional, for tools that require Node.js specifically)
 - Backend: N/A
 - Infrastructure: N/A
 
@@ -461,12 +466,12 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 ## Documentation Links
 
-- [Node.js Releases](https://nodejs.org/en/download)
-- [Go Releases](https://go.dev/dl/)
 - [Bun Documentation](https://bun.sh/docs)
+- [Go Releases](https://go.dev/dl/)
 - [SvelteKit Documentation](https://kit.svelte.dev/docs)
 - [SQLBoiler Documentation](https://github.com/volatiletech/sqlboiler)
 - [Supabase Documentation](https://supabase.com/docs)
+- [Node.js Releases](https://nodejs.org/en/download) (optional, for compatibility)
 - [Upstash Documentation](https://upstash.com/docs)
 
 ---

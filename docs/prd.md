@@ -268,7 +268,7 @@ Tag Weight: SUM(tag_weights) (max 15)
 - **Deployment**: Manual deployment to OCI Podman
 
 #### Development
-- **Node.js**: See dependencies.md for version requirements
+- **Runtime**: Bun (primary runtime for frontend build and production)
 - **Package Manager**: bun
 - **Version Control**: Git
 - **API Documentation**: OpenAPI/Swagger
@@ -734,7 +734,7 @@ Benefits:
 
 #### Platform Selection
 - **Frontend**: Vercel (Free tier)
-  - Node.js runtime (see dependencies.md for version)
+  - Bun runtime (see dependencies.md for version)
   - Bandwidth/month (see dependencies.md for limits)
   - Unlimited deployments
   - Global edge network
@@ -813,10 +813,10 @@ Benefits:
 8. **Deploy** (Vercel, OCI)
 
 #### Environment Configuration
-- **Development**: Node.js (see dependencies.md for version requirements)
-- **Testing**: Node.js (see dependencies.md for version requirements)
-- **Production**: Node.js (see dependencies.md for version requirements)
-- **Consistency**: Same Node.js version across all environments (see dependencies.md)
+- **Development**: Bun (see dependencies.md for version requirements)
+- **Testing**: Bun (see dependencies.md for version requirements)
+- **Production**: Bun (see dependencies.md for version requirements)
+- **Consistency**: Same Bun version across all environments (see dependencies.md)
 
 ---
 
@@ -858,7 +858,7 @@ Benefits:
 - **API**: Postman/Newman, httpexpect
 - **Security**: OWASP ZAP, Snyk
 - **Performance**: Lighthouse, k6
-- **Runtime**: Node.js (see dependencies.md for version requirements)
+- **Runtime**: Bun (see dependencies.md for version requirements)
 
 ### 9.3 Test Categories
 - Unit tests (functions, components)
@@ -869,10 +869,10 @@ Benefits:
 - Performance tests (load, stress)
 
 ### 9.4 Testing Environment
-- **Runtime Environment**: Node.js (see dependencies.md for version requirements)
+- **Runtime Environment**: Bun (see dependencies.md for version requirements)
 - **Testing Database**: `taskmanager_db_testing` (mandatory for all test environments)
 - **Test Isolation**: Each test runs in isolated environment
-- **Consistency**: Same Node.js version as development and production (see dependencies.md)
+- **Consistency**: Same Bun version as development and production (see dependencies.md)
 
 ---
 

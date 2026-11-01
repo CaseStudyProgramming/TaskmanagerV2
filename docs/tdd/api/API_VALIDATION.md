@@ -4,7 +4,7 @@ This document describes how to validate the OpenAPI specification to ensure it c
 
 ## Prerequisites
 
-- Node.js v24.20.0 (required across development, testing, and production)
+- Bun v1.4.2 (primary runtime for frontend build and production)
 
 ## Validation Tool
 
