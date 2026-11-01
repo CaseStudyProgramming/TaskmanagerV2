@@ -11,14 +11,16 @@ variables:
 clone:
   git:
     image: woodpeckerci/plugin-git:latest
-    depth: 50
+    depth: 1
+    tags: false
 
 pipeline:
   # Stage 1: Quality Checks (All branches)
   quality-checks:
     image: oven/bun:*bun_version
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run format:check
       - bun run lint
       - bun run type-check
@@ -29,7 +31,8 @@ pipeline:
   unit-tests-frontend:
     image: oven/bun:*bun_version
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run test:unit -- --coverage
     when:
       event: [push, pull_request]
@@ -37,6 +40,7 @@ pipeline:
   unit-tests-backend:
     image: golang:*go_version
     commands:
+      - go clean -cache -modcache
       - go test ./... -short -cover
     when:
       event: [push, pull_request]
@@ -88,40 +92,47 @@ pipeline:
   smoke-tests:
     image: oven/bun:*bun_version
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run build
       - bun run test:smoke
     when:
       branch: [develop, main]
       event: [push, pull_request]
 
-  # Stage 7: Full E2E Tests (Push to main and cron)
+  # Stage 7: Full E2E Tests (Push to main and cron at midnight)
   e2e-tests-chromium:
     image: mcr.microsoft.com/playwright:v1.63.0
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run test:e2e --project=chromium
     when:
       branch: main
       event: [push, cron]
+      cron: "0 0 * * *"
 
   e2e-tests-firefox:
     image: mcr.microsoft.com/playwright:v1.63.0
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run test:e2e --project=firefox
     when:
       branch: main
       event: [push, cron]
+      cron: "0 0 * * *"
 
   e2e-tests-webkit:
     image: mcr.microsoft.com/playwright:v1.63.0
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run test:e2e --project=webkit
     when:
       branch: main
       event: [push, cron]
+      cron: "0 0 * * *"
 
   # Stage 8: Performance Check (Push to main only)
   performance-check:
@@ -181,3 +192,16 @@ pipeline:
     when:
       branch: main
       event: manual
+
+  # Stage 11: Cleanup Session (Auto-cleanup after pipeline completes)
+  cleanup-session:
+    image: quay.io/podman/stable
+    commands:
+      - echo "Cleaning up session after pipeline..."
+      - podman system prune -f --all
+      - podman volume prune -f
+      - podman image prune -a -f
+      - echo "Cleanup completed at $(date)"
+    when:
+      event: [push, pull_request, cron]
+      status: [success, failure]

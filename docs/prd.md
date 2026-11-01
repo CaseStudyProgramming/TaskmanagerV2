@@ -255,9 +255,9 @@ Tag Weight: SUM(tag_weights) (max 15)
 - **Crypto**: Standard library crypto packages
 
 #### Infrastructure
-- **Database**: Supabase (PostgreSQL) - metadata only + links to VM storage
-- **Object Storage (CI/CD)**: OCI Object Storage (20GB free) - Woodpecker artifacts
-- **Media Storage**: VM Storage (200GB on OCI Debian 26 LTS) - video, photo, media files
+- **Database**: Supabase (PostgreSQL) - metadata (text) + links to VM storage for media files
+- **Object Storage (CI/CD)**: OCI Object Storage (10GB Standard tier PAYG) - Woodpecker artifacts
+- **Media Storage**: VM Storage (200GB on OCI Debian 26 LTS) - video, photo, media files (VM storage sends links to Supabase database)
 - **Cache**: Redis (Upstash)
 - **Reverse Proxy**: Nginx (backend only)
 - **Monitoring**: Grafana (Free tier)
@@ -348,6 +348,7 @@ CREATE TABLE tasks (
     priority VARCHAR(50) DEFAULT 'medium',
     due_date BIGINT,                  -- Epoch time in milliseconds
     tags TEXT[],
+    media_urls TEXT[],               -- Array of VM storage file paths/URLs (links to 200GB VM storage)
     created_at BIGINT NOT NULL,      -- Epoch time in milliseconds
     updated_at BIGINT NOT NULL,      -- Epoch time in milliseconds
     completed_at BIGINT,              -- Epoch time in milliseconds

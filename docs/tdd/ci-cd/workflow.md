@@ -203,10 +203,11 @@ develop:
 
 #### Cron Job (Midnight Daily)
 ```yaml
-# Full E2E tests on main branch at midnight
+# Full E2E tests on main branch at midnight (00:00)
 - E2E tests (chromium, firefox, webkit)
 - Smoke tests
 - Health check
+- Session cleanup (auto)
 ```
 
 ### CI/CD Workflow Steps
@@ -218,14 +219,16 @@ develop:
 clone:
   git:
     image: woodpeckerci/plugin-git:latest
-    depth: 50
+    depth: 1
+    tags: false
 
 pipeline:
   # Stage 1: Quality Checks (All branches)
   quality-checks:
     image: oven/bun:1.4.2
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run format:check
       - bun run lint
       - bun run type-check
@@ -236,7 +239,8 @@ pipeline:
   unit-tests-frontend:
     image: oven/bun:1.4.2
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run test:unit -- --coverage
     when:
       event: [push, pull_request]
@@ -244,6 +248,7 @@ pipeline:
   unit-tests-backend:
     image: golang:1.27
     commands:
+      - go clean -cache -modcache
       - go test ./... -short -cover
     when:
       event: [push, pull_request]
@@ -295,40 +300,47 @@ pipeline:
   smoke-tests:
     image: oven/bun:1.4.2
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run build
       - bun run test:smoke
     when:
       branch: [develop, main]
       event: [push, pull_request]
 
-  # Stage 7: Full E2E Tests (Push to main and cron)
+  # Stage 7: Full E2E Tests (Push to main and cron at midnight)
   e2e-tests-chromium:
     image: mcr.microsoft.com/playwright:v1.63.0
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run test:e2e --project=chromium
     when:
       branch: main
       event: [push, cron]
+      cron: "0 0 * * *"
 
   e2e-tests-firefox:
     image: mcr.microsoft.com/playwright:v1.63.0
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run test:e2e --project=firefox
     when:
       branch: main
       event: [push, cron]
+      cron: "0 0 * * *"
 
   e2e-tests-webkit:
     image: mcr.microsoft.com/playwright:v1.63.0
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run test:e2e --project=webkit
     when:
       branch: main
       event: [push, cron]
+      cron: "0 0 * * *"
 
   # Stage 8: Performance Check (Push to main only)
   performance-check:
@@ -388,6 +400,19 @@ pipeline:
     when:
       branch: main
       event: manual
+
+  # Stage 11: Cleanup Session (Auto-cleanup after pipeline completes)
+  cleanup-session:
+    image: quay.io/podman/stable
+    commands:
+      - echo "Cleaning up session after pipeline..."
+      - podman system prune -f --all
+      - podman volume prune -f
+      - podman image prune -a -f
+      - echo "Cleanup completed at $(date)"
+    when:
+      event: [push, pull_request, cron]
+      status: [success, failure]
 ```
 
 ## 4. Code Review Process
@@ -860,5 +885,93 @@ pre-commit: format lint vet test build
 - [ ] README.md updated
 - [ ] Code comments updated
 ```
+
+## 15. Session Cleanup Workflow
+
+### Auto-Cleanup After Pipeline
+
+**Stage 11: Cleanup Session** dijalankan otomatis setelah pipeline selesai (baik sukses maupun gagal):
+
+```yaml
+cleanup-session:
+  image: quay.io/podman/stable
+  commands:
+    - echo "Cleaning up session after pipeline..."
+    - podman system prune -f --all
+    - podman volume prune -f
+    - podman image prune -a -f
+    - echo "Cleanup completed at $(date)"
+  when:
+    event: [push, pull_request, cron]
+    status: [success, failure]
+```
+
+**Cleanup Operations**:
+- `podman system prune -f --all`: Hapus semua containers, networks, dan unused images
+- `podman volume prune -f`: Hapus semua unused volumes
+- `podman image prune -a -f`: Hapus semua unused images
+
+**Benefits**:
+- ✅ Workers tidak menumpuk cache dan artifacts
+- ✅ Storage lebih hemat
+- ✅ Mencegah resource exhaustion
+- ✅ Pipeline lebih predictable
+
+**Execution**:
+- Diambil untuk semua event types (push, pull_request, cron)
+- Diambil untuk semua status (success, failure)
+- Menjamin cleanup bahkan jika pipeline gagal
+
+### Woodpecker Agent Configuration
+
+**Environment variables untuk cleanup**:
+```yaml
+WOODPECKER_LIMIT_TIMEOUT=1800  # 30 minutes timeout
+WOODPECKER_CLEANUP=true  # Auto-cleanup after pipeline
+```
+
+## 16. Cron Job Setup (Nightly E2E Tests)
+
+### Configuration di Woodpecker UI
+
+**Setup Cron Job**:
+1. Buka Woodpecker UI → Project Settings → Cron Jobs
+2. Add new cron job:
+   - Name: `nightly-e2e-full-test`
+   - Schedule: `0 0 * * *` (midnight daily)
+   - Branch: `main`
+   - Execute pipeline: `true`
+
+**Schedule Format**:
+- `0 0 * * *` = Setiap hari jam 00:00 (midnight)
+- Format: `minute hour day month day-of-week`
+- Contoh lain:
+  - `0 6 * * *` = Setiap hari jam 06:00
+  - `0 */12 * * *` = Setiap 12 jam
+  - `0 0 * * 0` = Setiap hari Minggu jam 00:00
+
+### Testing Cron Job
+
+**Untuk testing, gunakan schedule yang lebih frequent**:
+```yaml
+cron: "*/5 * * * *"  # Setiap 5 menit (untuk testing)
+```
+
+**Setelah testing, kembali ke production schedule**:
+```yaml
+cron: "0 0 * * *"  # Midnight daily
+```
+
+### Cron Job Workflow
+
+**Cron job menjalankan**:
+1. E2E tests (chromium, firefox, webkit)
+2. Smoke tests
+3. Health check
+4. Session cleanup (auto)
+
+**Branch restriction**:
+- Hanya berjalan di `main` branch
+- Tidak berjalan di feature branches atau develop
 
 This workflow ensures quality, security, and reliability while maintaining development velocity following global senior developer standards.

@@ -26,15 +26,18 @@ This document summarizes the migration from GitHub Actions to Woodpecker CI/CD f
 - **E2E Tests**: Playwright with chromium, firefox, webkit
 - **PR Batching**: Mergify for batching 3 PRs (free tier)
 - **Deployment**: Manual deployment trigger
+- **No-Cache Policy**: All pipeline stages use --no-cache for clean builds
+- **Auto-Cleanup**: Session cleanup after pipeline completion (success or failure)
 
 ### 4. Frontend Runtime
 - **From**: Node.js
 - **To**: Bun (package manager and runtime)
 
 ### 5. Storage Strategy
-- **Metadata**: Supabase (PostgreSQL)
-- **Media Files**: OCI Object Storage (200GB)
-- **Media URLs**: Stored in Supabase database
+- **Metadata**: Supabase (PostgreSQL) - text metadata + links to VM storage
+- **Media Files**: VM Storage (200GB on OCI Debian 26 LTS) - video, photo, media files
+- **Media URLs**: VM storage sends links to Supabase database
+- **CI/CD Artifacts**: OCI Object Storage (10GB Standard tier PAYG) - Woodpecker artifacts
 
 ---
 
@@ -47,6 +50,9 @@ This document summarizes the migration from GitHub Actions to Woodpecker CI/CD f
    - Universal template for multiple projects
    - Installation and setup instructions
    - File permissions guide
+   - Cron job configuration (midnight E2E tests)
+   - Auto-cleanup session configuration
+   - No-cache policy configuration
 
 2. **.woodpecker.yml**
    - Woodpecker pipeline configuration
@@ -82,7 +88,7 @@ This document summarizes the migration from GitHub Actions to Woodpecker CI/CD f
    - Updated infrastructure section
    - Added Woodpecker CI/CD
    - Added Mergify for PR batching
-   - Added OCI Object Storage
+   - Updated storage strategy (VM Storage for media files, OCI Object Storage for CI/CD artifacts)
    - Updated frontend runtime to Bun
 
 5. **docs/tdd/project/dependencies.md**
@@ -138,13 +144,110 @@ git push origin feature/test-woodpecker
 # Check Woodpecker UI for pipeline status
 ```
 
-### 5. Configure Cron Job
+### 5. Configure Cron Job (Nightly E2E Tests at 00:00)
 
-```bash
-# Add cron job in Woodpecker UI
-# Schedule: 0 0 * * * (midnight daily)
-# Branch: main
+**Setup Cron Job di Woodpecker UI**:
+
+1. Buka Woodpecker UI → Project Settings → Cron Jobs
+2. Add new cron job:
+   - Name: `nightly-e2e-full-test`
+   - Schedule: `0 0 * * *` (midnight daily)
+   - Branch: `main`
+   - Execute pipeline: `true`
+
+**Testing Cron Job**:
+
+Untuk testing, gunakan schedule yang lebih frequent:
+```yaml
+cron: "*/5 * * * *"  # Setiap 5 menit (untuk testing)
 ```
+
+Setelah testing berhasil, kembali ke production schedule:
+```yaml
+cron: "0 0 * * *"  # Midnight daily
+```
+
+**Cron Job yang Dijalankan**:
+- E2E tests (chromium, firefox, webkit)
+- Smoke tests
+- Health check
+- Session cleanup (auto)
+
+### 6. Configure Auto-Cleanup Session
+
+**Stage 11: Cleanup Session** sudah ditambahkan di `.woodpecker.yml`:
+
+```yaml
+cleanup-session:
+  image: quay.io/podman/stable
+  commands:
+    - echo "Cleaning up session after pipeline..."
+    - podman system prune -f --all
+    - podman volume prune -f
+    - podman image prune -a -f
+    - echo "Cleanup completed at $(date)"
+  when:
+    event: [push, pull_request, cron]
+    status: [success, failure]
+```
+
+**Woodpecker Agent Configuration** (di docker-compose.yml):
+
+```yaml
+woodpecker-agent:
+  image: woodpeckerci/woodpecker-agent:latest
+  environment:
+    - WOODPECKER_SERVER=woodpecker-server:9000
+    - WOODPECKER_AGENT_SECRET=${WOODPECKER_AGENT_SECRET}
+    - WOODPECKER_MAX_PROCS=2
+    - WOODPECKER_LIMIT_MEM=2048
+    - WOODPECKER_LIMIT_TIMEOUT=1800  # 30 minutes timeout
+    - WOODPECKER_CLEANUP=true  # Auto-cleanup after pipeline
+```
+
+**Benefits**:
+- Workers tidak menumpuk cache dan artifacts
+- Storage lebih hemat
+- Mencegah resource exhaustion
+- Pipeline lebih predictable
+
+### 7. Configure No-Cache Policy
+
+**Clone Configuration**:
+```yaml
+clone:
+  git:
+    image: woodpeckerci/plugin-git:latest
+    depth: 1  # Shallow clone
+    tags: false  # Don't fetch tags
+```
+
+**Dependency Installation**:
+```yaml
+# Frontend (Bun)
+quality-checks:
+  image: oven/bun:*bun_version
+  commands:
+    - rm -rf node_modules .bun
+    - bun install --no-cache
+    - bun run format:check
+    - bun run lint
+    - bun run type-check
+
+# Backend (Go)
+unit-tests-backend:
+  image: golang:*go_version
+  commands:
+    - go clean -cache -modcache
+    - go test ./... -short -cover
+```
+
+**Benefits**:
+- Consistent builds (install dependencies fresh)
+- No cache corruption issues
+- Storage savings
+- Faster cleanup
+- More predictable build times
 
 ---
 
@@ -254,12 +357,55 @@ CREATE TABLE tasks (
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     title VARCHAR(200) NOT NULL,
     description TEXT,
-    media_urls TEXT[]  -- Array of OCI Object Storage URLs
+    media_urls TEXT[]  -- Array of VM storage file paths/URLs (links to 200GB VM storage)
     -- ... other fields
 );
 ```
 
-### OCI Object Storage for Media Files
+### VM Storage for Media Files (200GB on OCI Debian 26 LTS)
+
+**Storage Location**: `/var/www/media/` on OCI Debian 26 LTS server
+
+```bash
+# Create media storage directory
+sudo mkdir -p /var/www/media/videos
+sudo mkdir -p /var/www/media/photos
+sudo mkdir -p /var/www/media/documents
+
+# Set permissions
+sudo chown -R www-data:www-data /var/www/media
+sudo chmod -R 755 /var/www/media
+
+# Access via backend API
+# Backend serves files: https://yourdomain.com/media/videos/video.mp4
+```
+
+**Backend Integration**:
+```go
+// Upload file to VM storage
+func UploadToVMStorage(file io.Reader, filename string) (string, error) {
+    // Save to /var/www/media/
+    // Return file path for database storage
+    return "/media/videos/" + filename, nil
+}
+
+// Task with media
+type Task struct {
+    ID          uuid.UUID
+    Title       string
+    Description string
+    MediaURLs   []string  // VM storage file paths/URLs
+    // ... other fields
+}
+```
+
+**VM Storage → Supabase Link**:
+1. Backend uploads file to VM Storage (/var/www/media/)
+2. Backend generates URL or file path
+3. Backend stores URL/path in Supabase database (media_urls column)
+4. Frontend retrieves URL from Supabase and displays media
+
+### OCI Object Storage for CI/CD Artifacts (10GB Standard tier PAYG)
 
 ```bash
 # Install OCI CLI
@@ -268,21 +414,23 @@ sudo apt install -y oracle-cloud-cli
 # Configure OCI CLI
 oci setup config
 
-# Create bucket
+# Create bucket for CI/CD artifacts with 5-day auto-cleanup
 oci os bucket create \
   --compartment-id $COMPARTMENT_ID \
-  --name taskmanager-media
-
-# Upload file
-oci os object put \
-  --bucket-name taskmanager-media \
-  --file /path/to/file.jpg
-
-# Get pre-authenticated URL
-oci os preauth-request create \
-  --bucket-name taskmanager-media \
-  --name file.jpg
+  --name woodpecker-artifacts \
+  --public-access-type NoPublicAccess \
+  --object-lifecycle-rule-age-days 5
 ```
+
+**Penting**: `--object-lifecycle-rule-age-days 5` akan otomatis menghapus semua artifacts setelah 5 hari. Dengan OCI Object Storage 10GB Standard tier PAYG, 5-day retention adalah optimal untuk menghemat storage. Bisa ubah angka 5 ke berapa hari yang Anda mau (7, 10, dll), tapi ingat storage limit 10GB.
+
+**Storage Usage dengan 5-day retention**:
+- Daily usage: ~635 MB
+- 5-day rolling window: ~3.175 GB
+- OCI Object Storage limit: 10 GB
+- Remaining buffer: 6.825 GB ✅
+
+Untuk detail lebih lanjut tentang artifact management, lihat [Woodpecker Artifact Management](./docs/tdd/ci-cd/woodpecker-artifacts.md).
 
 ---
 
@@ -296,12 +444,18 @@ oci os preauth-request create \
 - [x] Update PRD.md
 - [x] Update dependencies.md
 - [x] Update README.md files
+- [x] Configure cron job for midnight E2E tests
+- [x] Configure auto-cleanup session after pipeline
+- [x] Configure no-cache policy for all pipeline stages
+- [x] Update storage configuration (10GB Standard tier PAYG for CI/CD artifacts, VM Storage for media files)
 - [ ] Install Woodpecker on OCI server
 - [ ] Configure Cloudflare SSL
 - [ ] Configure Woodpecker project
 - [ ] Add Woodpecker secrets
 - [ ] Test pipeline on feature branch
-- [ ] Configure cron job
+- [ ] Configure cron job in Woodpecker UI (0 0 * * *)
+- [ ] Test cron job execution
+- [ ] Verify auto-cleanup after pipeline
 - [ ] Disable GitHub Actions (after testing)
 - [ ] Deploy to staging
 - [ ] Deploy to production
@@ -352,10 +506,13 @@ WOODPECKER_MAX_PROCS=1
 2. Configure Cloudflare SSL
 3. Add repository to Woodpecker
 4. Configure project settings and secrets
-5. Test pipeline on feature branch
-6. Configure cron job for midnight E2E tests
-7. Disable GitHub Actions after successful testing
-8. Deploy to production
+5. Update docker-compose.yml with WOODPECKER_CLEANUP=true and WOODPECKER_LIMIT_TIMEOUT=1800
+6. Test pipeline on feature branch
+7. Configure cron job in Woodpecker UI (nightly-e2e-full-test, 0 0 * * *)
+8. Test cron job execution (use */5 * * * * for testing first)
+9. Verify auto-cleanup after pipeline completion
+10. Disable GitHub Actions after successful testing
+11. Deploy to production
 
 ---
 

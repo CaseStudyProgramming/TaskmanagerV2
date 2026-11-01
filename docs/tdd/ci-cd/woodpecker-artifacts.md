@@ -12,7 +12,7 @@ Woodpecker CI tidak memiliki built-in artifact storage seperti GitHub Actions. S
 
 ## Recommended Solution: OCI Object Storage + Lifecycle Policy + .zip Compression
 
-Gunakan OCI Object Storage (20GB free tier) untuk menyimpan Woodpecker CI/CD artifacts dengan:
+Gunakan OCI Object Storage (10GB Standard tier PAYG) untuk menyimpan Woodpecker CI/CD artifacts dengan:
 - **OCI Lifecycle Policy** untuk auto-cleanup otomatis
 - **.zip compression** (per-folder) untuk hemat storage
 - **2 buckets terpisah** untuk cache dan artifacts
@@ -88,11 +88,12 @@ oci os bucket list --compartment-id $COMPARTMENT_ID
 ```
 
 **Penting**:
-- **OCI Object Storage tidak punya hard limit per bucket** - semua bucket sharing 20GB total
+- **OCI Object Storage tidak punya hard limit per bucket** - semua bucket sharing 10GB total (Standard tier PAYG)
 - Bucket cache: 3-day retention untuk dependencies (node_modules, vendor)
 - Bucket artifacts: 2-day retention untuk coverage, E2E, security reports
-- Dengan .zip compression, estimated usage ~2.7 GB total, buffer 17.3 GB
-- Anda bisa ubah retention sesuai kebutuhan, tapi ingat storage limit 20GB
+- Dengan .zip compression, estimated usage ~2.7 GB total, buffer 7.3 GB
+- Jika ingin lebih hemat storage, gunakan 3-day retention untuk lebih optimal
+- Anda bisa ubah retention sesuai kebutuhan, tapi ingat storage limit 10GB
 
 ### 2. Configure Pre-Authenticated Requests (Optional)
 
@@ -588,7 +589,7 @@ oci os bucket update \
 - Tidak perlu cron job
 - Bisa ubah retention kapan saja
 - Dengan .zip compression, storage usage ~75% lebih hemat
-- Optimal untuk 20GB OCI Object Storage limit
+- Optimal untuk 10GB OCI Object Storage limit (Standard tier PAYG)
 
 ### Alternative: Manual Cleanup Script (Optional)
 

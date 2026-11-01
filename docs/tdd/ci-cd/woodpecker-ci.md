@@ -19,9 +19,11 @@ This document defines the Woodpecker CI/CD pipeline configuration that replaces 
 5. **Storage**:
    - Supabase for database teks(metadata) + links to VM storage
    - VM Storage (200GB on OCI Debian 26 LTS) for video, photo, media files
-   - OCI Object Storage (20GB free) for Woodpecker CI/CD artifacts
+   - OCI Object Storage (10GB Standard tier PAYG) for Woodpecker CI/CD artifacts
 6. **Deployment**: Manual deployment to OCI Podman
 7. **Universal Setup**: Configured for Project A, Project B, and future projects
+8. **No-Cache Policy**: All pipeline stages use --no-cache to ensure clean builds
+9. **Auto-Cleanup**: Session cleanup after pipeline completion (success or failure)
 
 ---
 
@@ -222,14 +224,16 @@ variables:
 clone:
   git:
     image: woodpeckerci/plugin-git:latest
-    depth: 50
+    depth: 1
+    tags: false
 
 pipeline:
   # Stage 1: Quality Checks (All branches)
   quality-checks:
     image: oven/bun:*bun_version
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run format:check
       - bun run lint
       - bun run type-check
@@ -240,7 +244,8 @@ pipeline:
   unit-tests-frontend:
     image: oven/bun:*bun_version
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run test:unit -- --coverage
     when:
       event: [push, pull_request]
@@ -248,6 +253,7 @@ pipeline:
   unit-tests-backend:
     image: golang:*go_version
     commands:
+      - go clean -cache -modcache
       - go test ./... -short -cover
     when:
       event: [push, pull_request]
@@ -299,40 +305,47 @@ pipeline:
   smoke-tests:
     image: oven/bun:*bun_version
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run build
       - bun run test:smoke
     when:
       branch: [develop, main]
       event: [push, pull_request]
 
-  # Stage 7: Full E2E Tests (Push to main only)
+  # Stage 7: Full E2E Tests (Push to main and cron at midnight)
   e2e-tests-chromium:
     image: mcr.microsoft.com/playwright:v1.63.0
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run test:e2e --project=chromium
     when:
       branch: main
       event: [push, cron]
+      cron: "0 0 * * *"
 
   e2e-tests-firefox:
     image: mcr.microsoft.com/playwright:v1.63.0
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run test:e2e --project=firefox
     when:
       branch: main
       event: [push, cron]
+      cron: "0 0 * * *"
 
   e2e-tests-webkit:
     image: mcr.microsoft.com/playwright:v1.63.0
     commands:
-      - bun install
+      - rm -rf node_modules .bun
+      - bun install --no-cache
       - bun run test:e2e --project=webkit
     when:
       branch: main
       event: [push, cron]
+      cron: "0 0 * * *"
 
   # Stage 8: Performance Check (Push to main only)
   performance-check:
@@ -392,22 +405,56 @@ pipeline:
     when:
       branch: main
       event: manual
+
+  # Stage 11: Cleanup Session (Auto-cleanup after pipeline completes)
+  cleanup-session:
+    image: quay.io/podman/stable
+    commands:
+      - echo "Cleaning up session after pipeline..."
+      - podman system prune -f --all
+      - podman volume prune -f
+      - podman image prune -a -f
+      - echo "Cleanup completed at $(date)"
+    when:
+      event: [push, pull_request, cron]
+      status: [success, failure]
 ```
 
 ---
 
 ## Cron Job Configuration (Midnight E2E Tests)
 
-### Woodpecker Cron Job
+### Woodpecker Cron Job (Jam 00:00)
+
+**Konfigurasi Cron Job di .woodpecker.yml**:
 
 ```yaml
-# Add to .woodpecker.yml
-cron: nightly-e2e
+# E2E tests dengan cron job
+e2e-tests-chromium:
+  image: mcr.microsoft.com/playwright:v1.63.0
+  commands:
+    - rm -rf node_modules .bun
+    - bun install --no-cache
+    - bun run test:e2e --project=chromium
   when:
-    event: cron
-    cron: "0 0 * * *"  # Midnight daily
     branch: main
+    event: [push, cron]
+    cron: "0 0 * * *"  # Midnight daily
 ```
+
+**Setup Cron Job di Woodpecker UI**:
+
+1. Buka Woodpecker UI → Project Settings → Cron Jobs
+2. Add new cron job:
+   - Name: `nightly-e2e-full-test`
+   - Schedule: `0 0 * * *` (midnight daily)
+   - Branch: `main`
+   - Execute pipeline: `true`
+
+**Cron Schedule Format**:
+- `0 0 * * *` = Setiap hari jam 00:00 (midnight)
+- Format: `minute hour day month day-of-week`
+- Untuk testing: gunakan `*/5 * * * *` (setiap 5 menit)
 
 ### Alternative: Systemd Timer (for OCI server)
 
@@ -448,6 +495,188 @@ WantedBy=timers.target
 sudo systemctl enable woodpecker-cron.timer
 sudo systemctl start woodpecker-cron.timer
 ```
+
+---
+
+## Auto-Cleanup Session Configuration
+
+### Session Cleanup di Pipeline
+
+**Stage 11: Cleanup Session** di .woodpecker.yml:
+
+```yaml
+# Stage 11: Cleanup Session (Auto-cleanup after pipeline completes)
+cleanup-session:
+  image: quay.io/podman/stable
+  commands:
+    - echo "Cleaning up session after pipeline..."
+    - podman system prune -f --all
+    - podman volume prune -f
+    - podman image prune -a -f
+    - echo "Cleanup completed at $(date)"
+  when:
+    event: [push, pull_request, cron]
+    status: [success, failure]
+```
+
+**Penjelasan**:
+- `podman system prune -f --all`: Hapus semua containers, networks, dan unused images
+- `podman volume prune -f`: Hapus semua unused volumes
+- `podman image prune -a -f`: Hapus semua unused images
+- `status: [success, failure]`: Cleanup dijalankan baik pipeline sukses maupun gagal
+- `event: [push, pull_request, cron]`: Cleanup dijalankan untuk semua event types
+
+### Woodpecker Agent Cleanup Configuration
+
+**Update docker-compose.yml untuk woodpecker-agent**:
+
+```yaml
+woodpecker-agent:
+  image: woodpeckerci/woodpecker-agent:latest
+  container_name: woodpecker-agent
+  command: agent
+  volumes:
+    - /var/run/podman/podman.sock:/var/run/docker.sock
+  environment:
+    - WOODPECKER_SERVER=woodpecker-server:9000
+    - WOODPECKER_AGENT_SECRET=${WOODPECKER_AGENT_SECRET}
+    - WOODPECKER_MAX_PROCS=2  # 2 workers
+    - WOODPECKER_LIMIT_MEM=2048  # 2GB RAM limit
+    - WOODPECKER_LIMIT_TIMEOUT=1800  # 30 minutes timeout
+    - WOODPECKER_CLEANUP=true  # Auto-cleanup after pipeline
+  depends_on:
+    - woodpecker-server
+  restart: unless-stopped
+  privileged: true  # Required for Podman
+```
+
+**Environment Variables untuk Cleanup**:
+- `WOODPECKER_LIMIT_TIMEOUT=1800`: Timeout 30 menit per pipeline untuk mencegah hanging sessions
+- `WOODPECKER_CLEANUP=true`: Auto-cleanup containers setelah pipeline selesai (native Woodpecker setting)
+
+### Server-Level Cleanup (Optional)
+
+**Jika ingin cleanup yang lebih agresif di server level**:
+
+```bash
+# Add ke crontab di OCI server
+# Edit crontab: crontab -e
+
+# Cleanup setiap 6 jam
+0 */6 * * * podman system prune -f --all && podman volume prune -f
+
+# Log output ke file
+0 */6 * * * podman system prune -f --all && podman volume prune -f >> /var/log/podman-cleanup.log 2>&1
+```
+
+**Atau gunakan systemd timer**:
+
+```bash
+# Create systemd service
+sudo nano /etc/systemd/system/podman-cleanup.service
+```
+
+```ini
+[Unit]
+Description=Podman Cleanup Service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/podman system prune -f --all
+ExecStart=/usr/bin/podman volume prune -f
+ExecStart=/usr/bin/podman image prune -a -f
+```
+
+```bash
+sudo nano /etc/systemd/system/podman-cleanup.timer
+```
+
+```ini
+[Unit]
+Description=Run Podman Cleanup Every 6 Hours
+
+[Timer]
+OnCalendar=*-*-* */6:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+```bash
+sudo systemctl enable podman-cleanup.timer
+sudo systemctl start podman-cleanup.timer
+```
+
+---
+
+## No-Cache Policy Configuration
+
+### Clone Configuration (No-Cache)
+
+**Update clone section di .woodpecker.yml**:
+
+```yaml
+clone:
+  git:
+    image: woodpeckerci/plugin-git:latest
+    depth: 1  # Shallow clone (depth 1 instead of 50)
+    tags: false  # Don't fetch tags to save bandwidth
+```
+
+**Penjelasan**:
+- `depth: 1`: Clone hanya 1 commit terakhir (bukan 50), hemat bandwidth dan storage
+- `tags: false`: Tidak fetch tags, lebih cepat
+
+### Dependency Installation (No-Cache)
+
+**Frontend (Bun)**:
+
+```yaml
+quality-checks:
+  image: oven/bun:*bun_version
+  commands:
+    - rm -rf node_modules .bun  # Clean existing dependencies
+    - bun install --no-cache  # Install without cache
+    - bun run format:check
+    - bun run lint
+    - bun run type-check
+  when:
+    event: [push, pull_request]
+```
+
+**Backend (Go)**:
+
+```yaml
+unit-tests-backend:
+  image: golang:*go_version
+  commands:
+    - go clean -cache -modcache  # Clean Go cache
+    - go test ./... -short -cover
+  when:
+    event: [push, pull_request]
+```
+
+**Penjelasan**:
+- `rm -rf node_modules .bun`: Hapus dependencies sebelum install
+- `bun install --no-cache`: Install tanpa cache
+- `go clean -cache -modcache`: Clean Go module cache
+- Ini memastikan build yang clean dan consistent
+
+### Benefits of No-Cache Policy
+
+**Advantages**:
+- ✅ **Consistent builds**: Setiap pipeline install dependencies fresh
+- ✅ **No cache corruption**: Mencegah issues dari cache yang corrupt
+- ✅ **Storage savings**: Tidak ada cache yang tersimpan di workers
+- ✅ **Faster cleanup**: Workers tidak perlu mengelola cache
+- ✅ **Predictable**: Build time lebih predictable (tapi sedikit lebih lambat)
+
+**Trade-offs**:
+- ⚠️ **Slightly slower build times**: Install dependencies dari scratch
+- ⚠️ **More network usage**: Download dependencies setiap pipeline
+
+**Rekomendasi**: Untuk environment dengan resource terbatas (1-2 workers, 2GB RAM), no-cache policy lebih baik karena menghemat storage dan mencegah cache-related issues.
 
 ---
 
@@ -532,7 +761,7 @@ pull_request_rules:
 │     ├── Local filesystem storage                          │
 │     └── Accessible via backend API                       │
 │                                                           │
-│  3. OCI OBJECT STORAGE (20GB free)                       │
+│  3. OCI OBJECT STORAGE (10GB Standard tier PAYG)        │
 │     ├── Woodpecker CI/CD artifacts                      │
 │     ├── Coverage reports                                  │
 │     ├── E2E test results                                 │
@@ -610,7 +839,7 @@ type Task struct {
 }
 ```
 
-### OCI Object Storage for CI/CD Artifacts (20GB)
+### OCI Object Storage for CI/CD Artifacts (10GB Standard tier PAYG)
 
 ```bash
 # Create bucket for CI/CD artifacts with 5-day auto-cleanup
@@ -621,7 +850,7 @@ oci os bucket create \
   --object-lifecycle-rule-age-days 5
 ```
 
-**Penting**: `--object-lifecycle-rule-age-days 5` akan otomatis menghapus semua artifacts setelah 5 hari. Dengan OCI Object Storage 20GB free, 5-day retention adalah optimal untuk menghemat storage. Bisa ubah angka 5 ke berapa hari yang Anda mau (7, 10, dll), tapi ingat storage limit 20GB.
+**Penting**: `--object-lifecycle-rule-age-days 5` akan otomatis menghapus semua artifacts setelah 5 hari. Dengan OCI Object Storage 10GB Standard tier PAYG, 5-day retention adalah optimal untuk menghemat storage. Bisa ubah angka 5 ke berapa hari yang Anda mau (7, 10, dll), tapi ingat storage limit 10GB.
 
 Untuk detail lebih lanjut tentang artifact management, lihat [Woodpecker Artifact Management](./woodpecker-artifacts.md).
 
