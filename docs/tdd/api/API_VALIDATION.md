@@ -4,7 +4,7 @@ This document describes how to validate the OpenAPI specification to ensure it c
 
 ## Prerequisites
 
-- Bun v1.4.2 (primary runtime for frontend build and production)
+- Bun v1.4.2 (JavaScript runtime for frontend - TypeScript/JavaScript)
 
 ## Validation Tool
 

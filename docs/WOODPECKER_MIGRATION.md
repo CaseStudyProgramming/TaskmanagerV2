@@ -31,7 +31,8 @@ This document summarizes the migration from GitHub Actions to Woodpecker CI/CD f
 
 ### 4. Frontend Runtime
 - **From**: Node.js (JavaScript runtime)
-- **To**: Bun (package manager and primary runtime for frontend build and production)
+- **To**: Bun (JavaScript runtime and package manager for frontend - TypeScript/JavaScript)
+- **Note**: Backend continues to use Go runtime with stdlib + Chi router
 
 ### 5. Storage Strategy
 - **Metadata**: Supabase (PostgreSQL) - text metadata + links to VM storage
@@ -92,7 +93,8 @@ This document summarizes the migration from GitHub Actions to Woodpecker CI/CD f
    - Updated frontend runtime to Bun
 
 5. **docs/tdd/project/dependencies.md**
-   - Updated Bun as runtime (not just package manager)
+   - Updated Bun as JavaScript runtime for frontend (TypeScript/JavaScript)
+   - Clarified Go runtime for backend (stdlib + Chi router)
    - Added Woodpecker CI/CD dependency
    - Added Mergify dependency
 

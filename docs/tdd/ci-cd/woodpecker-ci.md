@@ -1000,10 +1000,10 @@ alias docker=podman
 alias docker-compose=podman-compose
 ```
 
-### Bun Runtime for Frontend
+### Bun Runtime for Frontend (JavaScript/TypeScript)
 
 ```bash
-# Install Bun (for frontend)
+# Install Bun (JavaScript runtime for frontend)
 curl -fsSL https://bun.sh/install | bash
 
 # Install dependencies
@@ -1015,6 +1015,8 @@ bun run dev
 # Build frontend
 bun run build
 ```
+
+**Note**: Bun is the JavaScript runtime for frontend only. Backend uses Go runtime with stdlib + Chi router.
 
 ---
 

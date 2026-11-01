@@ -237,7 +237,8 @@ Tag Weight: SUM(tag_weights) (max 15)
 #### Frontend
 - **Framework**: SvelteKit
 - **Language**: TypeScript (strict mode)
-- **Runtime**: Bun (package manager and runtime)
+- **Runtime**: Bun (JavaScript runtime for TypeScript/JavaScript)
+- **Package Manager**: Bun
 - **Architecture**: Feature-Sliced Design (FSD) + Vertical Slices
 - **Styling**: Tailwind CSS
 - **Validation**: Zod
@@ -247,6 +248,7 @@ Tag Weight: SUM(tag_weights) (max 15)
 
 #### Backend
 - **Language**: Go
+- **Runtime**: Go stdlib (built-in Go runtime)
 - **Framework**: Chi (idiomatic HTTP router)
 - **Architecture**: Domain-Driven Design (DDD) + Vertical Slices
 - **ORM**: SQLBoiler
@@ -268,8 +270,10 @@ Tag Weight: SUM(tag_weights) (max 15)
 - **Deployment**: Manual deployment to OCI Podman
 
 #### Development
-- **Runtime**: Bun (primary runtime for frontend build and production)
-- **Package Manager**: bun
+- **Frontend Runtime**: Bun (JavaScript runtime for TypeScript/JavaScript)
+- **Frontend Package Manager**: Bun
+- **Backend Runtime**: Go stdlib (built-in Go runtime)
+- **Backend Framework**: Chi (idiomatic HTTP router)
 - **Version Control**: Git
 - **API Documentation**: OpenAPI/Swagger
 

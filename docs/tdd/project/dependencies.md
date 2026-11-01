@@ -34,14 +34,15 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 **bun**
 - version: ^1.4.2
-- purpose: Fast package manager and runtime (primary runtime for frontend build and production)
+- purpose: JavaScript runtime and package manager for frontend (TypeScript/JavaScript)
 - doc link: https://github.com/oven-sh/bun
+- note: Bun is the JavaScript runtime for frontend only - not for backend
 
 **Node.js** (Optional, for compatibility)
 - version: v24.20.0
 - purpose: JavaScript runtime (optional, only for tools that require Node.js specifically)
 - doc link: https://nodejs.org/en/download
-- note: Bun is the primary runtime for this project
+- note: Optional fallback for tools that don't support Bun yet
 
 ### Styling
 
@@ -420,19 +421,19 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 ## Compatibility Matrix
 
-**Bun**
-- Frontend: 1.4.2 (primary runtime)
-- Backend: N/A
+**Bun** (JavaScript Runtime)
+- Frontend: 1.4.2 (JavaScript runtime for TypeScript/JavaScript)
+- Backend: N/A (Go uses its own runtime)
 - Infrastructure: N/A
 
 **Node.js** (Optional)
 - Frontend: 24.20.0 (optional, for tools that require Node.js specifically)
-- Backend: N/A
+- Backend: N/A (Go uses its own runtime)
 - Infrastructure: N/A
 
-**Go**
-- Frontend: N/A
-- Backend: 1.27+
+**Go** (Go Runtime)
+- Frontend: N/A (Bun is the JavaScript runtime for frontend)
+- Backend: 1.27+ (built-in Go runtime with stdlib + Chi router)
 - Infrastructure: N/A
 
 **PostgreSQL**

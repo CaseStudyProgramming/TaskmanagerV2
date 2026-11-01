@@ -54,8 +54,8 @@ on:
     branches: [main, develop]
 
 env:
-  BUN_VERSION: '1.4.2'  # Primary runtime for frontend build and production
-  GO_VERSION: '1.25'
+  BUN_VERSION: '1.4.2'  # JavaScript runtime for frontend (TypeScript/JavaScript)
+  GO_VERSION: '1.25'    # Go runtime for backend (stdlib + Chi router)
   TEST_DB_NAME: taskmanager_db_testing
 
 jobs:

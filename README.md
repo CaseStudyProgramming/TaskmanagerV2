@@ -27,10 +27,10 @@ taskmanagerV2/
 
 ### Prerequisites
 
-- **Node.js**: v24.20.0 (required across development, testing, and production)
-- **Go**: 1.25+
+- **Bun**: v1.4.2 (JavaScript runtime and package manager for frontend - TypeScript/JavaScript)
+- **Go**: 1.25+ (runtime for backend with stdlib + Chi router)
 - **Docker** or **Podman**: For local development
-- **Bun**: Package manager (optional)
+- **Node.js**: v24.20.0 (optional, only for tools that require Node.js specifically)
 
 ### Local Development
 
@@ -90,6 +90,8 @@ See [Container Strategy](docs/architecture/container-strategy.md) for details.
 ### Frontend
 - **Framework**: SvelteKit
 - **Language**: TypeScript (strict mode)
+- **Runtime**: Bun (JavaScript runtime for TypeScript/JavaScript)
+- **Package Manager**: Bun
 - **Architecture**: Feature-Sliced Design (FSD)
 - **Styling**: Tailwind CSS
 - **Validation**: Zod
@@ -98,7 +100,8 @@ See [Container Strategy](docs/architecture/container-strategy.md) for details.
 
 ### Backend
 - **Language**: Go 1.25+
-- **Framework**: Chi (HTTP router)
+- **Runtime**: Go stdlib (built-in Go runtime)
+- **Framework**: Chi (idiomatic HTTP router)
 - **Architecture**: Domain-Driven Design (DDD)
 - **ORM**: SQLBoiler
 - **Database**: PostgreSQL (Supabase)
