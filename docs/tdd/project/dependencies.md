@@ -372,6 +372,8 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 **Oracle Cloud Infrastructure (OCI)**
 - Backend only: 2 OCPU + 12GB RAM
 - Nginx reverse proxy
+- VM Storage: 200GB (for media files)
+- OCI Object Storage: 20GB free (for CI/CD artifacts)
 - Always Free tier available
 
 **Grafana**

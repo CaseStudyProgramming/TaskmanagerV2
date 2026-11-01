@@ -255,8 +255,9 @@ Tag Weight: SUM(tag_weights) (max 15)
 - **Crypto**: Standard library crypto packages
 
 #### Infrastructure
-- **Database**: Supabase (PostgreSQL) - metadata only
-- **Object Storage**: OCI Object Storage (200GB) - media files (video, photo, etc.)
+- **Database**: Supabase (PostgreSQL) - metadata only + links to VM storage
+- **Object Storage (CI/CD)**: OCI Object Storage (20GB free) - Woodpecker artifacts
+- **Media Storage**: VM Storage (200GB on OCI Debian 26 LTS) - video, photo, media files
 - **Cache**: Redis (Upstash)
 - **Reverse Proxy**: Nginx (backend only)
 - **Monitoring**: Grafana (Free tier)

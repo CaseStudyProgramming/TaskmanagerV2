@@ -16,7 +16,10 @@ This document defines the Woodpecker CI/CD pipeline configuration that replaces 
 2. **Pipeline**: Build → Smoke Test → E2E (chromium, firefox, webkit) before merge to main
 3. **Resource Limits**: Max 2GB RAM, 1-2 workers (universal for multiple projects)
 4. **PR Batching**: Mergify for batching 3 PRs (free tier)
-5. **Storage**: Supabase for metadata, OCI Object Storage (200GB) for media files
+5. **Storage**:
+   - Supabase for database teks(metadata) + links to VM storage
+   - VM Storage (200GB on OCI Debian 26 LTS) for video, photo, media files
+   - OCI Object Storage (20GB free) for Woodpecker CI/CD artifacts
 6. **Deployment**: Manual deployment to OCI Podman
 7. **Universal Setup**: Configured for Project A, Project B, and future projects
 
@@ -512,6 +515,33 @@ pull_request_rules:
 
 ## Storage Strategy
 
+### Storage Overview
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    STORAGE STRATEGY                     │
+├─────────────────────────────────────────────────────────┤
+│                                                           │
+│  1. SUPABASE (PostgreSQL)                                │
+│     ├── Database metadata (text data)                    │
+│     ├── User data, task data, etc.                       │
+│     └── Links to VM storage (file paths/URLs)           │
+│                                                           │
+│  2. VM STORAGE (200GB on OCI Debian 26 LTS)              │
+│     ├── Media files (video, photo, etc.)                 │
+│     ├── Local filesystem storage                          │
+│     └── Accessible via backend API                       │
+│                                                           │
+│  3. OCI OBJECT STORAGE (20GB free)                       │
+│     ├── Woodpecker CI/CD artifacts                      │
+│     ├── Coverage reports                                  │
+│     ├── E2E test results                                 │
+│     ├── Security reports                                 │
+│     └── Auto-cleanup via lifecycle policy (5 days)       │
+│                                                           │
+└─────────────────────────────────────────────────────────┘
+```
+
 ### Supabase for Metadata
 
 ```sql
@@ -521,7 +551,7 @@ CREATE TABLE users (
     google_id VARCHAR(255) UNIQUE,
     email VARCHAR(255) UNIQUE NOT NULL,
     name VARCHAR(255) NOT NULL,
-    avatar_url TEXT,  -- OCI Object Storage URL
+    avatar_url TEXT,  -- Path to VM storage file
     created_at BIGINT NOT NULL,
     updated_at BIGINT NOT NULL
 );
@@ -539,51 +569,59 @@ CREATE TABLE tasks (
     updated_at BIGINT NOT NULL,
     completed_at BIGINT,
     priority_score INTEGER DEFAULT 0,
-    media_urls TEXT[]  -- Array of OCI Object Storage URLs
+    media_urls TEXT[]  -- Array of VM storage file paths
 );
 ```
 
-### OCI Object Storage for Media Files
+### VM Storage for Media Files (200GB)
+
+**Storage Location**: `/var/www/media/` on OCI Debian 26 LTS server
 
 ```bash
-# Install OCI CLI
-sudo apt install -y oracle-cloud-cli
+# Create media storage directory
+sudo mkdir -p /var/www/media/videos
+sudo mkdir -p /var/www/media/photos
+sudo mkdir -p /var/www/media/documents
 
-# Configure OCI CLI
-oci setup config
+# Set permissions
+sudo chown -R www-data:www-data /var/www/media
+sudo chmod -R 755 /var/www/media
 
-# Create bucket for media files
-oci os bucket create \
-  --compartment-id $COMPARTMENT_ID \
-  --name taskmanager-media \
-  --public-access-type NoPublicAccess
-
-# Upload file
-oci os object put \
-  --bucket-name taskmanager-media \
-  --file /path/to/file.jpg \
-  --name file.jpg
-
-# Get pre-authenticated URL (for database storage)
-oci os preauth-request create \
-  --bucket-name taskmanager-media \
-  --name file.jpg \
-  --access-type ObjectRead \
-  --time-expires 2027-01-01
+# Access via backend API
+# Backend serves files: https://yourdomain.com/media/videos/video.mp4
 ```
 
-### OCI Object Storage for CI/CD Artifacts
+**Backend Integration**:
+```go
+// Upload file to VM storage
+func UploadToVMStorage(file io.Reader, filename string) (string, error) {
+    // Save to /var/www/media/
+    // Return file path for database storage
+    return "/media/videos/" + filename, nil
+}
+
+// Task with media
+type Task struct {
+    ID          uuid.UUID
+    Title       string
+    Description string
+    MediaURLs   []string  // VM storage file paths
+    // ... other fields
+}
+```
+
+### OCI Object Storage for CI/CD Artifacts (20GB)
 
 ```bash
-# Create bucket for CI/CD artifacts with 30-day auto-cleanup
+# Create bucket for CI/CD artifacts with 5-day auto-cleanup
 oci os bucket create \
   --compartment-id $COMPARTMENT_ID \
   --name woodpecker-artifacts \
   --public-access-type NoPublicAccess \
-  --object-lifecycle-rule-age-days 30
+  --object-lifecycle-rule-age-days 5
 ```
 
-**Penting**: `--object-lifecycle-rule-age-days 30` akan otomatis menghapus semua artifacts setelah 30 hari. Ini adalah cara terbaik untuk auto-cleanup tanpa script tambahan. Bisa ubah angka 30 ke berapa hari yang Anda mau (7, 90, dll).
+**Penting**: `--object-lifecycle-rule-age-days 5` akan otomatis menghapus semua artifacts setelah 5 hari. Dengan OCI Object Storage 20GB free, 5-day retention adalah optimal untuk menghemat storage. Bisa ubah angka 5 ke berapa hari yang Anda mau (7, 10, dll), tapi ingat storage limit 20GB.
 
 Untuk detail lebih lanjut tentang artifact management, lihat [Woodpecker Artifact Management](./woodpecker-artifacts.md).
 

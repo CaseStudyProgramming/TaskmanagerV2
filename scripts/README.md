@@ -10,9 +10,9 @@ These scripts are used in the Woodpecker CI/CD pipeline and should be committed 
   - Used by Woodpecker pipeline for manual deployment
   - Commits: YES (required for CI/CD)
 
-- **upload_artifacts.py** - Upload artifacts to OCI Object Storage
+- **upload_artifacts.py** - Upload artifacts to OCI Object Storage with .zip compression
   - Used by Woodpecker pipeline to upload coverage, E2E, security reports
-  - Supports compression with `--compress` flag
+  - Compresses entire folder into 1 .zip file before upload
   - Commits: YES (required for CI/CD)
 
 ## Optional Scripts

@@ -10,42 +10,57 @@
 
 Woodpecker CI tidak memiliki built-in artifact storage seperti GitHub Actions. Solusinya adalah menggunakan external storage untuk menyimpan artifacts seperti coverage reports, test results, build artifacts, dll.
 
-## Recommended Solution: OCI Object Storage + Lifecycle Policy
+## Recommended Solution: OCI Object Storage + Lifecycle Policy + .zip Compression
 
-Gunakan OCI Object Storage (200GB free tier) untuk menyimpan semua artifacts dengan **OCI Lifecycle Policy** untuk auto-cleanup otomatis. Ini sudah sesuai dengan setup Anda dan paling simple - tidak perlu script tambahan atau cron job.
+Gunakan OCI Object Storage (20GB free tier) untuk menyimpan Woodpecker CI/CD artifacts dengan:
+- **OCI Lifecycle Policy** untuk auto-cleanup otomatis
+- **.zip compression** (per-folder) untuk hemat storage
+- **2 buckets terpisah** untuk cache dan artifacts
+
+Ini sudah sesuai dengan setup Anda dan paling simple - tidak perlu script tambahan atau cron job.
 
 ---
 
-## Artifact Types
+## Artifact Types (with .zip compression)
 
 ### 1. Coverage Reports
 - Frontend coverage (HTML, JSON, LCOV)
 - Backend coverage (HTML, JSON)
 - Coverage analysis reports
+- **Compression**: Folder dikompresi menjadi 1 file .zip
+- **Estimated size**: ~8-16 MB → ~2-4 MB (75% reduction)
 
 ### 2. Test Results
 - E2E test results (screenshots, videos, traces)
 - Unit test results (XML, JSON)
 - Integration test results
+- **Compression**: Folder dikompresi menjadi 1 file .zip
+- **Estimated size**: ~32-75 MB → ~8-19 MB (75% reduction)
 
 ### 3. Build Artifacts
 - Frontend build files
 - Backend binary
 - Docker images (push ke registry)
+- **Compression**: Folder dikompresi menjadi 1 file .zip
+- **Estimated size**: ~25-50 MB → ~6-12.5 MB (75% reduction)
 
 ### 4. Performance Reports
 - Lighthouse reports
 - k6 load test results
+- **Compression**: Folder dikompresi menjadi 1 file .zip
+- **Estimated size**: ~7-15 MB → ~1.75-3.75 MB (75% reduction)
 
 ### 5. Security Reports
 - Snyk scan results
 - Gitleaks scan results
+- **Compression**: Folder dikompresi menjadi 1 file .zip
+- **Estimated size**: ~1.5-4 MB → ~0.375-1 MB (75% reduction)
 
 ---
 
 ## OCI Object Storage Setup
 
-### 1. Create Bucket for Artifacts with Lifecycle Policy
+### 1. Create 2 Buckets with Lifecycle Policy
 
 ```bash
 # Install OCI CLI
@@ -54,18 +69,30 @@ sudo apt install -y oracle-cloud-cli
 # Configure OCI CLI
 oci setup config
 
-# Create bucket for CI/CD artifacts with 30-day auto-cleanup
+# Bucket 1: Cache (3-day retention)
+oci os bucket create \
+  --compartment-id $COMPARTMENT_ID \
+  --name woodpecker-cache \
+  --public-access-type NoPublicAccess \
+  --object-lifecycle-rule-age-days 3
+
+# Bucket 2: Artifacts (2-day retention)
 oci os bucket create \
   --compartment-id $COMPARTMENT_ID \
   --name woodpecker-artifacts \
   --public-access-type NoPublicAccess \
-  --object-lifecycle-rule-age-days 30
+  --object-lifecycle-rule-age-days 2
 
 # Verify bucket creation
 oci os bucket list --compartment-id $COMPARTMENT_ID
 ```
 
-**Penting**: `--object-lifecycle-rule-age-days 30` akan otomatis menghapus semua artifacts setelah 30 hari. Anda bisa ubah angka 30 ke berapa hari yang Anda mau (7, 90, dll).
+**Penting**:
+- **OCI Object Storage tidak punya hard limit per bucket** - semua bucket sharing 20GB total
+- Bucket cache: 3-day retention untuk dependencies (node_modules, vendor)
+- Bucket artifacts: 2-day retention untuk coverage, E2E, security reports
+- Dengan .zip compression, estimated usage ~2.7 GB total, buffer 17.3 GB
+- Anda bisa ubah retention sesuai kebutuhan, tapi ingat storage limit 20GB
 
 ### 2. Configure Pre-Authenticated Requests (Optional)
 
@@ -107,9 +134,9 @@ pipeline:
       event: [push, pull_request]
 ```
 
-### Option 2: OCI CLI Direct (Simpler)
+### Option 2: OCI CLI Direct with .zip Compression (Simpler)
 
-Gunakan OCI CLI langsung di pipeline:
+Gunakan OCI CLI langsung di pipeline dengan .zip compression:
 
 ```yaml
 # .woodpecker.yml
@@ -128,15 +155,18 @@ pipeline:
     commands:
       - apk add --no-cache python3 py3-pip
       - pip install oci
+      # Upload folder sebagai 1 file .zip
       - python3 scripts/upload_artifacts.py \
         --bucket woodpecker-artifacts \
         --source coverage/ \
-        --destination coverage/${CI_COMMIT_SHA}/
+        --destination coverage/
     secrets: [oci_config_file]
     when:
       branch: [develop, main]
       event: [push, pull_request]
 ```
+
+**Hasil**: Folder `coverage/` dikompresi menjadi `coverage.zip` dan diupload ke OCI Object Storage.
 
 ---
 
@@ -530,8 +560,9 @@ oci os preauth-request create \
 - ✅ Tidak perlu script tambahan
 - ✅ Tidak perlu cron job
 - ✅ Auto-cleanup otomatis
-- ✅ Bisa set retention period (30 hari, 90 hari, dll)
+- ✅ Bisa set retention period (2 hari, 3 hari, dll)
 - ✅ Gratis
+- ✅ Dengan .zip compression, storage usage ~75% lebih hemat
 
 **Setup Lifecycle Policy via OCI Console**:
 1. Buka OCI Console → Object Storage → Bucket "woodpecker-artifacts"
@@ -540,22 +571,24 @@ oci os preauth-request create \
    - Rule name: "Auto-delete artifacts"
    - Apply to: All objects in bucket
    - Action: Delete object
-   - Condition: Age > 30 days (atau sesuai kebutuhan)
+   - Condition: Age > 2 days (atau sesuai kebutuhan)
 
 **Setup Lifecycle Policy via OCI CLI**:
 ```bash
 # Update lifecycle rule
 oci os bucket update \
   --bucket-name woodpecker-artifacts \
-  --object-lifecycle-rule-age-days 30
+  --object-lifecycle-rule-age-days 2
 ```
 
-**Dengan lifecycle policy 30 hari**:
-- Semua artifacts otomatis dihapus setelah 30 hari
+**Dengan lifecycle policy 2 hari + .zip compression**:
+- Semua artifacts otomatis dihapus setelah 2 hari
 - Storage tidak akan menumpuk
 - Tidak perlu script cleanup
 - Tidak perlu cron job
 - Bisa ubah retention kapan saja
+- Dengan .zip compression, storage usage ~75% lebih hemat
+- Optimal untuk 20GB OCI Object Storage limit
 
 ### Alternative: Manual Cleanup Script (Optional)
 
