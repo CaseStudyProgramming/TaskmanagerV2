@@ -385,9 +385,13 @@ python3 scripts/upload_artifacts.py \
 
 **Dengan OCI Lifecycle Policy, monitoring opsional tapi tetap recommended untuk awareness.**
 
+**Script location**: `scripts/optional/monitor_storage.sh`
+
+**Note**: Script ini tidak di-commit ke Git secara default karena optional.
+
 ```bash
 #!/bin/bash
-# scripts/monitor_storage.sh
+# scripts/optional/monitor_storage.sh
 
 BUCKET_NAME="${BUCKET_NAME:-woodpecker-artifacts}"
 
@@ -456,8 +460,10 @@ fi
 **Setup Cron Job for Monitoring** (optional):
 ```bash
 # Add to crontab (run weekly)
-0 2 * * 0 /path/to/scripts/monitor_storage.sh >> /var/log/storage-monitor.log 2>&1
+0 2 * * 0 /path/to/scripts/optional/monitor_storage.sh >> /var/log/storage-monitor.log 2>&1
 ```
+
+**Note**: Script ini ada di folder `scripts/optional/` dan tidak di-commit ke Git secara default. Lihat [scripts/README.md](../../scripts/README.md) untuk informasi lebih lanjut.
 
 ---
 

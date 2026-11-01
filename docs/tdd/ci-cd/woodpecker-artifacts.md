@@ -563,7 +563,7 @@ Jika ingin lebih granular control, bisa gunakan script cleanup. Tapi lifecycle p
 
 ```bash
 #!/bin/bash
-# scripts/cleanup_artifacts.sh
+# scripts/optional/cleanup_artifacts.sh
 
 BUCKET_NAME="woodpecker-artifacts"
 RETENTION_DAYS=30
