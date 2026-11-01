@@ -1,0 +1,56 @@
+# .mergify.yml - PR Batching Configuration
+# Universal for all projects - batches 3 PRs at once (free tier)
+
+pull_request_rules:
+  # Automatic merge for PRs with approval
+  - name: Automatic merge for PRs with approval
+    conditions:
+      - "#approved-reviews-by>=1"
+      - "#changes-requested-reviews-by==0"
+      - base=develop
+      - check-success=quality-checks
+      - check-success=unit-tests-frontend
+      - check-success=unit-tests-backend
+      - check-success=integration-tests
+      - check-success=coverage-analysis
+      - check-success=security-scan
+      - check-success=smoke-tests
+    actions:
+      merge:
+        method: squash
+        strict: smart
+        strict_method: merge
+        commit_message_template: |
+          {{ title }} (#{{ number }})
+
+          {{ body }}
+
+  # Batch merge 3 PRs at once (for free tier optimization)
+  - name: Batch merge 3 PRs at once
+    conditions:
+      - "#approved-reviews-by>=1"
+      - "#changes-requested-reviews-by==0"
+      - base=develop
+      - "#pr>=3"  # Wait for 3 PRs
+      - check-success=quality-checks
+      - check-success=unit-tests-frontend
+      - check-success=unit-tests-backend
+      - check-success=integration-tests
+      - check-success=coverage-analysis
+      - check-success=security-scan
+      - check-success=smoke-tests
+    actions:
+      merge:
+        method: squash
+        batch_size: 3
+        commit_message_template: |
+          Batch merge: {{ title }} (#{{ number }})
+
+          {{ body }}
+
+  # Delete head branch after merge
+  - name: Delete head branch after merge
+    conditions:
+      - merged
+    actions:
+      delete_head_branch: {}

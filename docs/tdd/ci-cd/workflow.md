@@ -154,7 +154,7 @@ develop:
   required_approving_review_count: 1
 ```
 
-## 3. CI/CD Pipeline Workflow
+## 3. CI/CD Pipeline Workflow (Woodpecker)
 
 ### Pipeline Stages by Branch
 
@@ -179,7 +179,8 @@ develop:
 - Integration tests
 - Coverage report (hierarchical thresholds: critical >=93%, overall >=85%)
 - Security scan
-- Build and push to GHCR
+- Smoke tests
+- Build and push to registry
 # SKIP: E2E tests (on merge to main)
 ```
 
@@ -193,118 +194,200 @@ develop:
 - Integration tests
 - Coverage report (hierarchical thresholds: critical >=93%, overall >=85%)
 - Security scan
-- E2E tests (critical user flows)
+- Smoke tests
+- E2E tests (chromium, firefox, webkit)
 - Performance check
-- Build and push to GHCR
-- Deploy to production (manual approval)
+- Build and push to registry
+- Deploy to production (manual trigger)
+```
+
+#### Cron Job (Midnight Daily)
+```yaml
+# Full E2E tests on main branch at midnight
+- E2E tests (chromium, firefox, webkit)
+- Smoke tests
+- Health check
 ```
 
 ### CI/CD Workflow Steps
 
 ```yaml
-# .github/workflows/ci.yml
-name: CI/CD Pipeline
+# .woodpecker.yml - Woodpecker CI/CD Pipeline
+# See woodpecker-ci.md for complete configuration
 
-on:
-  pull_request:
-    branches: [main, develop]
-  push:
-    branches: [main, develop, feature/*]
+clone:
+  git:
+    image: woodpeckerci/plugin-git:latest
+    depth: 50
 
-jobs:
-  # Stage 1: Quality Checks (Fast)
+pipeline:
+  # Stage 1: Quality Checks (All branches)
   quality-checks:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Format check
-      - name: Lint check
-      - name: Type check
+    image: oven/bun:1.4.2
+    commands:
+      - bun install
+      - bun run format:check
+      - bun run lint
+      - bun run type-check
+    when:
+      event: [push, pull_request]
 
-  # Stage 2: Unit Tests (Fast)
-  unit-tests:
-    runs-on: ubuntu-latest
-    needs: quality-checks
-    steps:
-      - name: Frontend unit tests
-      - name: Backend unit tests
+  # Stage 2: Unit Tests (All branches)
+  unit-tests-frontend:
+    image: oven/bun:1.4.2
+    commands:
+      - bun install
+      - bun run test:unit -- --coverage
+    when:
+      event: [push, pull_request]
 
-  # Stage 3: Integration Tests (Medium)
+  unit-tests-backend:
+    image: golang:1.27
+    commands:
+      - go test ./... -short -cover
+    when:
+      event: [push, pull_request]
+
+  # Stage 3: Integration Tests (PR to develop, push to main)
   integration-tests:
-    runs-on: ubuntu-latest
-    needs: unit-tests
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    image: golang:1.27
+    commands:
+      - go test ./... -cover
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: test
+      DB_PASSWORD: test
+      DB_NAME: taskmanager_db_testing
     services:
       postgres:
-        image: postgres:16
+        image: postgres:16-alpine
         environment:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
           POSTGRES_DB: taskmanager_db_testing
-      redis:
-        image: redis:7-alpine
-    steps:
-      - name: Backend integration tests
-      - name: Frontend integration tests
+    when:
+      branch: [develop, main]
+      event: [push, pull_request]
 
-  # Stage 4: Coverage Analysis (Medium)
-  coverage-report:
-    runs-on: ubuntu-latest
-    needs: integration-tests
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
-    steps:
-      - name: Generate coverage report
-      - name: Analyze coverage by category (business logic >93%)
-      - name: Check hierarchical thresholds
-      - name: Upload coverage to Codecov
-      - name: Upload coverage to Codecov
+  # Stage 4: Coverage Analysis (PR to develop, push to main)
+  coverage-analysis:
+    image: python:3.12-alpine
+    commands:
+      - pip install coverage-parser
+      - python3 scripts/coverage_analyzer.py
+    when:
+      branch: [develop, main]
+      event: [push, pull_request]
 
-  # Stage 5: Security Scan (Medium)
+  # Stage 5: Security Scan (PR to develop, push to main)
   security-scan:
-    runs-on: ubuntu-latest
-    needs: unit-tests
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
-    steps:
-      - name: Snyk security scan
-      - name: Gitleaks secret scan
+    image: snyk/snyk-cli:latest
+    commands:
+      - snyk auth $${SNYK_TOKEN}
+      - snyk test --severity-threshold=high
+    secrets: [snyk_token]
+    when:
+      branch: [develop, main]
+      event: [push, pull_request]
 
-  # Stage 6: E2E Tests (Slow)
-  e2e-tests:
-    runs-on: ubuntu-latest
-    needs: [coverage-report, security-scan]
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Start test environment
-        run: docker-compose -f docker-compose.test.yml up -d
-      - name: Run Playwright E2E tests
-      - name: Cleanup test environment
-        run: docker-compose -f docker-compose.test.yml down -v
+  # Stage 6: Smoke Tests (PR to develop, push to main)
+  smoke-tests:
+    image: oven/bun:1.4.2
+    commands:
+      - bun install
+      - bun run build
+      - bun run test:smoke
+    when:
+      branch: [develop, main]
+      event: [push, pull_request]
 
-  # Stage 7: Performance Check (Slow)
+  # Stage 7: Full E2E Tests (Push to main and cron)
+  e2e-tests-chromium:
+    image: mcr.microsoft.com/playwright:v1.63.0
+    commands:
+      - bun install
+      - bun run test:e2e --project=chromium
+    when:
+      branch: main
+      event: [push, cron]
+
+  e2e-tests-firefox:
+    image: mcr.microsoft.com/playwright:v1.63.0
+    commands:
+      - bun install
+      - bun run test:e2e --project=firefox
+    when:
+      branch: main
+      event: [push, cron]
+
+  e2e-tests-webkit:
+    image: mcr.microsoft.com/playwright:v1.63.0
+    commands:
+      - bun install
+      - bun run test:e2e --project=webkit
+    when:
+      branch: main
+      event: [push, cron]
+
+  # Stage 8: Performance Check (Push to main only)
   performance-check:
-    runs-on: ubuntu-latest
-    needs: [coverage-report, security-scan]
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Lighthouse CI
-      - name: API load testing with k6
+    image: oven/bun:1.4.2
+    commands:
+      - bun install
+      - bun run build
+      - bun run lighthouse
+    when:
+      branch: main
+      event: [push]
 
-  # Stage 8: Build and Push
-  build-push:
-    runs-on: ubuntu-latest
-    needs: [coverage-report, security-scan]
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
-    steps:
-      - name: Build and push to GHCR
-      - name: Update deployment tags
+  # Stage 9: Build and Push (Push to main only)
+  build-frontend:
+    image: oven/bun:1.4.2
+    commands:
+      - bun install
+      - bun run build
+    when:
+      branch: main
+      event: [push]
 
-  # Stage 9: Deploy
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [build-push]
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
-    environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
-    steps:
-      - name: Deploy to environment
-      - name: Run smoke tests
+  build-backend:
+    image: golang:1.27
+    commands:
+      - go build -o bin/app ./cmd/api
+    when:
+      branch: main
+      event: [push]
+
+  push-to-registry:
+    image: quay.io/podman/stable
+    commands:
+      - podman login ghcr.io -u $${GITHUB_USERNAME} -p $${GITHUB_TOKEN}
+      - podman build -t ghcr.io/$${GITHUB_USERNAME}/$${PROJECT_NAME}-backend:latest ./backend
+      - podman push ghcr.io/$${GITHUB_USERNAME}/$${PROJECT_NAME}-backend:latest
+    secrets: [github_username, github_token]
+    when:
+      branch: main
+      event: [push]
+
+  # Stage 10: Manual Deployment (Manual trigger only)
+  deploy-staging:
+    image: quay.io/podman/stable
+    commands:
+      - echo "Deploying to staging..."
+      - ./scripts/deploy.sh staging
+    when:
+      branch: main
+      event: manual
+
+  deploy-production:
+    image: quay.io/podman/stable
+    commands:
+      - echo "Deploying to production..."
+      - ./scripts/deploy.sh production
+    when:
+      branch: main
+      event: manual
 ```
 
 ## 4. Code Review Process

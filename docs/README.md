@@ -61,7 +61,10 @@ docs/
 ### CI/CD
 - [Development Workflow](./tdd/ci-cd/workflow.md) - Complete development workflow and quality gates
 - [Coverage Strategy](./tdd/ci-cd/coverage-strategy.md) - Hierarchical coverage thresholds and enforcement
-- [GitHub Actions Configuration](./tdd/ci-cd/github-actions.md) - CI/CD pipeline configuration
+- [Woodpecker CI/CD Configuration](./tdd/ci-cd/woodpecker-ci.md) - Woodpecker CI/CD pipeline configuration (Primary)
+- [Woodpecker Artifact Management](./tdd/ci-cd/woodpecker-artifacts.md) - Artifact storage and management with OCI Object Storage
+- [Woodpecker Artifact Types & Storage](./tdd/ci-cd/woodpecker-artifact-types.md) - Artifact types, sizes, and retention policy recommendations
+- [GitHub Actions Configuration](./tdd/ci-cd/github-actions.md) - Legacy GitHub Actions configuration (deprecated)
 
 ### Quality & Reliability
 - [Backend Quality & Reliability](./tdd/quality-reliability/backend-quality-reliability.md) - Backend system quality requirements

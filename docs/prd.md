@@ -237,12 +237,13 @@ Tag Weight: SUM(tag_weights) (max 15)
 #### Frontend
 - **Framework**: SvelteKit
 - **Language**: TypeScript (strict mode)
+- **Runtime**: Bun (package manager and runtime)
 - **Architecture**: Feature-Sliced Design (FSD) + Vertical Slices
 - **Styling**: Tailwind CSS
 - **Validation**: Zod
-- **Build Tool**: Vite (via SvelteKit)
+- **Build Tool**: Bun build (via SvelteKit)
 - **Code Quality**: Biome.js (linting, formatting)
-- **Testing**: Vitest, Playwright (E2E)
+- **Testing**: Vitest, Playwright (E2E - chromium, firefox, webkit)
 
 #### Backend
 - **Language**: Go
@@ -254,12 +255,16 @@ Tag Weight: SUM(tag_weights) (max 15)
 - **Crypto**: Standard library crypto packages
 
 #### Infrastructure
-- **Database**: Supabase (PostgreSQL)
+- **Database**: Supabase (PostgreSQL) - metadata only
+- **Object Storage**: OCI Object Storage (200GB) - media files (video, photo, etc.)
 - **Cache**: Redis (Upstash)
 - **Reverse Proxy**: Nginx (backend only)
 - **Monitoring**: Grafana (Free tier)
 - **Containerization**: Docker/Podman
-- **CI/CD**: GitHub Actions
+- **CI/CD**: Woodpecker (self-hosted on OCI Debian 26 LTS)
+- **CI/CD Workers**: 1-2 workers (max 2GB RAM for 2 workers, universal for multiple projects)
+- **PR Batching**: Mergify (batch 3 PRs, free tier)
+- **Deployment**: Manual deployment to OCI Podman
 
 #### Development
 - **Node.js**: See dependencies.md for version requirements

@@ -31,7 +31,10 @@ This directory contains comprehensive technical design documentation for the Adv
 ### CI/CD & Testing
 - [Development Workflow](./ci-cd/workflow.md) - Complete development workflow
 - [Coverage Strategy](./ci-cd/coverage-strategy.md) - Hierarchical coverage thresholds
-- [GitHub Actions Configuration](./ci-cd/github-actions.md) - CI/CD pipeline setup
+- [Woodpecker CI/CD Configuration](./ci-cd/woodpecker-ci.md) - Woodpecker CI/CD pipeline setup (Primary)
+- [Woodpecker Artifact Management](./ci-cd/woodpecker-artifacts.md) - Artifact storage and management with OCI Object Storage
+- [Woodpecker Artifact Types & Storage](./ci-cd/woodpecker-artifact-types.md) - Artifact types, sizes, and retention policy recommendations
+- [GitHub Actions Configuration](./ci-cd/github-actions.md) - Legacy GitHub Actions setup (deprecated)
 - [Backend Testing Examples](./testing/backend-examples.md) - Go testing patterns
 - [Frontend Testing Examples](./testing/frontend-examples.md) - TypeScript/Svelte testing patterns
 

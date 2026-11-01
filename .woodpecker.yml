@@ -1,0 +1,183 @@
+# .woodpecker.yml - Woodpecker CI/CD Pipeline Configuration
+# Universal template for Advanced Task Manager project
+# Can be adapted for Project A, Project B, and future projects
+
+variables:
+  - &bun_version "1.4.2"
+  - &node_version "24.20.0"
+  - &go_version "1.27"
+  - &project_name "taskmanager"  # Change per project
+
+clone:
+  git:
+    image: woodpeckerci/plugin-git:latest
+    depth: 50
+
+pipeline:
+  # Stage 1: Quality Checks (All branches)
+  quality-checks:
+    image: oven/bun:*bun_version
+    commands:
+      - bun install
+      - bun run format:check
+      - bun run lint
+      - bun run type-check
+    when:
+      event: [push, pull_request]
+
+  # Stage 2: Unit Tests (All branches)
+  unit-tests-frontend:
+    image: oven/bun:*bun_version
+    commands:
+      - bun install
+      - bun run test:unit -- --coverage
+    when:
+      event: [push, pull_request]
+
+  unit-tests-backend:
+    image: golang:*go_version
+    commands:
+      - go test ./... -short -cover
+    when:
+      event: [push, pull_request]
+
+  # Stage 3: Integration Tests (PR to develop, push to main)
+  integration-tests:
+    image: golang:*go_version
+    commands:
+      - go test ./... -cover
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: test
+      DB_PASSWORD: test
+      DB_NAME: taskmanager_db_testing
+    services:
+      postgres:
+        image: postgres:16-alpine
+        environment:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: taskmanager_db_testing
+    when:
+      branch: [develop, main]
+      event: [push, pull_request]
+
+  # Stage 4: Coverage Analysis (PR to develop, push to main)
+  coverage-analysis:
+    image: python:3.12-alpine
+    commands:
+      - pip install coverage-parser
+      - python3 scripts/coverage_analyzer.py
+    when:
+      branch: [develop, main]
+      event: [push, pull_request]
+
+  # Stage 5: Security Scan (PR to develop, push to main)
+  security-scan:
+    image: snyk/snyk-cli:latest
+    commands:
+      - snyk auth $${SNYK_TOKEN}
+      - snyk test --severity-threshold=high
+    secrets: [snyk_token]
+    when:
+      branch: [develop, main]
+      event: [push, pull_request]
+
+  # Stage 6: Smoke Tests (PR to develop, push to main)
+  smoke-tests:
+    image: oven/bun:*bun_version
+    commands:
+      - bun install
+      - bun run build
+      - bun run test:smoke
+    when:
+      branch: [develop, main]
+      event: [push, pull_request]
+
+  # Stage 7: Full E2E Tests (Push to main and cron)
+  e2e-tests-chromium:
+    image: mcr.microsoft.com/playwright:v1.63.0
+    commands:
+      - bun install
+      - bun run test:e2e --project=chromium
+    when:
+      branch: main
+      event: [push, cron]
+
+  e2e-tests-firefox:
+    image: mcr.microsoft.com/playwright:v1.63.0
+    commands:
+      - bun install
+      - bun run test:e2e --project=firefox
+    when:
+      branch: main
+      event: [push, cron]
+
+  e2e-tests-webkit:
+    image: mcr.microsoft.com/playwright:v1.63.0
+    commands:
+      - bun install
+      - bun run test:e2e --project=webkit
+    when:
+      branch: main
+      event: [push, cron]
+
+  # Stage 8: Performance Check (Push to main only)
+  performance-check:
+    image: oven/bun:*bun_version
+    commands:
+      - bun install
+      - bun run build
+      - bun run lighthouse
+    when:
+      branch: main
+      event: [push]
+
+  # Stage 9: Build and Push (Push to main only)
+  build-frontend:
+    image: oven/bun:*bun_version
+    commands:
+      - bun install
+      - bun run build
+    when:
+      branch: main
+      event: [push]
+
+  build-backend:
+    image: golang:*go_version
+    commands:
+      - go build -o bin/app ./cmd/api
+    when:
+      branch: main
+      event: [push]
+
+  push-to-registry:
+    image: quay.io/podman/stable
+    commands:
+      - podman login ghcr.io -u $${GITHUB_USERNAME} -p $${GITHUB_TOKEN}
+      - podman build -t ghcr.io/$${GITHUB_USERNAME}/$${PROJECT_NAME}-backend:latest ./backend
+      - podman push ghcr.io/$${GITHUB_USERNAME}/$${PROJECT_NAME}-backend:latest
+    secrets: [github_username, github_token]
+    when:
+      branch: main
+      event: [push]
+
+  # Stage 10: Manual Deployment (Manual trigger only)
+  deploy-staging:
+    image: quay.io/podman/stable
+    commands:
+      - echo "Deploying to staging..."
+      - ./scripts/deploy.sh staging
+    when:
+      branch: main
+      event: manual
+
+  deploy-production:
+    image: quay.io/podman/stable
+    commands:
+      - echo "Deploying to production..."
+      - ./scripts/deploy.sh production
+    when:
+      branch: main
+      event: manual

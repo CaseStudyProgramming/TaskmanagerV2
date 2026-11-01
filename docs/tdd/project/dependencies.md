@@ -35,11 +35,11 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 - purpose: Build tool and dev server
 - doc link: https://vite.dev/releases
 
-### Package Manager
+### Package Manager & Runtime
 
 **bun**
 - version: ^1.4.2
-- purpose: Fast package manager and runtime
+- purpose: Fast package manager and runtime (replaces Node.js for frontend build and runtime)
 - doc link: https://github.com/oven-sh/bun
 
 ### Styling
@@ -353,10 +353,15 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 ### CI/CD
 
-**GitHub Actions**
+**Woodpecker CI**
 - version: Latest
-- purpose: CI/CD automation
-- doc link: https://docs.github.com/en/actions
+- purpose: Self-hosted CI/CD automation on OCI Debian 26 LTS
+- doc link: https://woodpecker-ci.org/docs/
+
+**Mergify**
+- version: Latest
+- purpose: PR batching (3 PRs at once, free tier)
+- doc link: https://doc.mergify.io/
 
 ### Platform Limits (Free Tier)
 
