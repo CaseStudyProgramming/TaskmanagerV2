@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "aiven": {
+      "serverUrl": "https://mcp.aiven.live/mcp"
+    },
+    "neon": {
+      "url": "https://mcp.neon.tech/mcp",
+      "transport": "http"
+    }
+  }
+}
