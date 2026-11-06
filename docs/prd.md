@@ -191,7 +191,7 @@ Tag Weight: SUM(tag_weights) (max 15)
 - Rate limiting on auth endpoints
 
 #### Data Protection
-- Encryption at rest (Supabase managed)
+- Encryption at rest (Neon managed PostgreSQL)
 - TLS 1.3 in transit
 - Input validation and sanitization
 - SQL injection prevention (parameterized queries)
@@ -245,6 +245,8 @@ Tag Weight: SUM(tag_weights) (max 15)
 - **Build Tool**: Bun build (via SvelteKit)
 - **Code Quality**: Biome.js (linting, formatting)
 - **Testing**: Vitest, Playwright (E2E - chromium, firefox, webkit)
+- **Deployment**: Cloudflare Workers edge (SvelteKit adapter)
+- **Adapter**: `@sveltejs/adapter-cloudflare` for edge deployment
 
 #### Backend
 - **Language**: Go
@@ -255,11 +257,13 @@ Tag Weight: SUM(tag_weights) (max 15)
 - **API Spec**: OpenAPI (oapi-codegen)
 - **Validation**: Go validator
 - **Crypto**: Standard library crypto packages
+- **Deployment**: OCI Instance (A1.Flex - 2 OCPUs, 12 GB RAM, Podman)
+- **Reverse Proxy**: Nginx
 
 #### Infrastructure
-- **Database**: Supabase (PostgreSQL) - metadata (text) + links to VM storage for media files
+- **Database**: Neon (PostgreSQL) - production and testing database with branch-first workflow
 - **Object Storage (CI/CD)**: OCI Object Storage (10GB Standard tier PAYG) - Woodpecker artifacts
-- **Media Storage**: VM Storage (200GB on OCI Debian 26 LTS) - video, photo, media files (VM storage sends links to Supabase database)
+- **Media Storage**: VM Storage (200GB on OCI Debian 26 LTS) - video, photo, media files (VM storage sends links to Neon database)
 - **Cache**: Redis (Upstash)
 - **Reverse Proxy**: Nginx (backend only)
 - **Monitoring**: Grafana (Free tier)
@@ -268,6 +272,11 @@ Tag Weight: SUM(tag_weights) (max 15)
 - **CI/CD Workers**: 1-2 workers (max 2GB RAM for 2 workers, universal for multiple projects)
 - **PR Batching**: Mergify (batch 3 PRs, free tier)
 - **Deployment**: Manual deployment to OCI Podman
+- **Frontend**: Cloudflare Workers edge (SvelteKit adapter)
+- **Backend**: OCI Instance (A1.Flex - 2 OCPUs, 12 GB RAM, Podman)
+- **CDN**: Cloudflare CDN edge
+- **DNS**: Cloudflare DNS + DDNS
+- **Domain**: davidcps.my.id
 
 #### Development
 - **Frontend Runtime**: Bun (JavaScript runtime for TypeScript/JavaScript)
@@ -278,6 +287,107 @@ Tag Weight: SUM(tag_weights) (max 15)
 - **API Documentation**: OpenAPI/Swagger
 
 ### 6.2 System Architecture
+
+### 6.3 Cloudflare Workers Edge Deployment for Frontend
+
+#### SvelteKit Adapter Configuration
+
+**Install Cloudflare Workers adapter:**
+```bash
+bun add -D @sveltejs/adapter-cloudflare
+```
+
+**Configure svelte.config.js:**
+```javascript
+import adapter from '@sveltejs/adapter-cloudflare';
+
+export default {
+  kit: {
+    adapter: adapter({
+      // Platform-specific configuration
+      platformProxy: {
+        pages: true, // Enable static page generation
+      }
+    })
+  }
+};
+```
+
+**Vite configuration for Cloudflare Workers:**
+```javascript
+import { sveltekit } from '@sveltejs/kit/vite';
+
+export default {
+  plugins: [sveltekit()],
+  ssr: {
+    noExternal: ['@cloudflare/workers-types']
+  }
+};
+```
+
+**wrangler.toml for Cloudflare Workers:**
+```toml
+name = "taskmanager-frontend"
+main = "./.cloudflare/_worker.js"
+compatibility_date = "2024-01-01"
+
+[site]
+bucket = "./.cloudflare/public"
+
+[build]
+command = "bun run build"
+cwd = "."
+watch_dir = "src"
+
+[vars]
+ENVIRONMENT = "production"
+API_URL = "https://api.davidcps.my.id"
+```
+
+**Cloudflare Pages configuration (alternative):**
+```toml
+# .cloudflare/pages
+[[build]]
+command = "bun run build"
+cwd = "."
+watch_dir = "src"
+
+[build.environment_variables]
+API_URL = "https://api.davidcps.my.id"
+```
+
+#### Edge Functions
+
+Cloudflare Workers edge deployment provides:
+- **Global Edge Network**: Deploy to 300+ locations worldwide
+- **Low Latency**: <50ms response time from edge locations
+- **Auto-scaling**: Automatic scaling based on traffic
+- **Serverless**: No server management required
+- **DDoS Protection**: Built-in DDoS protection
+- **HTTP/3**: Support for HTTP/3 protocol
+
+#### Nitro Configuration (for Nuxt/SvelteKit alternatives)
+
+If using Nuxt instead of SvelteKit:
+```javascript
+// nuxt.config.ts
+export default defineNuxtConfig({
+  nitro: {
+    preset: 'cloudflare',
+    cloudflare: {
+      bindings: [
+        {
+          type: 'kv',
+          name: 'CACHE',
+          namespace_id: 'your-kv-namespace-id'
+        }
+      ]
+    }
+  }
+})
+```
+
+### 6.5 System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -291,7 +401,8 @@ Tag Weight: SUM(tag_weights) (max 15)
                           ▼
 ┌─────────────────────────────────────────────────────────┐
 │                   CDN / Edge Layer                       │
-│                   (Vercel Edge Network)                  │
+│              (Cloudflare CDN edge)                      │
+│              (Cloudflare Workers edge)                 │
 └─────────────────────────────────────────────────────────┘
                           │
                           ▼
@@ -299,10 +410,11 @@ Tag Weight: SUM(tag_weights) (max 15)
 │                  Application Layer                       │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
 │  │   Frontend   │  │   Backend    │  │   Auth       │  │
-│  │  (Vercel)    │  │  (OCI)       │  │  (Supabase)  │  │
-│  │  SvelteKit   │  │  Go + Chi    │  │  Google OAuth│  │
-│  └──────────────┘  │  + Nginx     │  └──────────────┘  │
-│                     │  (Proxy)     │                   │
+│  │ (Cloudflare  │  │  (OCI)       │  │   (Neon)     │  │
+│  │   Workers)  │  │  Go + Chi    │  │  Google OAuth│  │
+│  │  SvelteKit   │  │  + Nginx     │  └──────────────┘  │
+│  └──────────────┘  │  (Proxy)     │                   │
+│                     │  A1.Flex     │                   │
 │                     │  2 OCPU+12GB │                   │
 │                     └──────────────┘                   │
 └─────────────────────────────────────────────────────────┘
@@ -312,7 +424,7 @@ Tag Weight: SUM(tag_weights) (max 15)
 │                   Data Layer                            │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
 │  │  PostgreSQL  │  │    Redis     │  │  Local Storage│ │
-│  │  (Supabase)  │  │  (Upstash)   │  │  (Browser)   │  │
+│  │   (Neon)     │  │  (Upstash)   │  │  (Browser)   │  │
 │  └──────────────┘  └──────────────┘  └──────────────┘  │
 └─────────────────────────────────────────────────────────┘
                           │
@@ -326,7 +438,7 @@ Tag Weight: SUM(tag_weights) (max 15)
 └─────────────────────────────────────────────────────────┘
 ```
 
-### 6.3 Database Schema
+### 6.6 Database Schema
 
 #### Users Table
 ```sql
@@ -377,13 +489,14 @@ CREATE TABLE sessions (
 ```
 
 #### Database Naming Convention
-- **Production Database**: `taskmanager_db`
-- **Testing Database**: `taskmanager_db_testing` (mandatory for all test environments)
-- **Local Development**: `taskmanager_db_dev`
+- **Production Database**: `taskmanager_db` (Neon branch: main)
+- **Testing Database**: `taskmanager_db_testing` (Neon branch: testing - mandatory for all test environments)
+- **Local Development**: `taskmanager_db_dev` (Neon branch: dev)
 - **Migration files**: Use timestamp-based naming (`YYYYMMDDHHMMSS_description.sql`)
 - **Database Version**: PostgreSQL (see dependencies.md for version requirements)
+- **Database Provider**: Neon (PostgreSQL with branch-first workflow for prod and testing)
 
-### 6.4 API Architecture
+### 6.7 API Architecture
 
 #### RESTful Endpoints
 - `POST /api/v1/auth/google` - Google OAuth callback
@@ -552,7 +665,7 @@ function extractError(response: StandardResponse): ErrorDetail[]
 function isSuccess(response: StandardResponse): boolean
 ```
 
-### 6.5 Backend Architecture (DDD + Vertical Slices)
+### 6.8 Backend Architecture (DDD + Vertical Slices)
 
 #### Domain-Driven Design Structure
 ```
@@ -633,7 +746,7 @@ Benefits:
 - Easy to add/remove features
 - Independent testing per slice
 
-### 6.6 Frontend Architecture (FSD + Vertical Slices)
+### 6.9 Frontend Architecture (FSD + Vertical Slices)
 
 #### Feature-Sliced Design Structure
 ```
@@ -737,23 +850,27 @@ Benefits:
 > **Note**: For specific version requirements and platform limits, see [Dependency Versions](./dependencies.md)
 
 #### Platform Selection
-- **Frontend**: Vercel (Free tier)
+- **Frontend**: Cloudflare Workers edge (Free tier)
   - Bun runtime (see dependencies.md for version)
-  - Bandwidth/month (see dependencies.md for limits)
+  - 100,000 requests/day (see dependencies.md for limits)
   - Unlimited deployments
-  - Global edge network
+  - Global edge network (300+ locations)
   - Automatic HTTPS
+  - SvelteKit adapter: @sveltejs/adapter-cloudflare
+  - Nuxt Nitro preset: cloudflare
 
-- **Backend**: Oracle Cloud Infrastructure (OCI)
-  - 2 OCPU + 12GB RAM (backend only)
+- **Backend**: OCI Instance (A1.Flex - 2 OCPUs, 12 GB RAM)
+  - Podman container runtime
   - Nginx reverse proxy
-  - Auto-scaling available
+  - Manual scaling (not auto-scaling)
   - Global deployment
 
-- **Database**: Supabase (Free tier)
-  - PostgreSQL database (see dependencies.md for version)
-  - Database and storage limits (see dependencies.md)
-  - Real-time subscriptions
+- **Database**: Neon (PostgreSQL with branch-first workflow)
+  - Production database: main branch
+  - Testing database: testing branch (mandatory for all test environments)
+  - Development database: dev branch
+  - Real-time subscriptions (Neon Realtime)
+  - Autoscaling and scale-to-zero
 
 - **Redis**: Upstash (Free tier)
   - Commands/day and storage limits (see dependencies.md)
@@ -766,13 +883,14 @@ Benefits:
   - Alert configuration
   - Integration with various data sources
 
-- **CDN**: Vercel Edge Network (included)
+- **CDN**: Cloudflare CDN edge (included)
+- **DNS**: Cloudflare DNS + DDNS (davidcps.my.id)
 
 ### 7.2 Multi-Region Strategy
 
 #### Global Access (Not Multi-Region Database)
 - Single database region (Singapore or Tokyo for Asia-Pacific)
-- CDN for static assets (Vercel Edge Network)
+- CDN for static assets (Cloudflare CDN edge)
 - API caching via Redis (Upstash global)
 - Google OAuth (global service)
 - No geo-specific routing complexity
@@ -787,7 +905,7 @@ Benefits:
 
 #### Local Development
 - Docker Compose for local services
-- Supabase local development (optional)
+- Neon local development (branch-first workflow)
 - Redis local instance
 - Hot reload for frontend and backend
 
@@ -800,7 +918,7 @@ Benefits:
 ### 7.4 CI/CD Pipeline
 
 #### GitHub Actions
-- Frontend: Build, test, deploy to Vercel
+- Frontend: Build, test, deploy to Cloudflare Workers edge
 - Backend: Build, test, deploy to OCI
 - Database migrations (manual initially)
 - Security scanning (OWASP ZAP, Snyk)
@@ -814,7 +932,7 @@ Benefits:
 5. **E2E Tests** (Playwright)
 6. **Build** (Frontend and Backend)
 7. **Security Scan** (Snyk, OWASP)
-8. **Deploy** (Vercel, OCI)
+8. **Deploy** (Cloudflare Workers edge, OCI Instance)
 
 #### Environment Configuration
 - **Development**: Bun (see dependencies.md for version requirements)
@@ -965,7 +1083,7 @@ Benefits:
 - **Risk**: Low user adoption
   - **Mitigation**: Focus on UX, gather early feedback, iterate quickly
 
-- **Risk**: Supabase/OCI free tier changes
+- **Risk**: Neon/OCI free tier changes
   - **Mitigation**: Architecture portability, vendor-neutral design
 
 ---
@@ -993,7 +1111,7 @@ Benefits:
 - [SvelteKit Documentation](https://kit.svelte.dev/docs)
 - [Chi Router](https://github.com/go-chi/chi)
 - [SQLBoiler](https://github.com/volatiletech/sqlboiler)
-- [Supabase Documentation](https://supabase.com/docs)
+- [Neon Documentation](https://neon.tech/docs)
 
 ---
 

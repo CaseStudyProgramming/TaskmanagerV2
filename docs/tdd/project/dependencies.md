@@ -105,10 +105,10 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 - purpose: Svelte preprocessor for TypeScript/PostCSS
 - doc link: https://github.com/sveltejs/svelte-preprocess
 
-**@sveltejs/adapter-vercel**
-- version: 6.3.4
-- purpose: Vercel deployment adapter
-- doc link: https://vercel.com/docs/frameworks/sveltekit
+**@sveltejs/adapter-cloudflare**
+- version: latest
+- purpose: Cloudflare Workers edge deployment adapter
+- doc link: https://developers.cloudflare.com/pages/framework-guides/deploy-a-sveltekit-site
 
 **@sveltejs/adapter-static**
 - version: ^3.0.10
@@ -298,8 +298,13 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 **PostgreSQL**
 - version: 16.x
-- purpose: Primary database (via Supabase)
+- purpose: Primary database (via Neon)
 - doc link: https://www.postgresql.org/docs/
+
+**Neon**
+- purpose: PostgreSQL cloud database with branch-first workflow
+- doc link: https://neon.tech/docs
+- features: Branching, autoscaling, scale-to-zero, read replicas
 
 **Redis**
 - version: 7.x
@@ -308,14 +313,16 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 ### Database Limits (Free Tier)
 
-**Supabase**
-- PostgreSQL database: 500MB
-- Monthly Active Users: 50,000
-- File storage: 1GB
+**Neon Free Tier**
+- PostgreSQL database: 3 GB storage
+- Branches: Unlimited
+- Compute: 2 OCPUs, 1 GB RAM (scale-to-zero)
+- Monthly Active Users: No limit (compute-based)
+- Auto-suspend: 1 hour inactivity
 
-**Upstash**
+**Upstash Free Tier**
 - Commands/day: 10,000
-- Storage: 256MB
+- Storage: 256 MB
 
 ### Reverse Proxy
 
@@ -367,15 +374,25 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 ### Platform Limits (Free Tier)
 
-**Vercel**
-- Bandwidth/month: 100GB
-- Bun runtime: See Bun version in Frontend Dependencies (primary runtime)
+**Cloudflare Workers**
+- Requests: 100,000 requests/day (free tier)
+- Workers: Unlimited workers
+- Edge locations: 300+ global locations
+- Storage: Included with Pages
+- Bandwidth: Unlimited bandwidth
 
 **Oracle Cloud Infrastructure (OCI)**
-- Backend only: 2 OCPU + 12GB RAM
+- Backend: OCI Instance (A1.Flex - 2 OCPUs, 12 GB RAM)
+- Container runtime: Podman
 - Nginx reverse proxy
 - VM Storage: 200GB (for media files)
 - OCI Object Storage: 10GB Standard tier PAYG (for CI/CD artifacts)
+
+**Neon**
+- Storage: 3 GB
+- Compute: 2 OCPUs, 1 GB RAM (scale-to-zero)
+- Branches: Unlimited
+- Auto-suspend: 1 hour inactivity
 
 **Grafana**
 - Cloud Grafana: Free tier
@@ -471,7 +488,9 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 - [Go Releases](https://go.dev/dl/)
 - [SvelteKit Documentation](https://kit.svelte.dev/docs)
 - [SQLBoiler Documentation](https://github.com/volatiletech/sqlboiler)
-- [Supabase Documentation](https://supabase.com/docs)
+- [Neon Documentation](https://neon.tech/docs)
+- [Cloudflare Workers Documentation](https://developers.cloudflare.com/workers)
+- [Cloudflare Pages Documentation](https://developers.cloudflare.com/pages)
 - [Node.js Releases](https://nodejs.org/en/download) (optional, for compatibility)
 - [Upstash Documentation](https://upstash.com/docs)
 
@@ -490,3 +509,11 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 **2025-09-21**
 - version: 1.2.0
 - changes: Converted from table format to bullet point format with version, purpose, and doc link
+
+**2026-11-06**
+- version: 1.3.0
+- changes: Updated infrastructure to Cloudflare Workers edge, OCI Instance, Neon database, Cloudflare DNS + DDNS
+- changes: Added Cloudflare Workers adapter for SvelteKit deployment
+- changes: Updated database from Supabase to Neon with branch-first workflow
+- changes: Updated backend deployment to OCI Instance (A1.Flex) with Podman
+- changes: Added Cloudflare DNS + DDNS configuration

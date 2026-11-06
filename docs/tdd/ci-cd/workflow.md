@@ -521,9 +521,9 @@ checks:
   - No E2E tests (for speed)
   - No performance checks
 deployment:
-  - Vercel (frontend)
-  - OCI (backend, 2 OCPU + 12GB RAM, Nginx)
-  - Supabase (database - staging)
+  - Cloudflare Workers edge (frontend)
+  - OCI Instance (backend, A1.Flex - 2 OCPUs, 12 GB RAM, Podman, Nginx)
+  - Neon (database - staging branch)
   - Upstash (cache - staging)
 ```
 
@@ -538,9 +538,9 @@ checks:
   - Performance checks
   - Security scan
 deployment:
-  - Vercel (frontend)
-  - OCI (backend, 2 OCPU + 12GB RAM, Nginx)
-  - Supabase (database - production)
+  - Cloudflare Workers edge (frontend)
+  - OCI Instance (backend, A1.Flex - 2 OCPUs, 12 GB RAM, Podman, Nginx)
+  - Neon (database - production branch)
   - Upstash (cache - production)
 ```
 

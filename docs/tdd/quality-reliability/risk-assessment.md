@@ -23,10 +23,10 @@ This document identifies and assesses technical, security, and business risks fo
 **Risk Score**: Medium-High
 
 **Description**:
-- Supabase free tier: 500MB database, 50k MAU, 1GB storage
+- Neon free tier: 3GB database, unlimited branches, 2 OCPUs 1GB RAM (scale-to-zero)
 - Upstash free tier: 10k commands/day, 256MB storage
-- Vercel free tier: 100GB bandwidth/month
-- OCI free tier: 2 OCPU + 12GB RAM (backend only)
+- Cloudflare Workers free tier: 100,000 requests/day, unlimited bandwidth
+- OCI Instance: A1.Flex 2 OCPUs + 12GB RAM (backend only)
 
 **Mitigation**:
 - Monitor usage closely with custom metrics
@@ -277,7 +277,7 @@ This document identifies and assesses technical, security, and business risks fo
 - Insider threats
 
 **Mitigation**:
-- Encryption at rest (Supabase managed)
+- Encryption at rest (Neon managed)
 - TLS 1.3 for data in transit
 - Regular security audits
 - Principle of least privilege
@@ -331,8 +331,8 @@ This document identifies and assesses technical, security, and business risks fo
 **Risk Score**: Medium
 
 **Description**:
-- Supabase dependency for database and auth
-- Vercel dependency for frontend hosting
+- Neon dependency for database
+- Cloudflare Workers dependency for frontend hosting
 - Upstash dependency for caching
 - OCI dependency for backend hosting
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document defines the system quality and reliability requirements for the Advanced Task Manager backend, focusing on production-grade deployment with Oracle Cloud Infrastructure (OCI), Nginx, Grafana, and other infrastructure components.
+This document defines the system quality and reliability requirements for the Advanced Task Manager backend, focusing on production-grade deployment with Oracle Cloud Infrastructure (OCI Instance A1.Flex with Podman), Nginx, Grafana, Neon database, Cloudflare CDN edge, and other infrastructure components.
 
 ---
 
@@ -82,14 +82,14 @@ type LogEntry struct {
 ### High Availability Architecture
 
 #### Redundancy Strategy
-- **Horizontal Scaling**: Auto-scaling based on CPU/memory metrics (OCI auto-scaling)
+- **Horizontal Scaling**: Manual scaling via OCI Instance (A1.Flex - 2 OCPUs, 12 GB RAM)
 - **Load Balancing**: Nginx as reverse proxy with health checks
-- **Database Redundancy**: Supabase managed PostgreSQL with automatic failover
+- **Database Redundancy**: Neon PostgreSQL with branch-based isolation and automatic failover
 - **Cache Redundancy**: Upstash Redis with automatic failover and global distribution
 
 #### Health Checks
 - **Application Health**: `/health` endpoint checking database connectivity, cache connectivity
-- **Dependency Health**: Check external service dependencies (Google OAuth, Upstash, Supabase)
+- **Dependency Health**: Check external service dependencies (Google OAuth, Upstash, Neon)
 - **Graceful Degradation**: Fallback to cached data when external services are unavailable
 - **Health Check Frequency**: Every 30 seconds for production, every 5 minutes for development
 
@@ -147,10 +147,11 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 ### Infrastructure Resiliency
 
 #### Container Orchestration
-- **OCI Platform**: Managed container orchestration with auto-scaling
-- **Resource Limits**: 2 OCPU + 12GB RAM (backend only)
-- **Health Checks**: Container health checks for auto-recovery
-- **Rolling Updates**: Zero-downtime deployments with rolling updates
+- **OCI Instance**: OCI A1.Flex (2 OCPUs, 12 GB RAM) with Podman container runtime
+- **Resource Limits**: 2 OCPUs + 12 GB RAM (backend only)
+- **Health Checks**: Container health checks for auto-recovery via Podman
+- **Rolling Updates**: Manual rolling updates with Podman
+- **Nginx Reverse Proxy**: Frontend traffic routing via Cloudflare CDN edge to OCI backend
 
 #### Network Resiliency
 - **Connection Pooling**: Database connection pooling with Go's sql.DB
@@ -193,9 +194,9 @@ db.SetConnMaxIdleTime(10 * time.Minute)
 - **Savepoints**: Use savepoints for complex transactions
 
 #### Backup & Recovery
-- **Automated Backups**: Supabase automated daily backups
+- **Automated Backups**: Neon automated daily backups with point-in-time recovery
 - **Point-in-Time Recovery**: Enable PITR for critical data
-- **Backup Retention**: 7-day backup retention for free tier
+- **Backup Retention**: 7-day backup retention (Neon free tier)
 - **Restore Testing**: Monthly backup restore testing
 
 ---
@@ -435,7 +436,7 @@ func workerPool(jobs <-chan Job, results chan<- Result, workerCount int) {
 ### Data Protection
 
 #### Encryption
-- **Data at Rest**: Encryption at rest via Supabase
+- **Data at Rest**: Encryption at rest via Neon
 - **Data in Transit**: TLS 1.3 for all communications
 - **Key Management**: Secure key management practices
 - **Algorithm Choice**: Use modern encryption algorithms (AES-256)
@@ -645,7 +646,7 @@ CMD ["./main"]
 The backend implements a multi-level caching strategy to optimize performance and reduce database load:
 
 ```
-Browser Cache → CDN Cache → Application Cache (Redis) → Database Cache (PostgreSQL)
+Browser Cache → Cloudflare CDN edge → Application Cache (Redis) → Database Cache (Neon PostgreSQL)
 ```
 
 #### Cache Layers
@@ -656,11 +657,11 @@ Browser Cache → CDN Cache → Application Cache (Redis) → Database Cache (Po
 - **Invalidation**: Write-through, manual invalidation
 - **Implementation**: Redis via Upstash
 
-**Database Cache (PostgreSQL)**
+**Database Cache (Neon PostgreSQL)**
 - **Scope**: Query results, execution plans
 - **TTL**: Automatic database cache management
 - **Invalidation**: Automatic based on data changes
-- **Implementation**: PostgreSQL built-in query cache
+- **Implementation**: Neon PostgreSQL built-in query cache
 
 ### Cache Key Patterns
 

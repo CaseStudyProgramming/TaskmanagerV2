@@ -11,7 +11,7 @@ This document explains the container platform strategy for the Advanced Task Man
 | **Development (Windows/macOS)** | Docker Desktop | Best cross-platform support |
 | **Development (Linux)** | Docker or Podman | Flexibility for team preference |
 | **CI/CD (GitHub Actions)** | Docker | Native support, pre-installed |
-| **Production** | PaaS (No Docker/Podman) | Managed services handle runtime |
+| **Production** | OCI Instance (Podman) | Self-managed container runtime |
 | **Registry** | GHCR | Integrated with GitHub, no signup needed |
 
 ## Development Setup
@@ -108,14 +108,14 @@ ghcr.io/yourusername/taskmanager-backend:1.0.0
 
 ## Production Deployment
 
-### PaaS Architecture
+### OCI Instance Architecture
 
-**No Docker/Podman on production servers**
+**Backend deployment on OCI Instance with Podman**
 
 ```
-Frontend: Vercel (managed deployment from Git)
-Backend:  OCI (Oracle Cloud Infrastructure, 2 OCPU + 12GB RAM, Nginx proxy)
-Database: Supabase (managed PostgreSQL)
+Frontend: Cloudflare Workers edge (SvelteKit adapter)
+Backend:  OCI Instance (A1.Flex - 2 OCPUs, 12 GB RAM, Podman)
+Database: Neon (PostgreSQL with branch-first workflow)
 Cache:    Upstash (managed Redis)
 ```
 
@@ -125,29 +125,53 @@ Cache:    Upstash (managed Redis)
 # 1. Developer pushes code to GitHub
 git push origin main
 
-# 2. GitHub Actions builds and pushes to GHCR
+# 2. Woodpecker CI/CD builds and pushes to GHCR
 # - Docker builds image
 # - Docker pushes to GHCR
 # - Tests run in Docker containers
 
-# 3. OCI pulls latest image from GHCR
-# - OCI handles container runtime
-# - OCI manages scaling and health checks
+# 3. OCI Instance pulls latest image from GHCR
+# - Podman handles container runtime
 # - Nginx configured as reverse proxy
+# - Manual deployment trigger
 
-# 4. No Docker/Podman installation on production servers
+# 4. Cloudflare Workers deploys frontend from Git
+# - Cloudflare builds and deploys to edge
+# - Global CDN distribution
 ```
 
-### OCI Configuration
+### OCI Instance Configuration
 
 **Image Source:**
 - Registry: GitHub Container Registry
 - Image: `ghcr.io/yourusername/taskmanager-backend:latest`
 - Authentication: GitHub username + PAT or OCI credentials
-- Instance Type: 2 OCPU + 12GB RAM
+- Instance Type: A1.Flex - 2 OCPUs, 12 GB RAM
+- Container Runtime: Podman
 - Reverse Proxy: Nginx
 
-**No manual Docker commands needed on production servers.**
+**Manual deployment to OCI Instance:**
+```bash
+# SSH into OCI Instance
+ssh user@oci-instance-ip
+
+# Pull latest image
+podman pull ghcr.io/yourusername/taskmanager-backend:latest
+
+# Stop old container
+podman stop taskmanager-backend
+podman rm taskmanager-backend
+
+# Start new container
+podman run -d \
+  --name taskmanager-backend \
+  -p 8080:8080 \
+  --restart unless-stopped \
+  ghcr.io/yourusername/taskmanager-backend:latest
+
+# Configure Nginx reverse proxy
+sudo systemctl reload nginx
+```
 
 ## Team Guidelines
 
@@ -200,10 +224,10 @@ git push origin main
 - Industry standard approach
 
 ### Production Simplicity
-- No Docker/Podman installation on servers
-- PaaS providers handle container runtime
+- Podman installed on OCI Instance (A1.Flex - 2 OCPUs, 12 GB RAM)
+- Self-managed container runtime
 - Focus on application logic
-- Automatic scaling and management
+- Manual scaling and management
 
 ### Registry Convenience
 - GHCR integrated with GitHub

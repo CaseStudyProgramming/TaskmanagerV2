@@ -1,7 +1,12 @@
 {
   "mcpServers": {
     "aiven": {
-      "serverUrl": "https://mcp.aiven.live/mcp"
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.aiven.live/mcp"
+      ]
     },
     "neon": {
       "url": "https://mcp.neon.tech/mcp",

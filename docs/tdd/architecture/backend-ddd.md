@@ -323,9 +323,9 @@ The infrastructure layer implements interfaces defined in the domain layer and h
 internal/infrastructure/
 ├── persistence/
 │   ├── postgresql/
-│   │   ├── task_repository.go      # PostgreSQL implementation
-│   │   ├── user_repository.go      # PostgreSQL implementation
-│   │   └── auth_repository.go      # PostgreSQL implementation
+│   │   ├── task_repository.go      # Neon PostgreSQL implementation
+│   │   ├── user_repository.go      # Neon PostgreSQL implementation
+│   │   └── auth_repository.go      # Neon PostgreSQL implementation
 │   └── redis/
 │       └── cache_repository.go      # Redis cache implementation
 ├── external/
@@ -614,7 +614,7 @@ HTTP Request → Nginx → Chi Router → Middleware → Handler → Service →
    - Transaction handling
 
 7. **Database Layer**
-   - PostgreSQL data persistence
+   - Neon PostgreSQL data persistence
    - Query execution and optimization
    - Transaction management
    - Data integrity enforcement
@@ -623,9 +623,9 @@ HTTP Request → Nginx → Chi Router → Middleware → Handler → Service →
 
 #### Task Creation Flow
 ```
-User → Frontend → API Client → Backend API → PostgreSQL → Redis
-                              ↓                              ↓
-                         Priority Calc                   Cache
+User → Frontend → API Client → Backend API → Neon PostgreSQL → Redis
+                              ↓                                    ↓
+                         Priority Calc                         Cache
 ```
 
 1. **User Action**: User fills task creation form
@@ -640,9 +640,9 @@ User → Frontend → API Client → Backend API → PostgreSQL → Redis
 
 #### Authentication Flow
 ```
-User → Frontend → Google OAuth → Supabase Auth → Backend → JWT Token
-                ↑                                           ↓
-                └───────────────────────────────────────────┘
+User → Frontend → Google OAuth → Backend → JWT Token
+                ↑                       ↓
+                └───────────────────────┘
 ```
 
 1. **User Action**: User clicks "Login with Google" button

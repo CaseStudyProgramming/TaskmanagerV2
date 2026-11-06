@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document defines the system quality and reliability requirements for the Advanced Task Manager frontend (SvelteKit application), focusing on production-grade deployment with Vercel, comprehensive error handling, and excellent user experience.
+This document defines the system quality and reliability requirements for the Advanced Task Manager frontend (SvelteKit application), focusing on production-grade deployment with Cloudflare Workers edge, comprehensive error handling, and excellent user experience.
 
 ---
 
@@ -106,7 +106,7 @@ class ErrorBoundary {
 ### High Availability Architecture
 
 #### Content Delivery
-- **CDN**: Vercel Edge Network for global content delivery
+- **CDN**: Cloudflare CDN edge for global content delivery
 - **Static Asset Caching**: Aggressive caching for static assets
 - **API Caching**: Cache API responses when appropriate
 - **Offline Support**: Service worker for offline functionality
@@ -172,10 +172,13 @@ async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 3)
 ### Infrastructure Resiliency
 
 #### Deployment Architecture
-- **Vercel Platform**: Managed deployment with automatic scaling
-- **Edge Functions**: Edge functions for global performance
-- **Asset Optimization**: Automatic asset optimization
-- **Image Optimization**: Automatic image optimization
+- **Cloudflare Workers edge**: Edge deployment with automatic scaling
+- **Edge Functions**: Workers for global performance and low latency
+- **Asset Optimization**: Automatic asset optimization via Cloudflare
+- **Image Optimization**: Automatic image optimization via Cloudflare
+- **SvelteKit Adapter**: `@sveltejs/adapter-cloudflare` for Cloudflare Workers deployment
+- **Nuxt Nitro**: `cloudflare` preset for Cloudflare Workers deployment
+- **DNS Management**: Cloudflare DNS + DDNS for `davidcps.my.id`
 
 #### CDN Configuration
 - **Cache Headers**: Appropriate cache headers for different content types

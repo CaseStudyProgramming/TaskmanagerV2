@@ -35,9 +35,9 @@ This document summarizes the migration from GitHub Actions to Woodpecker CI/CD f
 - **Note**: Backend continues to use Go runtime with stdlib + Chi router
 
 ### 5. Storage Strategy
-- **Metadata**: Supabase (PostgreSQL) - text metadata + links to VM storage
+- **Metadata**: Neon (PostgreSQL) - text metadata + links to VM storage
 - **Media Files**: VM Storage (200GB on OCI Debian 26 LTS) - video, photo, media files
-- **Media URLs**: VM storage sends links to Supabase database
+- **Media URLs**: VM storage sends links to Neon database
 - **CI/CD Artifacts**: OCI Object Storage (10GB Standard tier PAYG) - Woodpecker artifacts
 
 ---
@@ -350,7 +350,7 @@ chmod +x scripts/deploy.sh
 
 ## Storage Strategy
 
-### Supabase for Metadata
+### Neon for Metadata
 
 ```sql
 -- Database schema for metadata
@@ -401,11 +401,11 @@ type Task struct {
 }
 ```
 
-**VM Storage → Supabase Link**:
+**VM Storage → Neon Link**:
 1. Backend uploads file to VM Storage (/var/www/media/)
 2. Backend generates URL or file path
-3. Backend stores URL/path in Supabase database (media_urls column)
-4. Frontend retrieves URL from Supabase and displays media
+3. Backend stores URL/path in Neon database (media_urls column)
+4. Frontend retrieves URL from Neon and displays media
 
 ### OCI Object Storage for CI/CD Artifacts (10GB Standard tier PAYG)
 
@@ -497,7 +497,7 @@ WOODPECKER_MAX_PROCS=1
 - [Mergify Documentation](https://doc.mergify.io/)
 - [Playwright Documentation](https://playwright.dev/)
 - [OCI Documentation](https://docs.oracle.com/en-us/iaas/)
-- [Supabase Documentation](https://supabase.com/docs)
+- [Neon Documentation](https://neon.tech/docs)
 - [Bun Documentation](https://bun.sh/docs)
 
 ---

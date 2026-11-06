@@ -17,7 +17,7 @@ This document defines the Woodpecker CI/CD pipeline configuration that replaces 
 3. **Resource Limits**: Max 2GB RAM, 1-2 workers (universal for multiple projects)
 4. **PR Batching**: Mergify for batching 3 PRs (free tier)
 5. **Storage**:
-   - Supabase for database teks(metadata) + links to VM storage
+   - Neon for database teks(metadata) + links to VM storage
    - VM Storage (200GB on OCI Debian 26 LTS) for video, photo, media files
    - OCI Object Storage (10GB Standard tier PAYG) for Woodpecker CI/CD artifacts
 6. **Deployment**: Manual deployment to OCI Podman
@@ -751,7 +751,7 @@ pull_request_rules:
 │                    STORAGE STRATEGY                     │
 ├─────────────────────────────────────────────────────────┤
 │                                                           │
-│  1. SUPABASE (PostgreSQL)                                │
+│  1. NEON (PostgreSQL)                                    │
 │     ├── Database metadata (text data)                    │
 │     ├── User data, task data, etc.                       │
 │     └── Links to VM storage (file paths/URLs)           │
@@ -771,7 +771,7 @@ pull_request_rules:
 └─────────────────────────────────────────────────────────┘
 ```
 
-### Supabase for Metadata
+### Neon for Metadata
 
 ```sql
 -- Database schema for metadata
@@ -861,7 +861,7 @@ Untuk detail lebih lanjut tentang artifact management, lihat [Woodpecker Artifac
 func UploadToOCI(file io.Reader, filename string) (string, error) {
     // OCI SDK integration
     // Returns pre-authenticated URL
-    // Store URL in Supabase
+    // Store URL in Neon
     return url, nil
 }
 
@@ -1179,7 +1179,7 @@ git push origin feature/test-woodpecker
 - [Mergify Documentation](https://doc.mergify.io/)
 - [Playwright Documentation](https://playwright.dev/)
 - [OCI Documentation](https://docs.oracle.com/en-us/iaas/)
-- [Supabase Documentation](https://supabase.com/docs)
+- [Neon Documentation](https://neon.tech/docs)
 - [Bun Documentation](https://bun.sh/docs)
 
 ---

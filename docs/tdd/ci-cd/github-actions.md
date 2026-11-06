@@ -247,14 +247,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Deploy Frontend to Vercel
-        uses: amondnet/vercel-action@v25
+      - name: Deploy Frontend to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-          working-directory: ./frontend
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy ./frontend --project-name=taskmanager-frontend
 
       - name: Deploy Backend to OCI
         uses: oracle-actions/oci-deploy@v1
@@ -273,14 +271,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Deploy Frontend to Vercel
-        uses: amondnet/vercel-action@v25
+      - name: Deploy Frontend to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-          working-directory: ./frontend
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy ./frontend --project-name=taskmanager-frontend
 
       - name: Deploy Backend to OCI
         uses: oracle-actions/oci-deploy@v1
@@ -330,7 +326,7 @@ echo "All checks passed!"
 
 ## Coverage Configuration
 
-### Frontend Coverage (Vitest)
+### Frontend Coverage (Vitest) - Cloudflare Workers Edge Deployment
 
 ```typescript
 // vitest.config.ts
@@ -392,9 +388,9 @@ echo "Coverage $COVERAGE% meets threshold $THRESHOLD%"
 
 ```yaml
 # Frontend Deployment
-VERCEL_TOKEN:                  # Vercel API token
-VERCEL_ORG_ID:                 # Vercel organization ID
-VERCEL_PROJECT_ID:             # Vercel project ID
+CLOUDFLARE_API_TOKEN:         # Cloudflare API token
+CLOUDFLARE_ACCOUNT_ID:        # Cloudflare account ID
+CLOUDFLARE_PROJECT_NAME:      # Cloudflare project name (taskmanager-frontend)
 
 # Backend Deployment
 OCI_API_TOKEN:                 # OCI API token
@@ -404,12 +400,10 @@ OCI_SERVICE_ID:                # OCI service ID
 SNYK_TOKEN:                    # Snyk API token
 GITLEAKS_LICENSE:              # Gitleaks license (optional)
 
-# Database (for integration tests)
-TEST_DB_HOST:                  # Test database host
-TEST_DB_PORT:                  # Test database port
-TEST_DB_USER:                  # Test database user
-TEST_DB_PASSWORD:              # Test database password
-TEST_DB_NAME:                  # taskmanager_db_testing
+# Database (Neon for integration tests)
+NEON_DATABASE_URL:            # Neon database connection string (testing branch)
+NEON_PROJECT_ID:              # Neon project ID
+TEST_DB_NAME:                  # taskmanager_db_testing (Neon branch: testing)
 
 # Redis (for integration tests)
 REDIS_HOST:                    # Redis host
@@ -491,6 +485,103 @@ lhci autorun --collect.url=http://localhost:3000
 - Production-ready phase (can be added to CI/CD)
 - Different from k6 (API load) and Playwright (functional testing)
 
+## Cloudflare Workers Edge Deployment
+
+### Cloudflare Pages Configuration
+
+**Create `wrangler.toml` in project root:**
+```toml
+name = "taskmanager-frontend"
+main = "./.cloudflare/_worker.js"
+compatibility_date = "2024-01-01"
+
+[site]
+bucket = "./.cloudflare/public"
+
+[build]
+command = "bun run build"
+cwd = "."
+watch_dir = "src"
+
+[vars]
+ENVIRONMENT = "production"
+API_URL = "https://api.davidcps.my.id"
+```
+
+**SvelteKit Adapter Configuration:**
+```javascript
+// svelte.config.js
+import adapter from '@sveltejs/adapter-cloudflare';
+
+export default {
+  kit: {
+    adapter: adapter({
+      platformProxy: {
+        pages: true
+      }
+    })
+  }
+};
+```
+
+**Deploy to Cloudflare Pages:**
+```yaml
+deploy-cloudflare:
+  name: Deploy to Cloudflare Workers
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: ${{ env.BUN_VERSION }}
+    
+    - name: Install dependencies
+      run: bun install
+    
+    - name: Build application
+      run: bun run build
+    
+    - name: Deploy to Cloudflare Workers
+      uses: cloudflare/wrangler-action@v3
+      with:
+        apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        command: pages deploy . --project-name=taskmanager-frontend
+```
+
+**Cloudflare Environment Variables:**
+```yaml
+CLOUDFLARE_API_TOKEN:         # Cloudflare API token
+CLOUDFLARE_ACCOUNT_ID:        # Cloudflare account ID
+CLOUDFLARE_PROJECT_NAME:      # taskmanager-frontend
+```
+
+### Cloudflare DNS + DDNS Configuration
+
+**DNS Configuration:**
+- Add A record: `davidcps.my.id` → Cloudflare Pages
+- Add CNAME for subdomains: `api.davidcps.my.id` → OCI Instance IP
+- Enable CDN caching
+- Configure DDNS for dynamic IP updates
+
+**DDNS Script (for OCI Instance):**
+```bash
+#!/bin/bash
+# Update Cloudflare DNS when OCI Instance IP changes
+
+CURRENT_IP=$(curl -s https://api.ipify.org)
+ZONE_ID="your-cloudflare-zone-id"
+RECORD_ID="your-record-id"
+
+curl -X PUT "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$RECORD_ID" \
+  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data "{\"type\":\"A\",\"name\":\"api.davidcps.my.id\",\"content\":\"$CURRENT_IP\",\"ttl\":1,\"proxied\":false}"
+```
+
 ## Load Testing
 
 ### k6 Configuration
@@ -547,8 +638,12 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
-# Rollback frontend
-vercel rollback $VERSION
+# Rollback frontend (Cloudflare Workers)
+# Deploy previous version using Cloudflare API
+curl -X POST "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/taskmanager-frontend/deployments" \
+  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"rollback_to": "'$VERSION'"}'
 
 # Rollback backend (OCI)
 oci compute instance-action --instance-id $OCI_INSTANCE_ID --action STOP
