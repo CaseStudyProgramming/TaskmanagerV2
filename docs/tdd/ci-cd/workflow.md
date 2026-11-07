@@ -154,7 +154,7 @@ develop:
   required_approving_review_count: 1
 ```
 
-## 3. CI/CD Pipeline Workflow (Woodpecker)
+## 3. CI/CD Pipeline Workflow (Forgejo Actions)
 
 ### Pipeline Stages by Branch
 
@@ -213,98 +213,157 @@ develop:
 ### CI/CD Workflow Steps
 
 ```yaml
-# .woodpecker.yml - Woodpecker CI/CD Pipeline
-# See woodpecker-ci.md for complete configuration
+# .forgejo/workflows/ci.yml - Forgejo Actions CI/CD Pipeline
+# See forgejo-ci.md for complete configuration
 
-clone:
-  git:
-    image: woodpeckerci/plugin-git:latest
-    depth: 1
-    tags: false
+name: CI Pipeline
 
-pipeline:
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [develop]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'  # Midnight daily
+
+env:
+  BUN_VERSION: '1.4.2'
+  GO_VERSION: '1.27'
+
+jobs:
   # Stage 1: Quality Checks (All branches)
   quality-checks:
-    image: oven/bun:1.4.2
-    commands:
-      - rm -rf node_modules .bun
-      - bun install --no-cache
-      - bun run format:check
-      - bun run lint
-      - bun run type-check
-    when:
-      event: [push, pull_request]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      
+      - name: Install dependencies
+        run: bun install --no-cache
+      
+      - name: Format check
+        run: bun run format:check
+      
+      - name: Lint
+        run: bun run lint
+      
+      - name: Type check
+        run: bun run type-check
 
   # Stage 2: Unit Tests (All branches)
   unit-tests-frontend:
-    image: oven/bun:1.4.2
-    commands:
-      - rm -rf node_modules .bun
-      - bun install --no-cache
-      - bun run test:unit -- --coverage
-    when:
-      event: [push, pull_request]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      
+      - name: Install dependencies
+        run: bun install --no-cache
+      
+      - name: Run unit tests
+        run: bun run test:unit -- --coverage
 
   unit-tests-backend:
-    image: golang:1.27
-    commands:
-      - go clean -cache -modcache
-      - go test ./... -short -cover
-    when:
-      event: [push, pull_request]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      
+      - name: Run unit tests
+        run: go test ./... -short -cover
 
   # Stage 3: Integration Tests (PR to develop, push to main)
   integration-tests:
-    image: golang:1.27
-    commands:
-      - go test ./... -cover
-    environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: test
-      DB_PASSWORD: test
-      DB_NAME: taskmanager_db_testing
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
     services:
       postgres:
         image: postgres:16-alpine
-        environment:
+        env:
           POSTGRES_USER: test
           POSTGRES_PASSWORD: test
           POSTGRES_DB: taskmanager_db_testing
-    when:
-      branch: [develop, main]
-      event: [push, pull_request]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      
+      - name: Run integration tests
+        run: go test ./... -cover
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: test
+          DB_PASSWORD: test
+          DB_NAME: taskmanager_db_testing
 
   # Stage 4: Coverage Analysis (PR to develop, push to main)
   coverage-analysis:
-    image: python:3.12-alpine
-    commands:
-      - pip install coverage-parser
-      - python3 scripts/coverage_analyzer.py
-    when:
-      branch: [develop, main]
-      event: [push, pull_request]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    needs: [integration-tests]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install coverage tools
+        run: pip install coverage-parser
+      
+      - name: Analyze coverage
+        run: python3 scripts/coverage_analyzer.py
 
   # Stage 5: Security Scan (PR to develop, push to main)
   security-scan:
-    image: snyk/snyk-cli:latest
-    commands:
-      - snyk auth $${SNYK_TOKEN}
-      - snyk test --severity-threshold=high
-    secrets: [snyk_token]
-    when:
-      branch: [develop, main]
-      event: [push, pull_request]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Snyk
+        uses: snyk/actions/golang@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   # Stage 6: Smoke Tests (PR to develop, push to main)
   smoke-tests:
-    image: oven/bun:1.4.2
-    commands:
-      - rm -rf node_modules .bun
-      - bun install --no-cache
-      - bun run build
-      - bun run test:smoke
-    when:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      
+      - name: Install dependencies
+        run: bun install --no-cache
+      
+      - name: Build
+        run: bun run build
+      
+      - name: Run smoke tests
+        run: bun run test:smoke
       branch: [develop, main]
       event: [push, pull_request]
 
