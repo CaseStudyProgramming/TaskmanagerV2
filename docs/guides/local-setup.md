@@ -217,6 +217,6 @@ podman run ghcr.com/user/myapp:latest
 
 ## Need Help?
 
-- Check [DOCKER_PODMAN_ENV_STRATEGY.md](./DOCKER_PODMAN_ENV_STRATEGY.md) for detailed strategy
-- Check [CREDENTIALS_GUIDE.md](./CREDENTIALS_GUIDE.md) for env variables management
+- Check [Infrastructure & Network](../architecture/infrastructure-&-network.md) for detailed infrastructure strategy
+- Check [Credentials Guide](../CREDENTIALS_GUIDE.md) for env variables management
 - Ask in team chat or create an issue

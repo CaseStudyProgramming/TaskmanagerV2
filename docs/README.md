@@ -6,83 +6,103 @@ This directory contains comprehensive documentation for the Advanced Task Manage
 
 ```
 docs/
-├── README.md                    # This file
-├── prd.md                       # Product Requirements Document
-├── CREDENTIALS_GUIDE.md         # Credentials and environment management
-├── DEVELOPMENT_SETUP.md         # Quick start development setup
-├── DOCKER_PODMAN_ENV_STRATEGY.md # Comprehensive environment strategy
-├── archived/                    # Historical documentation
-│   ├── README.md                # Archive index
-│   ├── WOODPECKER_MIGRATION.md  # Historical Woodpecker migration
-│   ├── woodpecker-artifacts.md  # Woodpecker artifact docs (deprecated)
-│   └── woodpecker-artifact-types.md # Woodpecker artifact types (deprecated)
-└── tdd/                         # Technical Design Documentation
-    ├── README.md                # TDD navigation and overview
-    ├── architecture/            # Architecture documentation
-    │   ├── backend-ddd.md       # Backend DDD architecture + interactions
-    │   ├── frontend-fsd.md      # Frontend FSD architecture + interactions
-    │   └── container-strategy.md # Container platform strategy
-    ├── api/                     # API documentation
-    │   ├── openapi.yaml         # OpenAPI 3.1 specification
-    │   ├── standard-response-format.md # API response specification
-    │   └── API_VALIDATION.md    # API validation rules
-    ├── ci-cd/                   # CI/CD documentation
-    │   ├── workflow.md          # Development workflow
-    │   ├── coverage-strategy.md # Coverage thresholds
-    │   ├── forgejo-ci.md        # Forgejo CI/CD pipeline config (Primary)
-    │   └── github-mirror-setup.md # GitHub mirror to Forgejo setup
-    ├── project/                 # Project-level documentation
-    │   ├── dependencies.md     # Dependency versions + tech rationale
-    │   ├── test-driven-development.md # Testing guidelines
-    │   └── future-roadmap.md   # Future enhancements roadmap
-    ├── quality-reliability/     # Quality & reliability
-    │   ├── backend-quality-reliability.md # Backend quality + caching
-    │   ├── frontend-quality-reliability.md # Frontend quality
-    │   ├── container-recommendations.md # Container best practices
-    │   └── risk-assessment.md  # Technical and business risks
-    └── testing/                 # Testing documentation
-        ├── backend-examples.md  # Backend testing examples
-        └── frontend-examples.md # Frontend testing examples
+├── README.md                           # This file
+├── prd.md                              # Product Requirements Document
+├── CREDENTIALS_GUIDE.md                # Credentials and environment management
+├── credentials.md.example              # Credentials template (committed)
+├── design DiC.md                       # Documentation design specification
+│
+├── /architecture                       # MACRO ARCHITECTURE (Ex-SAD)
+│   ├── system-overview.md              # System C4 Model Diagram (Context & Container)
+│   ├── infrastructure-&-network.md      # Cloud topology, VPC, CDN, CI/CD pipeline
+│   ├── security-&-compliance.md        # Auth strategy, Data encryption, GDPR/ISO
+│   └── disaster-recovery.md            # RTO/RPO targets, Backup strategies, Failover steps
+│
+├── /backend-spec                       # BACKEND TECHNICAL DESIGN (Ex-SDD Backend)
+│   ├── README.md                       # Backend tech stack, Directory conventions, Coding standards
+│   ├── database-schema.md              # ERD (Mermaid.js), Migration rules, Caching strategy (Redis)
+│   ├── background-jobs.md              # Message brokers, Cron schedules
+│   └── /services                       # Module-specific design (only for complex logic)
+│       ├── auth-service.md             # Authentication service design
+│       └── payment-service.md         # Payment service design (future)
+│
+├── /frontend-spec                      # FRONTEND TECHNICAL DESIGN (Ex-SDD Frontend)
+│   ├── README.md                       # Frontend tech stack, Rendering strategy (SSR/SPA)
+│   ├── state-management.md             # Client-side data flow, Hydration rules
+│   ├── design-system-&-ui.md           # Component anatomy, Theme tokens, Accessibility (WCAG)
+│   └── routing-&-middleware.md         # Route mapping, Navigation guards, Code-splitting rules
+│
+├── /api-specs                          # TRUTH CONTRACTS (Jantung Spec-Driven Development)
+│   ├── openapi.yaml                    # REST API specifications (Swagger format)
+│   ├── standard-response-format.md     # API response specification
+│   ├── API_VALIDATION.md               # API validation rules
+│   └── error-codes.md                  # Global error dictionary (Standardized error payloads)
+│
+├── /adr                                # ARCHITECTURE DECISION RECORDS (Lightweight logs)
+│   ├── 0000-template.md                # Standard ADR template
+│   ├── 0001-record-architecture-decisions.md
+│   ├── 0002-technology-stack-selection.md
+│   └── 0003-use-postgresql-for-core-ledger.md
+│
+├── /guides                             # OPERATION & ONBOARDING PADS
+│   ├── local-setup.md                  # Step-by-step local environment spinning (Docker)
+│   ├── git-workflow.md                 # Branch naming, Conventional commits
+│   └── release-&-deployment.md         # Staging/Prod release checklists, Rollback procedures
+│
+└── /tdd                                # LEGACY: Technical Design Documentation (to be migrated)
+    ├── README.md
+    ├── architecture/
+    ├── ci-cd/
+    ├── project/
+    ├── quality-reliability/
+    └── testing/
 ```
 
 ## Quick Links
 
 ### Getting Started
 - [Product Requirements Document (PRD)](./prd.md) - Product requirements and specifications
-- [Development Setup](./DEVELOPMENT_SETUP.md) - Quick start development setup
-- [Environment Strategy](./DOCKER_PODMAN_ENV_STRATEGY.md) - Comprehensive environment and deployment strategy
+- [Local Setup Guide](./guides/local-setup.md) - Quick start development setup
 - [Credentials Guide](./CREDENTIALS_GUIDE.md) - Credentials and security management
 
-### Project Documentation
-- [Test-Driven Development Guidelines](./tdd/project/test-driven-development.md) - Testing guidelines and standards
-- [Dependency Versions](./tdd/project/dependencies.md) - Backend and frontend dependency versions
-- [Future Roadmap](./tdd/project/future-roadmap.md) - Scalability and feature enhancements
+### Architecture (Macro)
+- [System Overview](./architecture/system-overview.md) - C4 Model Diagram (Context & Container)
+- [Infrastructure & Network](./architecture/infrastructure-&-network.md) - Cloud topology, VPC, CDN, CI/CD
+- [Security & Compliance](./architecture/security-&-compliance.md) - Auth strategy, encryption, GDPR/ISO
+- [Disaster Recovery](./architecture/disaster-recovery.md) - RTO/RPO, backup strategies, failover
 
-### Architecture
-- [Backend DDD Architecture](./tdd/architecture/backend-ddd.md) - Domain-Driven Design for backend
-- [Frontend FSD Architecture](./tdd/architecture/frontend-fsd.md) - Feature-Sliced Design for frontend
-- [Container Strategy](./tdd/architecture/container-strategy.md) - Container platform strategy
+### Backend Technical Design
+- [Backend Overview](./backend-spec/README.md) - Backend tech stack, conventions, standards
+- [Database Schema](./backend-spec/database-schema.md) - ERD, migrations, caching strategy
+- [Background Jobs](./backend-spec/background-jobs.md) - Message brokers, cron schedules
+- [Auth Service](./backend-spec/services/auth-service.md) - Authentication service design
+- [Payment Service](./backend-spec/services/payment-service.md) - Payment service design (future)
 
-### API
-- [OpenAPI 3.1 Specification](./tdd/api/openapi.yaml) - Complete API contract
-- [Standard Response Format](./tdd/api/standard-response-format.md) - API response specification
-- [API Validation](./tdd/api/API_VALIDATION.md) - API validation rules
+### Frontend Technical Design
+- [Frontend Overview](./frontend-spec/README.md) - Frontend tech stack, rendering strategy
+- [State Management](./frontend-spec/state-management.md) - Client-side data flow, hydration rules
+- [Design System & UI](./frontend-spec/design-system-&-ui.md) - Component anatomy, theme tokens, WCAG
+- [Routing & Middleware](./frontend-spec/routing-&-middleware.md) - Route mapping, navigation guards
 
-### Testing
-- [Backend Testing Examples](./tdd/testing/backend-examples.md) - Go testing examples
-- [Frontend Testing Examples](./tdd/testing/frontend-examples.md) - TypeScript/Svelte testing examples
+### API Specifications
+- [OpenAPI Specification](./api-specs/openapi.yaml) - Complete API contract
+- [Standard Response Format](./api-specs/standard-response-format.md) - API response specification
+- [API Validation](./api-specs/API_VALIDATION.md) - API validation rules
+- [Error Codes](./api-specs/error-codes.md) - Global error dictionary
 
-### CI/CD
-- [Development Workflow](./tdd/ci-cd/workflow.md) - Complete development workflow and quality gates
-- [Coverage Strategy](./tdd/ci-cd/coverage-strategy.md) - Hierarchical coverage thresholds and enforcement
-- [Forgejo CI/CD Configuration](./tdd/ci-cd/forgejo-ci.md) - Forgejo CI/CD pipeline configuration (Primary)
-- [GitHub Mirror Setup](./tdd/ci-cd/github-mirror-setup.md) - GitHub repository mirroring to Forgejo
+### Architecture Decision Records (ADR)
+- [ADR Template](./adr/0000-template.md) - Standard ADR template
+- [Record Architecture Decisions](./adr/0001-record-architecture-decisions.md) - ADR adoption decision
+- [Technology Stack Selection](./adr/0002-technology-stack-selection.md) - Technology stack decision
+- [Use PostgreSQL for Core Database](./adr/0003-use-postgresql-for-core-ledger.md) - Database selection decision
 
-### Quality & Reliability
-- [Backend Quality & Reliability](./tdd/quality-reliability/backend-quality-reliability.md) - Backend system quality requirements
-- [Frontend Quality & Reliability](./tdd/quality-reliability/frontend-quality-reliability.md) - Frontend system quality requirements
-- [Container Recommendations](./tdd/quality-reliability/container-recommendations.md) - Docker container and Alpine Linux recommendations
-- [Risk Assessment](./tdd/quality-reliability/risk-assessment.md) - Technical and business risks
+### Operation & Onboarding
+- [Local Setup](./guides/local-setup.md) - Step-by-step local environment setup
+- [Git Workflow](./guides/git-workflow.md) - Branch naming, conventional commits
+- [Release & Deployment](./guides/release-&-deployment.md) - Release checklists, rollback procedures
+
+### Legacy Documentation (to be migrated)
+- [Legacy TDD Documentation](./tdd/README.md) - Legacy technical design documentation
 
 ## Documentation Standards
 
@@ -90,16 +110,17 @@ docs/
 
 1. **New Features**: Add architecture documentation before implementation
 2. **API Changes**: Update API documentation immediately
-3. **Testing Patterns**: Add examples for new testing approaches
-4. **CI/CD Changes**: Update pipeline documentation
-5. **Architecture Decisions**: Document significant architectural decisions
+3. **Architecture Decisions**: Document significant decisions as ADRs
+4. **Infrastructure Changes**: Update infrastructure documentation
+5. **Security Changes**: Update security documentation
 
 ### Documentation Format
 
 - Use Markdown for all documentation
 - Use proper heading hierarchy (H1, H2, H3)
-- Include diagrams for complex architectures
+- Include diagrams for complex architectures (Mermaid.js)
 - Keep documentation up-to-date with code changes
+- Follow the design specification in [design DiC.md](./design DiC.md)
 
 ### Review Process
 
@@ -112,11 +133,12 @@ docs/
 
 When adding new documentation:
 
-1. Choose the appropriate directory (project, architecture, api, testing, ci-cd, quality-reliability)
+1. Choose the appropriate directory (architecture, backend-spec, frontend-spec, api-specs, adr, guides)
 2. Use clear, descriptive filenames
 3. Include a table of contents for longer documents
 4. Add cross-references to related documentation
 5. Update this README.md with new documentation links
+6. Follow the design specification in [design DiC.md](./design DiC.md)
 
 ## Maintenance
 
@@ -126,3 +148,26 @@ Documentation maintenance is part of the development process:
 - Update documentation when APIs change
 - Remove deprecated documentation
 - Document known issues and workarounds
+- Migrate legacy documentation to new structure
+
+## Principles
+
+### Separation of Concerns
+
+- **Folder /architecture**: Only discusses what components are and why they were chosen
+- **Folder /backend-spec**: Discusses how the backend platform implements architecture internally
+- **Folder /frontend-spec**: Discusses how the frontend platform implements architecture internally
+
+### Documentation Philosophy
+
+- **Architecture**: High-level design decisions and rationale
+- **Backend-spec**: Technical implementation details for backend
+- **Frontend-spec**: Technical implementation details for frontend
+- **API-specs**: Truth contracts for API (spec-driven development)
+- **ADR**: Lightweight logs of architecture decisions
+- **Guides**: Operation and onboarding procedures
+
+## References
+
+- [Design Specification](./design DiC.md) - Documentation design and structure
+- [Product Requirements Document](./prd.md) - Product requirements and specifications

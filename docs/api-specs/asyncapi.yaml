@@ -1,0 +1,85 @@
+asyncapi: '2.6.0'
+info:
+  title: Advanced Task Manager API
+  version: 1.0.0
+  description: |
+    This document defines the event-driven specifications for the Advanced Task Manager.
+    Currently, the application uses REST API (see openapi.yaml). Event-driven features
+    (WebSockets, Webhooks) are planned for future implementation.
+
+servers:
+  production:
+    url: wss://api.davidcps.my.id
+    protocol: websocket
+    description: Production WebSocket server (future)
+
+channels:
+  # Example: Real-time task updates (future)
+  tasks/updates:
+    publish:
+      summary: Task update events
+      message:
+        name: TaskUpdated
+        payload:
+          type: object
+          properties:
+            taskId:
+              type: string
+              format: uuid
+            status:
+              type: string
+              enum: [todo, in-progress, completed]
+            timestamp:
+              type: integer
+              format: int64
+
+  # Example: Real-time notifications (future)
+  notifications:
+    subscribe:
+      summary: Notification events
+      message:
+        name: Notification
+        payload:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [task_created, task_updated, task_deleted]
+            message:
+              type: string
+            timestamp:
+              type: integer
+              format: int64
+
+components:
+  messages:
+    TaskUpdated:
+      name: TaskUpdated
+      title: Task Updated Event
+      summary: Emitted when a task is updated
+      payload:
+        type: object
+        properties:
+          taskId:
+            type: string
+            format: uuid
+          status:
+            type: string
+          timestamp:
+            type: integer
+            format: int64
+
+    Notification:
+      name: Notification
+      title: Notification Event
+      summary: Emitted for user notifications
+      payload:
+        type: object
+        properties:
+          type:
+            type: string
+          message:
+            type: string
+          timestamp:
+            type: integer
+            format: int64
