@@ -8,16 +8,21 @@ This document explains the strategy for managing environment variables across de
 Development (Local Machine):
 - Runtime: Docker OR Podman (team choice)
 - Env Source: .env file (local)
-- Build: Docker/Podman image locally
-- Push: Push to GHCR
-- Registry: GitHub Container Registry (GHCR)
+- Action: Edit code, push to GitHub
+- Build: NOT required (CI/CD handles this)
+
+GitHub:
+- Code repository
+- Mirror to Forgejo (via webhook)
 
 CI/CD (Forgejo Actions on OCI):
 - Runtime: Podman (runner)
 - Env Source: Forgejo Secrets
-- Pull: Pull from GHCR (image built by dev)
+- Trigger: GitHub mirror to Forgejo
+- Build: Build image from code
 - Test: Run tests
-- Registry: GHCR
+- Push: Push image to GHCR (for production)
+- Deploy: Deploy to production
 
 Production (OCI Instance):
 - Runtime: Podman
@@ -30,8 +35,9 @@ Production (OCI Instance):
 - Forgejo app (UI, API) runs in Podman containers on OCI
 - Forgejo Actions runner runs with Podman (consistent with Forgejo app)
 - Development team can use Docker or Podman (both supported)
-- **Docker images built by Docker users can be run by Podman in CI/CD**
-- Image format is universal (OCI compliant)
+- GitHub mirrors to Forgejo via webhook
+- **Dev does NOT build/push images - CI/CD handles this**
+- Dev only pushes code to GitHub
 
 ## File Structure
 
@@ -122,12 +128,22 @@ services:
 
 **Env Source:** Forgejo Secrets
 
+**Trigger:** GitHub mirror to Forgejo
+
+**Workflow:**
+1. Dev pushes code to GitHub
+2. GitHub mirrors to Forgejo (via webhook)
+3. Forgejo CI/CD triggers
+4. Forgejo runner (Podman) builds image from code
+5. Forgejo runner runs tests
+6. If passes, optionally push to GHCR for production
+
 **Important:**
-- Dev builds image with Docker OR Podman (team choice)
-- Dev pushes image to GHCR
-- Forgejo runner (Podman) pulls from GHCR
-- **Docker images are compatible with Podman - both can use same image**
-- No issue if dev uses Docker and CI/CD uses Podman
+- Dev pushes code to GitHub (not image to GHCR required)
+- GitHub mirrors to Forgejo
+- Forgejo CI/CD builds image from code (recommended)
+- Docker/Podman choice doesn't matter - Forgejo builds with Podman
+- No issue if dev uses Docker/Podman - CI/CD builds independently
 
 **Setup in Forgejo:**
 1. Repository → Settings → Secrets

@@ -76,51 +76,53 @@ podman-compose logs -f
 - Backend: http://localhost:3000
 - Database: localhost:5432
 
-## Building Images
+## Building Images (Optional Local Testing)
 
-### If Using Docker
+**Note:** Dev does NOT need to build/push images for CI/CD. CI/CD (Forgejo) handles this automatically when you push code to GitHub.
+
+### If You Want to Test Container Locally (Optional)
+
+#### If Using Docker
 ```bash
-# Build image
+# Build image locally (for testing only)
 docker build -t taskmanager-backend ./backend
 
 # Run container
 docker run -p 3000:3000 --env-file .env taskmanager-backend
 ```
 
-### If Using Podman
+#### If Using Podman
 ```bash
-# Build image
+# Build image locally (for testing only)
 podman build -t taskmanager-backend ./backend
 
 # Run container
 podman run -p 3000:3000 --env-file .env taskmanager-backend
 ```
 
-## Pushing to Container Registry
+**Important:** This is only for local testing. For CI/CD, just push code to GitHub - Forgejo will build the image.
 
-### If Using Docker
+## Pushing Code to GitHub (Required for CI/CD)
+
+**Dev Workflow:**
 ```bash
-# Tag image
-docker tag taskmanager-backend ghcr.io/casestudyprogramming/taskmanager-backend:latest
+# Commit changes
+git add .
+git commit -m "Your commit message"
 
-# Login to GHCR
-echo $GITHUB_TOKEN | docker login ghcr.io -u casestudyprogramming --password-stdin
+# Push to GitHub
+git push origin your-branch
 
-# Push image
-docker push ghcr.com/casestudyprogramming/taskmanager-backend:latest
+# Create PR on GitHub
+# Forgejo will mirror and trigger CI/CD
 ```
 
-### If Using Podman
-```bash
-# Tag image
-podman tag taskmanager-backend ghcr.com/casestudyprogramming/taskmanager-backend:latest
+**Forgejo CI/CD will:**
+- Build image from your code
+- Run tests
+- Push to GHCR (if passes)
+- Deploy to production (if passes)
 
-# Login to GHCR
-echo $GITHUB_TOKEN | podman login ghcr.io -u casestudyprogramming --password-stdin
-
-# Push image
-podman push ghcr.com/casestudyprogramming/taskmanager-backend:latest
-```
 
 ## Testing
 
