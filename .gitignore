@@ -26,6 +26,7 @@ coverage.html
 .env.*.local
 .env.development
 .env.production
+.env.test
 
 # Credentials file (DO NOT COMMIT)
 docs/credentials.md

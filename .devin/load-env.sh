@@ -1,6 +1,7 @@
 #!/bin/bash
 # Load environment variables from .env
 # Usage: source .devin/load-env.sh or .devin/load-env.sh <command>
+# Note: For passwords with special characters, use dotenv-cli instead
 
 ENV_FILE=".env"
 
@@ -12,15 +13,12 @@ fi
 
 echo "Loading environment variables from $ENV_FILE"
 
-# Load env variables - more robust handling of quotes and special chars
-while IFS= read -r line || [[ -n "$line" ]]; do
-    # Skip comments and empty lines
-    [[ "$line" =~ ^#.*$ ]] && continue
-    [[ -z "$line" ]] && continue
-
-    # Export the variable
-    export "$line"
-done < "$ENV_FILE"
+# Load env variables - simple approach
+# Note: This may not handle all special characters correctly
+# For complex passwords, use: dotenv -e .env -- command
+set -a
+source "$ENV_FILE"
+set +a
 
 if [ $# -gt 0 ]; then
     exec "$@"

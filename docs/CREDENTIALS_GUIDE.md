@@ -139,48 +139,54 @@ export $(cat .env | xargs)
 
 ### Loading Methods
 
-**Option 1: Manual Export (Not recommended for passwords with special chars)**
-```bash
-export $(cat .env | xargs)
-devin start
-```
-⚠️ **Warning:** This method may fail if passwords contain special characters like `#`.
-
-**Option 2: Using dotenv (Recommended for special characters)**
+**Option 1: Using dotenv-cli (Safest for all special characters)**
 ```bash
 npm install -g dotenv-cli
 dotenv -e .env -- devin start
 ```
-✅ **Better:** dotenv-cli handles special characters and quotes correctly.
+✅ **Best:** dotenv-cli handles ALL special characters correctly. No issues with `#`, `$`, `!`, etc.
 
-**Option 3: Using Wrapper Script (Handles special characters)**
+**Option 2: Using Wrapper Script (Good for most cases)**
 ```bash
 # .devin/load-env.sh
 # Usage
 ./.devin/load-env.sh devin start
 ```
-✅ **Best:** The script handles special characters including `#` correctly.
+✅ **Good:** Uses `source` command which handles most special characters.
+
+**Option 3: Manual Export (Not recommended for special chars)**
+```bash
+export $(cat .env | xargs)
+devin start
+```
+❌ **Avoid:** This method will fail with special characters like `#`, `$`, etc.
 
 ### Handling Special Characters in Passwords
 
-If your passwords contain special characters like `#`, `$`, `!`, etc.:
+If your passwords contain special characters like `#`, `$`, `!`, `\`, etc.:
 
-**In .env file, always quote values:**
+**In .env file, use double quotes:**
 ```bash
-# Correct
+# Recommended
 FORGEJO_PASSWORD="my#password"
 NEON_API_KEY="key$with$dollar"
 DATABASE_URL="postgresql://user:pass!word@host/db"
 
-# Incorrect (may cause issues)
-FORGEJO_PASSWORD=my#password
-NEON_API_KEY=key$with$dollar
+# For passwords with quotes, escape them
+FORGEJO_PASSWORD="my\"password"
 ```
 
-**Use dotenv-cli or the wrapper script:**
-- `export $(cat .env | xargs)` may fail with special characters
-- `dotenv -e .env -- command` handles them correctly
-- `.devin/load-env.sh` handles them correctly
+**Note on special characters:**
+- `#` in double quotes: Safe (not treated as comment)
+- `$` in double quotes: ⚠️ Will expand variables (use single quotes `''` to prevent)
+- `\` in double quotes: ⚠️ Escape character (use double backslash `\\`)
+- `!` in double quotes: Safe in bash (history expansion disabled in scripts)
+
+**Best practice for complex passwords:**
+```bash
+# Use dotenv-cli - handles everything correctly
+dotenv -e .env -- devin start
+```
 
 ### MCP Configuration
 
