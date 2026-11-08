@@ -1,0 +1,15 @@
+name: Trigger Forgejo Sync
+
+on:
+  push:
+    branches: ['**']  # Trigger di semua branches termasuk branch baru
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Forgejo Mirror Sync
+        run: |
+          curl -X POST \
+            https://ci.davidcps.my.id/api/v1/repos/davidtan/TaskmanagerV2/mirror-sync \
+            -H "Authorization: token ${{ secrets.FORGEJO_TOKEN_ACCESS_GITHUB_ACTION }}"
