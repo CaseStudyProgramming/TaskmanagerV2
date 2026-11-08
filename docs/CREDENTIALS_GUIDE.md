@@ -139,28 +139,48 @@ export $(cat .env | xargs)
 
 ### Loading Methods
 
-**Option 1: Manual Export**
+**Option 1: Manual Export (Not recommended for passwords with special chars)**
 ```bash
 export $(cat .env | xargs)
 devin start
 ```
+⚠️ **Warning:** This method may fail if passwords contain special characters like `#`.
 
-**Option 2: Using dotenv**
+**Option 2: Using dotenv (Recommended for special characters)**
 ```bash
 npm install -g dotenv-cli
 dotenv -e .env -- devin start
 ```
+✅ **Better:** dotenv-cli handles special characters and quotes correctly.
 
-**Option 3: Using Wrapper Script (Optional)**
+**Option 3: Using Wrapper Script (Handles special characters)**
 ```bash
 # .devin/load-env.sh
-#!/bin/bash
-export $(cat .env | xargs)
-exec "$@"
-
 # Usage
 ./.devin/load-env.sh devin start
 ```
+✅ **Best:** The script handles special characters including `#` correctly.
+
+### Handling Special Characters in Passwords
+
+If your passwords contain special characters like `#`, `$`, `!`, etc.:
+
+**In .env file, always quote values:**
+```bash
+# Correct
+FORGEJO_PASSWORD="my#password"
+NEON_API_KEY="key$with$dollar"
+DATABASE_URL="postgresql://user:pass!word@host/db"
+
+# Incorrect (may cause issues)
+FORGEJO_PASSWORD=my#password
+NEON_API_KEY=key$with$dollar
+```
+
+**Use dotenv-cli or the wrapper script:**
+- `export $(cat .env | xargs)` may fail with special characters
+- `dotenv -e .env -- command` handles them correctly
+- `.devin/load-env.sh` handles them correctly
 
 ### MCP Configuration
 
