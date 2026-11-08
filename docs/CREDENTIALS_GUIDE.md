@@ -163,17 +163,47 @@ dotenv -e .env -- devin start
 
 ### MCP Configuration
 
-MCP config should use environment variables:
+MCP config should use environment variables. There are two levels of MCP config:
 
+#### 1. Global MCP Config (User Level)
+**Location:** `~/.config/devin/mcp_config.json`
+**Applies to:** All projects
+
+Example:
 ```json
-// ~/.config/devin/mcp/servers.json
+{
+  "mcpServers": {
+    "oracle-oci-cloud-mcp-server": {
+      "command": "/home/davidtan/.local/bin/uvx",
+      "args": ["oracle.oci-cloud-mcp-server@latest"],
+      "env": {
+        "OCI_CONFIG_PROFILE": "${OCI_CONFIG_PROFILE:-DEFAULT}"
+      }
+    }
+  }
+}
+```
+
+#### 2. Project MCP Config (Project Level)
+**Location:** `.devin/mcp_config.json`
+**Applies to:** This project only
+
+Example:
+```json
 {
   "mcpServers": {
     "neon": {
-      "command": "neon-mcp-server",
-      "args": ["--api-key", "${NEON_API_KEY}"],
+      "url": "https://mcp.neon.tech/mcp",
+      "transport": "http",
       "env": {
-        "NEON_API_KEY": "${NEON_API_KEY}"
+        "NEON_API_KEY": "${NEON_API_KEY:-}"
+      }
+    },
+    "aiven": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.aiven.live/mcp"],
+      "env": {
+        "AIVEN_API_KEY": "${AIVEN_API_KEY:-}"
       }
     }
   }
@@ -181,10 +211,11 @@ MCP config should use environment variables:
 ```
 
 **Important:**
-- MCP config uses `${VARIABLE}` syntax
+- MCP config uses `${VARIABLE:-default}` syntax
 - Credentials are in .env file (not in MCP config)
 - Agent loads env variables before starting
 - Agent accesses MCP with env variables (not reading file)
+- `${VARIABLE:-default}` uses default if env variable not set
 
 ## Team Collaboration
 

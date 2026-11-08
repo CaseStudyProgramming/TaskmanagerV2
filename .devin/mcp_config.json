@@ -6,11 +6,17 @@
         "-y",
         "mcp-remote",
         "https://mcp.aiven.live/mcp"
-      ]
+      ],
+      "env": {
+        "AIVEN_API_KEY": "${AIVEN_API_KEY:-}"
+      }
     },
     "neon": {
       "url": "https://mcp.neon.tech/mcp",
-      "transport": "http"
+      "transport": "http",
+      "env": {
+        "NEON_API_KEY": "${NEON_API_KEY:-}"
+      }
     }
   }
 }
