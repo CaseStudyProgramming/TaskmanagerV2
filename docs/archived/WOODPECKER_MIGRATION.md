@@ -46,7 +46,7 @@ This document summarizes the migration from GitHub Actions to Woodpecker CI/CD f
 
 ### New Files Created
 
-1. **docs/tdd/ci-cd/woodpecker-ci.md**
+1. **tdd/ci-cd/woodpecker-ci.md** (archived)
    - Complete Woodpecker CI/CD configuration guide
    - Universal template for multiple projects
    - Installation and setup instructions
@@ -432,7 +432,7 @@ oci os bucket create \
 - OCI Object Storage limit: 10 GB
 - Remaining buffer: 6.825 GB ✅
 
-Untuk detail lebih lanjut tentang artifact management, lihat [Woodpecker Artifact Management](./docs/tdd/ci-cd/woodpecker-artifacts.md).
+Untuk detail lebih lanjut tentang artifact management, lihat [Woodpecker Artifact Management](./woodpecker-artifacts.md).
 
 ---
 

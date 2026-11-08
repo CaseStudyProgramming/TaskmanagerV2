@@ -254,7 +254,7 @@ sudo netfilter-persistent save
 
 ### SSL Certificate (Let's Encrypt Wildcard)
 
-Certificate already exists from previous Woodpecker setup:
+Certificate already exists from previous CI/CD setup:
 - Full chain: `/etc/letsencrypt/live/davidcps.my.id/fullchain.pem`
 - Private key: `/etc/letsencrypt/live/davidcps.my.id/privkey.pem`
 - Auto-renewal: Configured by certbot (systemd timer)
@@ -714,7 +714,7 @@ on:
 
 1. Buka Forgejo UI → Repository Settings → Actions
 2. Configure schedule in workflow file
-3. No additional UI setup needed (unlike Woodpecker)
+3. No additional UI setup needed
 
 **Cron Schedule Format:**
 - `0 0 * * *` = Setiap hari jam 00:00 (midnight)

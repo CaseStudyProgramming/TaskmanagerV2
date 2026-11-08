@@ -490,7 +490,7 @@ fi
 0 2 * * 0 /path/to/scripts/optional/monitor_storage.sh >> /var/log/storage-monitor.log 2>&1
 ```
 
-**Note**: Script ini ada di folder `scripts/optional/` dan tidak di-commit ke Git secara default. Lihat [scripts/README.md](../../scripts/README.md) untuk informasi lebih lanjut.
+**Note**: Script ini ada di folder `scripts/optional/` dan tidak di-commit ke Git secara default. Lihat [scripts/README.md](../scripts/README.md) untuk informasi lebih lanjut.
 
 ---
 

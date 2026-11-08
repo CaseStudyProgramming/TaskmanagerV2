@@ -362,10 +362,10 @@ This document tracks the exact dependency versions used in the Advanced Task Man
 
 ### CI/CD
 
-**Woodpecker CI**
+**Forgejo CI**
 - version: Latest
 - purpose: Self-hosted CI/CD automation on OCI Debian 26 LTS
-- doc link: https://woodpecker-ci.org/docs/
+- doc link: https://forgejo.org/docs/
 
 **Mergify**
 - version: Latest

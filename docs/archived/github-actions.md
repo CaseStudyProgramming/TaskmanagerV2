@@ -1,10 +1,15 @@
-# CI/CD Pipeline Documentation
+# CI/CD Pipeline Documentation (GitHub Actions - DEPRECATED)
 
-This document provides comprehensive CI/CD pipeline configuration and best practices for the Advanced Task Manager project.
+**Status**: Deprecated
+**Replacement**: [Forgejo CI/CD Configuration](../tdd/ci-cd/forgejo-ci.md)
+
+---
+
+This document provides historical CI/CD pipeline configuration using GitHub Actions. GitHub Actions has been replaced by Forgejo as the primary CI/CD platform.
 
 ## Overview
 
-The CI/CD pipeline ensures code quality, security, and consistency across all environments using GitHub Actions.
+The CI/CD pipeline ensures code quality, security, and consistency across all environments using GitHub Actions (deprecated).
 
 ## Pipeline Stages
 

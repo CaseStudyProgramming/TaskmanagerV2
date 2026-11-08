@@ -8,6 +8,14 @@ This directory contains comprehensive documentation for the Advanced Task Manage
 docs/
 ├── README.md                    # This file
 ├── prd.md                       # Product Requirements Document
+├── CREDENTIALS_GUIDE.md         # Credentials and environment management
+├── DEVELOPMENT_SETUP.md         # Quick start development setup
+├── DOCKER_PODMAN_ENV_STRATEGY.md # Comprehensive environment strategy
+├── archived/                    # Historical documentation
+│   ├── README.md                # Archive index
+│   ├── WOODPECKER_MIGRATION.md  # Historical Woodpecker migration
+│   ├── woodpecker-artifacts.md  # Woodpecker artifact docs (deprecated)
+│   └── woodpecker-artifact-types.md # Woodpecker artifact types (deprecated)
 └── tdd/                         # Technical Design Documentation
     ├── README.md                # TDD navigation and overview
     ├── architecture/            # Architecture documentation
@@ -21,7 +29,8 @@ docs/
     ├── ci-cd/                   # CI/CD documentation
     │   ├── workflow.md          # Development workflow
     │   ├── coverage-strategy.md # Coverage thresholds
-    │   └── github-actions.md   # CI/CD pipeline config
+    │   ├── forgejo-ci.md        # Forgejo CI/CD pipeline config (Primary)
+    │   └── github-mirror-setup.md # GitHub mirror to Forgejo setup
     ├── project/                 # Project-level documentation
     │   ├── dependencies.md     # Dependency versions + tech rationale
     │   ├── test-driven-development.md # Testing guidelines
@@ -38,8 +47,13 @@ docs/
 
 ## Quick Links
 
-### Project Documentation
+### Getting Started
 - [Product Requirements Document (PRD)](./prd.md) - Product requirements and specifications
+- [Development Setup](./DEVELOPMENT_SETUP.md) - Quick start development setup
+- [Environment Strategy](./DOCKER_PODMAN_ENV_STRATEGY.md) - Comprehensive environment and deployment strategy
+- [Credentials Guide](./CREDENTIALS_GUIDE.md) - Credentials and security management
+
+### Project Documentation
 - [Test-Driven Development Guidelines](./tdd/project/test-driven-development.md) - Testing guidelines and standards
 - [Dependency Versions](./tdd/project/dependencies.md) - Backend and frontend dependency versions
 - [Future Roadmap](./tdd/project/future-roadmap.md) - Scalability and feature enhancements
@@ -61,10 +75,8 @@ docs/
 ### CI/CD
 - [Development Workflow](./tdd/ci-cd/workflow.md) - Complete development workflow and quality gates
 - [Coverage Strategy](./tdd/ci-cd/coverage-strategy.md) - Hierarchical coverage thresholds and enforcement
-- [Woodpecker CI/CD Configuration](./tdd/ci-cd/woodpecker-ci.md) - Woodpecker CI/CD pipeline configuration (Primary)
-- [Woodpecker Artifact Management](./tdd/ci-cd/woodpecker-artifacts.md) - Artifact storage and management with OCI Object Storage
-- [Woodpecker Artifact Types & Storage](./tdd/ci-cd/woodpecker-artifact-types.md) - Artifact types, sizes, and retention policy recommendations
-- [GitHub Actions Configuration](./tdd/ci-cd/github-actions.md) - Legacy GitHub Actions configuration (deprecated)
+- [Forgejo CI/CD Configuration](./tdd/ci-cd/forgejo-ci.md) - Forgejo CI/CD pipeline configuration (Primary)
+- [GitHub Mirror Setup](./tdd/ci-cd/github-mirror-setup.md) - GitHub repository mirroring to Forgejo
 
 ### Quality & Reliability
 - [Backend Quality & Reliability](./tdd/quality-reliability/backend-quality-reliability.md) - Backend system quality requirements

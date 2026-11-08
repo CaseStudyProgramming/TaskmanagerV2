@@ -15,7 +15,7 @@ We use **Redocly CLI** for validating the OpenAPI specification against OpenAPI 
 ### Using npx (recommended)
 
 ```bash
-npx @redocly/cli lint docs/api/openapi.yaml
+npx @redocly/cli lint docs/tdd/api/openapi.yaml
 ```
 
 This command:
@@ -28,8 +28,8 @@ This command:
 
 **Success:**
 ```
-validating docs/api/openapi.yaml...
-docs/api/openapi.yaml: validated in 196ms
+validating docs/tdd/api/openapi.yaml...
+docs/tdd/api/openapi.yaml: validated in 196ms
 
 Woohoo! Your API description is valid. 🎉
 You have 1 warning.
@@ -37,8 +37,8 @@ You have 1 warning.
 
 **Failure:**
 ```
-validating docs/api/openapi.yaml...
-[1] docs/api/openapi.yaml:770:11 at #/components/schemas/StandardResponse/properties/data/nullable
+validating docs/tdd/api/openapi.yaml...
+[1] docs/tdd/api/openapi.yaml:770:11 at #/components/schemas/StandardResponse/properties/data/nullable
 
 Property `nullable` is not expected here.
 
@@ -49,7 +49,7 @@ Property `nullable` is not expected here.
 
 Run validation after any changes to the API contract:
 
-1. **Before committing changes** to `docs/api/openapi.yaml`
+1. **Before committing changes** to `docs/tdd/api/openapi.yaml`
 2. **After adding new endpoints** to the API
 3. **After modifying existing schemas** or request/response structures
 4. **Before running code generation** (oapi-codegen, orval)
@@ -106,10 +106,10 @@ Always validate before generating Go code:
 
 ```bash
 # Validate first
-npx @redocly/cli lint docs/api/openapi.yaml
+npx @redocly/cli lint docs/tdd/api/openapi.yaml
 
 # Then generate code
-oapi-codegen -package api -generate types,server,spec docs/api/openapi.yaml > internal/api/gen.go
+oapi-codegen -package api -generate types,server,spec docs/tdd/api/openapi.yaml > internal/api/gen.go
 ```
 
 ### Before orval
@@ -118,7 +118,7 @@ Always validate before generating TypeScript/React Query code:
 
 ```bash
 # Validate first
-npx @redocly/cli lint docs/api/openapi.yaml
+npx @redocly/cli lint docs/tdd/api/openapi.yaml
 
 # Then generate code
 orval --config orval.config.ts
@@ -129,9 +129,9 @@ orval --config orval.config.ts
 Add validation to your CI/CD pipeline to catch API contract errors early:
 
 ```yaml
-# Example for GitHub Actions
+# Example for Forgejo Actions
 - name: Validate OpenAPI spec
-  run: npx @redocly/cli lint docs/api/openapi.yaml
+  run: npx @redocly/cli lint docs/tdd/api/openapi.yaml
 ```
 
 ## Common Issues and Solutions
@@ -172,4 +172,4 @@ For this project (Task Manager API):
 - Authentication: Bearer JWT (from Google OAuth)
 - Main endpoints: Authentication, Tasks, Export/Import, Offline Sync
 
-The current OpenAPI spec is located at: `docs/api/openapi.yaml`
+The current OpenAPI spec is located at: `docs/tdd/api/openapi.yaml`

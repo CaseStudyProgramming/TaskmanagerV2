@@ -262,13 +262,13 @@ Tag Weight: SUM(tag_weights) (max 15)
 
 #### Infrastructure
 - **Database**: Neon (PostgreSQL) - production and testing database with branch-first workflow
-- **Object Storage (CI/CD)**: OCI Object Storage (10GB Standard tier PAYG) - Woodpecker artifacts
+- **Object Storage (CI/CD)**: OCI Object Storage (10GB Standard tier PAYG) - Forgejo artifacts
 - **Media Storage**: VM Storage (200GB on OCI Debian 26 LTS) - video, photo, media files (VM storage sends links to Neon database)
 - **Cache**: Redis (Upstash)
 - **Reverse Proxy**: Nginx (backend only)
 - **Monitoring**: Grafana (Free tier)
 - **Containerization**: Docker/Podman
-- **CI/CD**: Woodpecker (self-hosted on OCI Debian 26 LTS)
+- **CI/CD**: Forgejo (self-hosted on OCI Debian 26 LTS)
 - **CI/CD Workers**: 1-2 workers (max 2GB RAM for 2 workers, universal for multiple projects)
 - **PR Batching**: Mergify (batch 3 PRs, free tier)
 - **Deployment**: Manual deployment to OCI Podman
@@ -353,7 +353,7 @@ cwd = "."
 watch_dir = "src"
 
 [build.environment_variables]
-API_URL = "https://api.davidcps.my.id"1
+API_URL = "https://api.davidcps.my.id"
 ```
 
 #### Edge Functions
@@ -917,7 +917,7 @@ Benefits:
 
 ### 7.4 CI/CD Pipeline
 
-#### GitHub Actions
+#### Forgejo Actions
 - Frontend: Build, test, deploy to Cloudflare Workers edge
 - Backend: Build, test, deploy to OCI
 - Database migrations (manual initially)

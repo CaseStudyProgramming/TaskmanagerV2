@@ -10,7 +10,7 @@ This document explains the container platform strategy for the Advanced Task Man
 |-------------|----------|--------|
 | **Development (Windows/macOS)** | Docker Desktop | Best cross-platform support |
 | **Development (Linux)** | Docker or Podman | Flexibility for team preference |
-| **CI/CD (GitHub Actions)** | Docker | Native support, pre-installed |
+| **CI/CD (Forgejo Actions)** | Podman | Consistent with production (OCI) |
 | **Production** | OCI Instance (Podman) | Self-managed container runtime |
 | **Registry** | GHCR | Integrated with GitHub, no signup needed |
 
@@ -63,25 +63,25 @@ docker-compose up -d
 
 ## CI/CD Pipeline
 
-### GitHub Actions (Docker Only)
+### Forgejo Actions (Podman)
 
-**Why Docker in CI/CD?**
-- Native support in GitHub Actions (pre-installed)
-- No setup required on runners
-- Rich ecosystem of Docker actions
-- Better caching and performance
-- Industry standard
+**Why Podman in CI/CD?**
+- Consistent with production (OCI Instance uses Podman)
+- Rootless and more secure
+- No daemon required
+- Better resource isolation
+- Native OCI support
 
 **Workflow:**
 ```yaml
-# Docker operations in CI/CD:
-# 1. Setup Docker Buildx (native action)
-# 2. Login to GHCR (automatic GitHub token)
-# 3. Build and push image (Docker build-push action)
-# 4. Run tests in Docker containers
+# Podman operations in CI/CD:
+# 1. Setup Podman (native on Forgejo runner)
+# 2. Login to GHCR (GitHub token via Forgejo secrets)
+# 3. Build and push image (Podman build)
+# 4. Run tests in Podman containers
 ```
 
-See `.github/workflows/ci.yml` for complete implementation.
+See `.forgejo/workflows/ci.yml` for complete implementation.
 
 ## Container Registry
 
@@ -90,19 +90,19 @@ See `.github/workflows/ci.yml` for complete implementation.
 **Why GHCR?**
 - **No additional signup** - Integrated with GitHub
 - **Free** for public/private repositories
-- **Automatic authentication** - Uses GITHUB_TOKEN
-- **Native GitHub Actions support**
+- **Automatic authentication** - Uses GitHub token (via Forgejo secrets)
+- **Native Forgejo Actions support**
 - **Single platform** for code and containers
 
 **Image Naming Convention:**
 ```
-ghcr.io/yourusername/taskmanager-backend:latest
-ghcr.io/yourusername/taskmanager-backend:main-abc123def
-ghcr.io/yourusername/taskmanager-backend:1.0.0
+ghcr.io/davidtan/taskmanager-backend:latest
+ghcr.io/davidtan/taskmanager-backend:main-abc123def
+ghcr.io/davidtan/taskmanager-backend:1.0.0
 ```
 
 **Authentication:**
-- CI/CD: Automatic via `GITHUB_TOKEN`
+- CI/CD: Automatic via GitHub token (Forgejo secrets)
 - Local: `docker login ghcr.io -u USERNAME -p TOKEN`
 - Production (OCI): GitHub Personal Access Token (PAT) or OCI credentials
 
@@ -125,7 +125,7 @@ Cache:    Upstash (managed Redis)
 # 1. Developer pushes code to GitHub
 git push origin main
 
-# 2. Woodpecker CI/CD builds and pushes to GHCR
+# 2. Forgejo CI/CD builds and pushes to GHCR
 # - Docker builds image
 # - Docker pushes to GHCR
 # - Tests run in Docker containers
@@ -144,7 +144,7 @@ git push origin main
 
 **Image Source:**
 - Registry: GitHub Container Registry
-- Image: `ghcr.io/yourusername/taskmanager-backend:latest`
+- Image: `ghcr.io/davidtan/taskmanager-backend:latest`
 - Authentication: GitHub username + PAT or OCI credentials
 - Instance Type: A1.Flex - 2 OCPUs, 12 GB RAM
 - Container Runtime: Podman
@@ -156,7 +156,7 @@ git push origin main
 ssh user@oci-instance-ip
 
 # Pull latest image
-podman pull ghcr.io/yourusername/taskmanager-backend:latest
+podman pull ghcr.io/davidtan/taskmanager-backend:latest
 
 # Stop old container
 podman stop taskmanager-backend
@@ -191,8 +191,8 @@ sudo systemctl reload nginx
    ```
 
 4. **CI/CD consistency:**
-   - GitHub Actions always uses Docker
-   - No need to match local platform choice
+   - Forgejo Actions uses Podman (consistent with production)
+   - Local Docker/Podman choice doesn't matter for CI/CD
 
 ### For Platform Choice
 
@@ -218,10 +218,10 @@ sudo systemctl reload nginx
 - No forced tool standardization
 
 ### CI/CD Simplicity
-- Docker native support in GitHub Actions
-- No setup required on runners
-- Rich ecosystem of actions
-- Industry standard approach
+- Podman native support in Forgejo Actions
+- Consistent with production (OCI Instance)
+- Rootless and secure
+- No daemon required
 
 ### Production Simplicity
 - Podman installed on OCI Instance (A1.Flex - 2 OCPUs, 12 GB RAM)
@@ -272,10 +272,9 @@ sudo ln -s /usr/bin/podman /usr/bin/docker
 
 **GHCR authentication:**
 ```yaml
-# Ensure correct permissions
-permissions:
-  contents: read
-  packages: write
+# Forgejo secrets for GHCR
+GITHUB_USERNAME: davidtan
+GITHUB_TOKEN: your-github-token
 ```
 
 **Build failures:**
@@ -290,7 +289,7 @@ permissions:
 - [Docker Documentation](https://docs.docker.com/)
 - [Podman Documentation](https://docs.podman.io/)
 - [GitHub Container Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
-- [GitHub Actions Docker](https://github.com/docker/build-push-action)
+- [Forgejo Documentation](https://forgejo.org/docs/)
 - [Oracle Cloud Infrastructure Documentation](https://docs.oracle.com/en-us/iaas/)
 
 ## Questions?
@@ -298,5 +297,5 @@ permissions:
 For questions about the container strategy:
 1. Check this documentation
 2. Review `docs/project/dependencies.md` for detailed version information
-3. Check `.github/workflows/ci.yml` for CI/CD implementation
+3. Check `.forgejo/workflows/ci.yml` for CI/CD implementation
 4. Contact the team for platform-specific guidance

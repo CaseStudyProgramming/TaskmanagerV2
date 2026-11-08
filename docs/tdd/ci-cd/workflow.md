@@ -628,7 +628,7 @@ git push origin main
 # → Manual approval required for production deployment
 
 # 4. Production deployment (manual approval)
-# - GitHub Actions waits for approval
+# - Forgejo Actions waits for approval
 # - Maintainer approves deployment
 # - Full E2E tests run
 # - Performance checks run
@@ -755,7 +755,7 @@ automatic_rollback_conditions:
 # Identify regression point
 
 # 2. Rollback to previous version
-# GitHub Actions rollback
+# Forgejo Actions rollback
 # Or manual OCI rollback
 
 # 3. Create hotfix branch
@@ -832,7 +832,7 @@ bun run test:unit
 
 **CI/CD failures:**
 ```bash
-# Check logs in GitHub Actions
+# Check logs in Forgejo Actions
 # Identify failing stage
 # Reproduce locally
 # Fix issue
@@ -981,20 +981,20 @@ cleanup-session:
 - Diambil untuk semua status (success, failure)
 - Menjamin cleanup bahkan jika pipeline gagal
 
-### Woodpecker Agent Configuration
+### Forgejo Agent Configuration
 
 **Environment variables untuk cleanup**:
 ```yaml
-WOODPECKER_LIMIT_TIMEOUT=1800  # 30 minutes timeout
-WOODPECKER_CLEANUP=true  # Auto-cleanup after pipeline
+FORGEJO_LIMIT_TIMEOUT=1800  # 30 minutes timeout
+FORGEJO_CLEANUP=true  # Auto-cleanup after pipeline
 ```
 
 ## 16. Cron Job Setup (Nightly E2E Tests)
 
-### Configuration di Woodpecker UI
+### Configuration di Forgejo UI
 
 **Setup Cron Job**:
-1. Buka Woodpecker UI → Project Settings → Cron Jobs
+1. Buka Forgejo UI → Project Settings → Cron Jobs
 2. Add new cron job:
    - Name: `nightly-e2e-full-test`
    - Schedule: `0 0 * * *` (midnight daily)

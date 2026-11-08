@@ -31,10 +31,8 @@ This directory contains comprehensive technical design documentation for the Adv
 ### CI/CD & Testing
 - [Development Workflow](./ci-cd/workflow.md) - Complete development workflow
 - [Coverage Strategy](./ci-cd/coverage-strategy.md) - Hierarchical coverage thresholds
-- [Woodpecker CI/CD Configuration](./ci-cd/woodpecker-ci.md) - Woodpecker CI/CD pipeline setup (Primary)
-- [Woodpecker Artifact Management](./ci-cd/woodpecker-artifacts.md) - Artifact storage and management with OCI Object Storage
-- [Woodpecker Artifact Types & Storage](./ci-cd/woodpecker-artifact-types.md) - Artifact types, sizes, and retention policy recommendations
-- [GitHub Actions Configuration](./ci-cd/github-actions.md) - Legacy GitHub Actions setup (deprecated)
+- [Forgejo CI/CD Configuration](./ci-cd/forgejo-ci.md) - Forgejo CI/CD pipeline setup (Primary)
+- [GitHub Mirror Setup](./ci-cd/github-mirror-setup.md) - GitHub repository mirroring to Forgejo
 - [Backend Testing Examples](./testing/backend-examples.md) - Go testing patterns
 - [Frontend Testing Examples](./testing/frontend-examples.md) - TypeScript/Svelte testing patterns
 
@@ -65,7 +63,7 @@ This directory contains comprehensive technical design documentation for the Adv
 - [Container Strategy](./architecture/container-strategy.md) - Container platform strategy
 - [Container Recommendations](./quality-reliability/container-recommendations.md) - Container best practices
 - [Development Workflow](./ci-cd/workflow.md) - Development workflow
-- [GitHub Actions Configuration](./ci-cd/github-actions.md) - CI/CD pipeline setup
+- [Forgejo CI/CD Configuration](./ci-cd/forgejo-ci.md) - CI/CD pipeline setup
 
 ### For Technical Leads/Architects
 - [Risk Assessment](./quality-reliability/risk-assessment.md) - Risk analysis and mitigation

@@ -681,15 +681,15 @@ Tests must verify they are using the correct database. See implementation in [Ba
 
 ### 8.3 Environment Configuration
 
-Set the test database name via environment variable. See examples in [GitHub Actions Documentation](../ci-cd/github-actions.md#environment-configuration).
+Set the test database name via environment variable. See examples in [Forgejo CI/CD Documentation](../ci-cd/forgejo-ci.md#environment-configuration).
 
 ### 8.4 CI/CD Configuration
 
-GitHub Actions configuration for test database. See full configuration in [GitHub Actions Documentation](../ci-cd/github-actions.md).
+Forgejo Actions configuration for test database. See full configuration in [Forgejo CI/CD Documentation](../ci-cd/forgejo-ci.md).
 
 ### 8.5 Connection String Examples
 
-Connection strings for different environments. See examples in [GitHub Actions Documentation](../ci-cd/github-actions.md).
+Connection strings for different environments. See examples in [Forgejo CI/CD Documentation](../ci-cd/forgejo-ci.md).
 
 ---
 
@@ -711,7 +711,7 @@ Security tests must cover OWASP Top 10 vulnerabilities. See detailed examples in
 
 ### 9.2 Security Scanning
 
-Security scanning is automated in CI/CD. See configuration in [GitHub Actions Documentation](../ci-cd/github-actions.md#security).
+Security scanning is automated in CI/CD. See configuration in [Forgejo CI/CD Documentation](../ci-cd/forgejo-ci.md#security).
 
 #### Security Tools
 - Snyk (dependency scanning)
@@ -725,7 +725,7 @@ Security scanning is automated in CI/CD. See configuration in [GitHub Actions Do
 
 ### 10.1 Load Testing
 
-Load testing ensures performance under stress. See configuration in [GitHub Actions Documentation](../ci-cd/github-actions.md#performance-testing).
+Load testing ensures performance under stress. See configuration in [Forgejo CI/CD Documentation](../ci-cd/forgejo-ci.md#performance-testing).
 
 #### Performance Requirements
 - API response time < 200ms (p95)
@@ -734,13 +734,13 @@ Load testing ensures performance under stress. See configuration in [GitHub Acti
 
 ### 10.2 Frontend Performance
 
-Frontend performance is monitored via Lighthouse CI. See configuration in [GitHub Actions Documentation](../ci-cd/github-actions.md#performance-budgets).
+Frontend performance is monitored via Lighthouse CI. See configuration in [Forgejo CI/CD Documentation](../ci-cd/forgejo-ci.md#performance-budgets).
 
 ---
 
 ## 11. CI/CD Integration
 
-CI/CD pipeline configuration and setup. See complete documentation in [GitHub Actions Documentation](../ci-cd/github-actions.md).
+CI/CD pipeline configuration and setup. See complete documentation in [Forgejo CI/CD Documentation](../ci-cd/forgejo-ci.md).
 
 ### 11.1 Pipeline Stages
 
@@ -761,11 +761,11 @@ CI/CD pipeline configuration and setup. See complete documentation in [GitHub Ac
 
 ### 11.2 Coverage Enforcement
 
-Coverage thresholds are enforced in CI/CD. See configuration in [GitHub Actions Documentation](../ci-cd/github-actions.md#coverage-configuration).
+Coverage thresholds are enforced in CI/CD. See configuration in [Forgejo CI/CD Documentation](../ci-cd/forgejo-ci.md#coverage-configuration).
 
 ### 11.3 Pre-commit Hooks
 
-Pre-commit hooks configuration. See detailed setup in [GitHub Actions Documentation](../ci-cd/github-actions.md#pre-commit-hooks).
+Pre-commit hooks configuration. See detailed setup in [Forgejo CI/CD Documentation](../ci-cd/forgejo-ci.md#pre-commit-hooks).
 
 ---
 
@@ -846,11 +846,11 @@ Pre-commit hooks configuration. See detailed setup in [GitHub Actions Documentat
 
 ### 14.3 Coverage Analysis Tools
 
-Coverage analysis tools and configuration. See detailed setup in [GitHub Actions Documentation](../ci-cd/github-actions.md#coverage-analysis-tools).
+Coverage analysis tools and configuration. See detailed setup in [Forgejo CI/CD Documentation](../ci-cd/forgejo-ci.md#coverage-analysis-tools).
 
 ### 14.4 Coverage Enforcement
 
-Coverage threshold enforcement scripts and configuration. See detailed setup in [GitHub Actions Documentation](../ci-cd/github-actions.md#coverage-enforcement).
+Coverage threshold enforcement scripts and configuration. See detailed setup in [Forgejo CI/CD Documentation](../ci-cd/forgejo-ci.md#coverage-enforcement).
 
 ---
 

@@ -372,5 +372,5 @@ Each response includes a unique `request_id` (UUID) for:
 ## Related Documentation
 
 - [OpenAPI 3.1 Specification](./openapi.yaml) - Complete API contract
-- [Product Requirements Document](../project/prd.md) - API architecture overview
+- [Product Requirements Document](../../prd.md) - API architecture overview
 - [Backend Architecture](../architecture/backend-ddd.md) - Implementation details
