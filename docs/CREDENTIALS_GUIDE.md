@@ -9,14 +9,15 @@ taskmanagerV2/
 ├── .env                      # Actual credentials (NOT committed to Git)
 ├── .env.example              # Template file (committed to Git)
 ├── .gitignore                # Ignore .env files
+├── .devin/
+│   ├── mcp_config.json       # Project MCP config (uses env variables)
+│   └── load-env.sh           # Script to load env variables
 ├── docs/
 │   ├── credentials.md        # Manual reference (NOT committed to Git)
 │   ├── credentials.md.example # Template (committed to Git)
 │   └── CREDENTIALS_GUIDE.md  # This file
-└── .config/
-    └── devin/
-        └── mcp/
-            └── servers.json   # MCP config (uses env variables)
+└── ~/.config/devin/
+    └── mcp_config.json       # Global MCP config (uses env variables)
 ```
 
 ## Quick Start
@@ -144,7 +145,13 @@ export $(cat .env | xargs)
 devin start
 ```
 
-**Option 2: Using Wrapper Script**
+**Option 2: Using dotenv**
+```bash
+npm install -g dotenv-cli
+dotenv -e .env -- devin start
+```
+
+**Option 3: Using Wrapper Script (Optional)**
 ```bash
 # .devin/load-env.sh
 #!/bin/bash
@@ -155,12 +162,6 @@ exec "$@"
 ./.devin/load-env.sh devin start
 ```
 
-**Option 3: Using dotenv**
-```bash
-npm install -g dotenv-cli
-dotenv -e .env -- devin start
-```
-
 ### MCP Configuration
 
 MCP config should use environment variables. There are two levels of MCP config:
@@ -169,7 +170,7 @@ MCP config should use environment variables. There are two levels of MCP config:
 **Location:** `~/.config/devin/mcp_config.json`
 **Applies to:** All projects
 
-Example:
+Example (for OCI):
 ```json
 {
   "mcpServers": {
@@ -188,7 +189,7 @@ Example:
 **Location:** `.devin/mcp_config.json`
 **Applies to:** This project only
 
-Example:
+Example (for Neon and Aiven):
 ```json
 {
   "mcpServers": {
