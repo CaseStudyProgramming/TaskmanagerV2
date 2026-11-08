@@ -353,7 +353,7 @@ cwd = "."
 watch_dir = "src"
 
 [build.environment_variables]
-API_URL = "https://api.davidcps.my.id"1
+API_URL = "https://api.davidcps.my.id"
 ```
 
 #### Edge Functions
