@@ -151,7 +151,7 @@ services:
       
       # Admin Account (Auto-created)
       - FORGEJO__admin__user=davidtan
-      - FORGEJO__admin__password=Admin@2026!Secure
+      - FORGEJO__admin__password=<CHANGE_ME_USE_STRONG_PASSWORD>
       - FORGEJO__admin__email=admin@davidcps.my.id
       
       # Security
