@@ -3,6 +3,8 @@ name: Trigger Forgejo Sync
 on:
   push:
     branches: ['**']  # Trigger di semua branches termasuk branch baru
+  delete:
+    branches: ['**']  # Trigger saat branch dihapus
 
 jobs:
   sync:
