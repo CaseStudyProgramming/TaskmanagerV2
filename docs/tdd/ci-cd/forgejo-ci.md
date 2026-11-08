@@ -138,7 +138,7 @@ services:
       - FORGEJO__database__HOST=ep-broad-king-azlvkfiu.c-3.ap-southeast-1.aws.neon.tech
       - FORGEJO__database__NAME=ci-forgejo-oci
       - FORGEJO__database__USER=ci-forgejo-oci_owner
-      - FORGEJO__database__PASSWD=npg_g6D4amnjezEJ
+      - FORGEJO__database__PASSWD=<CHANGE_ME_NEON_DB_PASSWORD>
       - FORGEJO__database__SSL_MODE=require
       
       # Server Configuration
@@ -270,7 +270,7 @@ Certificate already exists from previous Woodpecker setup:
 
 **Connection String:**
 ```
-postgresql://ci-forgejo-oci_owner:npg_g6D4amnjezEJ@ep-broad-king-azlvkfiu.c-3.ap-southeast-1.aws.neon.tech/ci-forgejo-oci?sslmode=require
+postgresql://ci-forgejo-oci_owner:<PASSWORD>@ep-broad-king-azlvkfiu.c-3.ap-southeast-1.aws.neon.tech/ci-forgejo-oci?sslmode=require
 ```
 
 **Benefits of Neon:**
