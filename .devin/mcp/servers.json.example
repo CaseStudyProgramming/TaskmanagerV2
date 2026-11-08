@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "neon": {
+      "command": "neon-mcp-server",
+      "args": ["--api-key", "${NEON_API_KEY}"],
+      "env": {
+        "NEON_API_KEY": "${NEON_API_KEY}"
+      }
+    },
+    "forgejo": {
+      "command": "forgejo-mcp-server",
+      "args": ["--url", "${FORGEJO_URL}", "--token", "${FORGEJO_TOKEN}"],
+      "env": {
+        "FORGEJO_URL": "${FORGEJO_URL}",
+        "FORGEJO_TOKEN": "${FORGEJO_TOKEN}"
+      }
+    }
+  }
+}

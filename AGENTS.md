@@ -194,10 +194,12 @@ EOF
 
 **Configure Cloudflare credentials:**
 ```bash
+# Set API token in .env file as CLOUDFLARE_API_TOKEN
+# Then copy to production server:
 ssh -i /home/davidtan/_Workspaces/_Catatan_WSL/SSH-KEY/ssh-key-2026-10-21.key ubuntu@<public-ip> << 'EOF'
 sudo mkdir -p /etc/letsencrypt
 sudo tee /etc/letsencrypt/cloudflare.ini > /dev/null << 'CLOUDFLARE'
-dns_cloudflare_api_token = your-cloudflare-api-token
+dns_cloudflare_api_token = ${CLOUDFLARE_API_TOKEN}
 CLOUDFLARE
 sudo chmod 600 /etc/letsencrypt/cloudflare.ini
 EOF
@@ -253,7 +255,7 @@ FORGEJO__database__DB_TYPE=postgres
 FORGEJO__database__HOST=ep-broad-king-azlvkfiu.c-3.ap-southeast-1.aws.neon.tech
 FORGEJO__database__NAME=ci-forgejo-oci
 FORGEJO__database__USER=ci-forgejo-oci_owner
-FORGEJO__database__PASSWD=<CHANGE_ME_NEON_DB_PASSWORD>
+FORGEJO__database__PASSWD=${FORGEJO_DATABASE_PASSWD}  # Set in .env file
 FORGEJO__database__SSL_MODE=require
 
 # Server Configuration

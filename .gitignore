@@ -24,6 +24,11 @@ coverage.html
 .env
 .env.local
 .env.*.local
+.env.development
+.env.production
+
+# Credentials file (DO NOT COMMIT)
+docs/credentials.md
 
 # IDE
 .vscode/

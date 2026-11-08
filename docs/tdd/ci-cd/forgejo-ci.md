@@ -138,7 +138,7 @@ services:
       - FORGEJO__database__HOST=ep-broad-king-azlvkfiu.c-3.ap-southeast-1.aws.neon.tech
       - FORGEJO__database__NAME=ci-forgejo-oci
       - FORGEJO__database__USER=ci-forgejo-oci_owner
-      - FORGEJO__database__PASSWD=<CHANGE_ME_NEON_DB_PASSWORD>
+      - FORGEJO__database__PASSWD=${FORGEJO_DATABASE_PASSWD}  # Set in .env file
       - FORGEJO__database__SSL_MODE=require
       
       # Server Configuration
@@ -151,7 +151,7 @@ services:
       
       # Admin Account (Auto-created)
       - FORGEJO__admin__user=davidtan
-      - FORGEJO__admin__password=<CHANGE_ME_USE_STRONG_PASSWORD>
+      - FORGEJO__admin__password=${FORGEJO_ADMIN_PASSWORD}  # Set in .env file
       - FORGEJO__admin__email=admin@davidcps.my.id
       
       # Security
