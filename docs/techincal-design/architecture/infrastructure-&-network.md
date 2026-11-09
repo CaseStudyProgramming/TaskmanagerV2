@@ -70,7 +70,7 @@ graph TB
 | **Cache** | Upstash Redis | Global edge cache | Application caching |
 | **Media Storage** | OCI VM Storage | 200GB attached storage | Video, photo, media files |
 | **CI/CD** | Forgejo (Self-hosted) | On OCI instance | Build, test, deploy pipeline |
-| **Container Registry** | OCI Registry | Integrated with GitHub | Docker image storage |
+| **Container Registry** | OCI Registry | Integrated with OCI ecosystem | Docker image storage |
 | **DNS** | Cloudflare DNS | Dynamic DNS support | Domain resolution |
 
 ---
@@ -126,10 +126,13 @@ graph LR
 - Nginx handles SSL termination and proxies to backend (HTTP 8080)
 - Maximum security for production deployment
 
-**SSL Certificate Future Plan:**
-- Install Let's Encrypt wildcard certificate on OCI instance
-- Certificate: `*.davidcps.my.id` and `davidcps.my.id`
-- Upgrade to Full (strict) mode for end-to-end encryption
+**SSL Certificate Management:**
+- Auto-renewal: Configured via certbot systemd timer
+- Renewal check: Automatic before expiration
+- No manual intervention required
+- Certificate location: `/etc/letsencrypt/live/davidcps.my.id/`
+
+**Reference:** See [ADR 0004: Upgrade to Cloudflare Full Strict SSL/TLS Mode](./adr/infrastructure/0004-upgrade-to-cloudflare-full-strict-ssl.md) for complete implementation details.
 
 ### Firewall Configuration
 
@@ -159,7 +162,7 @@ Oracle-provided iptables rules block HTTP (port 80) and HTTPS (port 443) by defa
 | **Development (Linux)** | Docker or Podman | Flexibility for team preference |
 | **CI/CD (Forgejo Actions)** | Podman | Consistent with production (OCI) |
 | **Production** | OCI Instance (Podman) | Self-managed container runtime |
-| **Registry** | OCI Registry | Integrated with GitHub, no signup needed |
+| **Registry** | OCI Registry | Integrated with OCI ecosystem, no signup needed |
 
 ### Development Setup
 
@@ -186,8 +189,8 @@ Oracle-provided iptables rules block HTTP (port 80) and HTTPS (port 443) by defa
 **OCI Instance Configuration**
 
 - **Image Source**: OCI Registry
-- **Image**: `ghcr.io/davidtan/taskmanager-backend:latest`
-- **Authentication**: GitHub username + PAT or OCI credentials
+- **Image**: `ocir.io/tenancy-namespace/taskmanager-backend:latest`
+- **Authentication**: OCI credentials (API key or auth token)
 - **Instance Type**: A1.Flex - 2 OCPUs, 12 GB RAM
 - **Container Runtime**: Podman
 - **Reverse Proxy**: Nginx

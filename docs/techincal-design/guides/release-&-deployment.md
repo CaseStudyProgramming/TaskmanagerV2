@@ -33,7 +33,7 @@ This document describes the staging and production release checklists, rollback 
 **Backend:**
 - **Platform**: OCI Instance (Podman)
 - **Trigger**: Manual deployment
-- **Process**: Pull image from GHCR, restart container
+- **Process**: Pull image from OCI Registry, restart container
 
 ---
 

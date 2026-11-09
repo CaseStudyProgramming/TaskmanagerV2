@@ -32,6 +32,11 @@ We will use PostgreSQL as the primary database, hosted on Neon with the followin
 - **Testing**: `taskmanager_db_testing` (Neon branch: testing)
 - **Development**: `taskmanager_db_dev` (Neon branch: dev)
 
+**Note on Testing vs Development Branches:**
+- For solo development, testing and development branches can be combined to reduce costs
+- For team collaboration or CI/CD automation, keeping them separate is recommended to avoid data conflicts
+- Current configuration uses separate branches for better isolation in production-ready setup
+
 ### Key Features
 - **Branch-first workflow**: Isolated environments for development and testing
 - **Automatic scaling**: Scales based on load
