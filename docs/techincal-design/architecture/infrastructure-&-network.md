@@ -43,7 +43,7 @@ graph TB
 
     subgraph "CI/CD Infrastructure"
         Forgejo[Forgejo<br/>Self-hosted CI/CD]
-        OCI Registry[OCI Registry<br/>Image Registry]
+        OCI_Registry[OCI Registry<br/>Image Registry]
     end
 
     CDN -->|Static Assets| Workers
@@ -56,8 +56,8 @@ graph TB
     Instance -->|SQL| NeonProd
     Instance -->|SQL (Tests)| NeonTest
     Instance -->|Cache| Redis
-    Forgejo -->|Build & Push| OCI Registry
-    Instance -->|Pull Images| OCI Registry
+    Forgejo -->|Build & Push| OCI_Registry
+    Instance -->|Pull Images| OCI_Registry
 ```
 
 ### Infrastructure Components
@@ -213,7 +213,7 @@ graph TB
     Runner[Forgejo Runner<br/>Podman]
     Build[Build Stage<br/>Docker Build]
     Test[Test Stage<br/>Unit & Integration Tests]
-    Push[Push Stage<br/>OCI Registry Registry]
+    Push[Push Stage<br/>OCI Registry]
     Deploy[Deploy Stage<br/>Manual to OCI]
 
     GitHub -->|Mirror| Mirror
