@@ -195,92 +195,7 @@ frontend/
 
 ### Example Code
 
-**Component Example:**
-```svelte
-<script lang="ts">
-  import { taskCreateStore } from './model/task-create.store';
-  import { taskSchema } from './model/task-create.schema';
-
-  const store = taskCreateStore();
-
-  async function handleSubmit() {
-    const validation = taskSchema.safeParse(store.form);
-
-    if (!validation.success) {
-      store.setErrors(validation.error.errors);
-      return;
-    }
-
-    await store.createTask();
-  }
-</script>
-
-<form on:submit|preventDefault={handleSubmit}>
-  <input type="text" bind:value={store.form.title} />
-  {#if store.errors.title}
-    <span class="error">{store.errors.title}</span>
-  {/if}
-  <button type="submit">Create Task</button>
-</form>
-```
-
-**Store Example:**
-```typescript
-import { writable, derived } from 'svelte/store';
-
-interface TaskForm {
-  title: string;
-  description: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  dueDate: number | null;
-  tags: string[];
-}
-
-interface TaskFormErrors {
-  title?: string;
-  description?: string;
-  priority?: string;
-}
-
-function createTaskCreateStore() {
-  const form = writable<TaskForm>({
-    title: '',
-    description: '',
-    priority: 'medium',
-    dueDate: null,
-    tags: [],
-  });
-
-  const errors = writable<TaskFormErrors>({});
-  const loading = writable(false);
-
-  async function createTask() {
-    loading.set(true);
-    try {
-      const response = await fetch('/api/v1/tasks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(get(form)),
-      });
-      const data = await response.json();
-      // Handle response
-    } catch (error) {
-      console.error('Failed to create task:', error);
-    } finally {
-      loading.set(false);
-    }
-  }
-
-  return {
-    form,
-    errors,
-    loading,
-    createTask,
-  };
-}
-
-export const taskCreateStore = createTaskCreateStore();
-```
+For complete implementation examples, refer to the specific design documents for state management, routing, and UI components.
 
 ---
 
@@ -316,20 +231,9 @@ export const taskCreateStore = createTaskCreateStore();
 - Landing pages
 
 **Configuration:**
-```javascript
-// svelte.config.js
-export default {
-  kit: {
-    adapter: adapter({
-      pages: 'build',
-      assets: 'build',
-      fallback: 'index.html',
-      precompress: false,
-      strict: true,
-    }),
-  },
-};
-```
+- Configure SvelteKit adapter for Cloudflare Workers
+- Set platform proxy for pages
+- Configure build output directory
 
 ---
 
@@ -362,26 +266,10 @@ Shared Layer (Global State)
 - Persist critical state to localStorage
 
 **Example:**
-```typescript
-// Load tasks on page load
-export async function load({ fetch }) {
-  const response = await fetch('/api/v1/tasks');
-  const tasks = await response.json();
-  return { tasks };
-}
-
-// Hydrate store in component
-<script lang="ts">
-  import { onMount } from 'svelte';
-  import { tasksStore } from './model/tasks.store';
-
-  export let data;
-
-  onMount(() => {
-    tasksStore.set(data.tasks);
-  });
-</script>
-```
+- Load initial data from server using load function
+- Hydrate client-side stores with server data
+- Update state via API calls
+- Persist critical state to localStorage
 
 ---
 
@@ -390,74 +278,18 @@ export async function load({ fetch }) {
 ### API Client
 
 **Shared API Client:**
-```typescript
-// shared/api/client.ts
-class ApiClient {
-  private baseURL: string;
-
-  constructor(baseURL: string) {
-    this.baseURL = baseURL;
-  }
-
-  async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`;
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return response.json();
-  }
-
-  async get<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: 'GET' });
-  }
-
-  async post<T>(endpoint: string, data: unknown): Promise<T> {
-    return this.request<T>(endpoint, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-}
-
-export const apiClient = new ApiClient('https://api.davidcps.my.id');
-```
+- Request method with endpoint and options
+- Type-safe response handling
+- Error handling for non-OK responses
+- Convenience methods for GET and POST
 
 ### Response Handling
 
 **Standard Response Parser:**
-```typescript
-interface StandardResponse<T> {
-  status: {
-    code: number;
-    message: string;
-    is_success: boolean;
-  };
-  data: T;
-  meta: {
-    timestamp: number;
-    request_id: string;
-  };
-}
-
-function extractData<T>(response: StandardResponse<T>): T {
-  if (!response.status.is_success) {
-    throw new Error(response.status.message);
-  }
-  return response.data;
-}
-```
+- Parse standard response format with status, data, and meta
+- Check is_success flag
+- Extract data on success
+- Throw error on failure
 
 ---
 
@@ -498,81 +330,25 @@ function extractData<T>(response: StandardResponse<T>): T {
 ### Cloudflare Workers Configuration
 
 **SvelteKit Adapter:**
-```javascript
-// svelte.config.js
-import adapter from '@sveltejs/adapter-cloudflare';
-
-export default {
-  kit: {
-    adapter: adapter({
-      platformProxy: {
-        pages: true,
-      },
-    }),
-  },
-};
-```
+- Import Cloudflare adapter
+- Configure adapter with platform proxy
+- Enable pages for SSR
 
 **Wrangler Configuration:**
-```toml
-name = "taskmanager-frontend"
-main = "./.cloudflare/_worker.js"
-compatibility_date = "2024-01-01"
-
-[site]
-bucket = "./.cloudflare/public"
-
-[build]
-command = "bun run build"
-cwd = "."
-watch_dir = "src"
-
-[vars]
-ENVIRONMENT = "production"
-API_URL = "https://api.davidcps.my.id"
-```
+- Configure worker name and entry point
+- Set compatibility date
+- Configure site bucket for static assets
+- Set build command and watch directory
+- Define environment variables
 
 ### CI/CD Pipeline
 
 **Forgejo Actions Workflow:**
-```yaml
-name: CI
-
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install
-
-      - name: Lint
-        run: bun run lint
-
-      - name: Type check
-        run: bun run typecheck
-
-      - name: Build
-        run: bun run build
-
-      - name: Test
-        run: bun run test
-
-      - name: E2E Test
-        run: bun run test:e2e
-```
+- Trigger on push to main/develop branches
+- Setup Bun runtime
+- Install dependencies
+- Run linting, type checking, build, and tests
+- Run E2E tests
 
 ---
 

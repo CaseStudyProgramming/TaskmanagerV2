@@ -35,79 +35,12 @@ component-name/
 
 ### Example Component
 
-```svelte
-<script lang="ts">
-  import type { Snippet } from 'svelte';
-
-  interface Props {
-    variant?: 'primary' | 'secondary' | 'danger';
-    size?: 'sm' | 'md' | 'lg';
-    disabled?: boolean;
-    onclick?: () => void;
-    children: Snippet;
-  }
-
-  let {
-    variant = 'primary',
-    size = 'md',
-    disabled = false,
-    onclick,
-    children,
-  }: Props = $props();
-
-  const classes = $derived(
-    `btn btn-${variant} btn-${size} ${disabled ? 'btn-disabled' : ''}`
-  );
-</script>
-
-<button
-  class={classes}
-  {disabled}
-  onclick={onclick}
-  aria-disabled={disabled}
->
-  {@render children()}
-</button>
-
-<style>
-  .btn {
-    border: none;
-    border-radius: 0.375rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .btn-primary {
-    background-color: #3b82f6;
-    color: white;
-  }
-
-  .btn-primary:hover:not(.btn-disabled) {
-    background-color: #2563eb;
-  }
-
-  .btn-sm {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.875rem;
-  }
-
-  .btn-md {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-  }
-
-  .btn-lg {
-    padding: 0.75rem 1.5rem;
-    font-size: 1.125rem;
-  }
-
-  .btn-disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-</style>
-```
+**Component Structure:**
+- Script block with TypeScript
+- Props interface with type annotations
+- Derived reactive classes
+- HTML template with bindings
+- Scoped styles with utility classes
 
 ---
 
@@ -230,19 +163,9 @@ component-name/
 - UI components: 3:1 contrast ratio
 
 **Implementation:**
-```css
-/* Good contrast */
-.text-on-primary {
-  color: white;
-  background-color: var(--color-primary-600);
-}
-
-/* Bad contrast (avoid) */
-.text-on-primary {
-  color: #dbeafe;
-  background-color: var(--color-primary-600);
-}
-```
+- Use high contrast colors for text
+- Verify contrast ratios meet WCAG AA standards
+- Avoid low contrast combinations
 
 ### Keyboard Navigation
 

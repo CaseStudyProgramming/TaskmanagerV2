@@ -28,51 +28,24 @@ This document describes the client-side data flow, state management patterns, an
 ### Store Types
 
 **Writable Stores:**
-```typescript
-import { writable } from 'svelte/store';
-
-const count = writable(0);
-
-// Read
-count.subscribe(value => console.log(value));
-
-// Write
-count.set(1);
-count.update(n => n + 1);
-```
+- Create writable store with initial value
+- Subscribe to store changes
+- Set or update store values
 
 **Readable Stores:**
-```typescript
-import { readable } from 'svelte/store';
-
-const time = readable(new Date(), set => {
-  const interval = setInterval(() => set(new Date()), 1000);
-  return () => clearInterval(interval);
-});
-```
+- Create readable store with initial value
+- Provide cleanup function for cleanup
+- Automatically update on interval
 
 **Derived Stores:**
-```typescript
-import { derived } from 'svelte/store';
-
-const doubled = derived(count, $count => $count * 2);
-```
+- Derive value from parent store
+- Automatically update when parent changes
+- Use derived for computed values
 
 **Custom Stores:**
-```typescript
-function createCounter() {
-  const { subscribe, set, update } = writable(0);
-
-  return {
-    subscribe,
-    increment: () => update(n => n + 1),
-    decrement: () => update(n => n - 1),
-    reset: () => set(0),
-  };
-}
-
-export const counter = createCounter();
-```
+- Create writable store with methods
+- Expose subscribe and custom methods
+- Implement business logic in methods
 
 ---
 
@@ -137,188 +110,23 @@ For error codes and their meanings, refer to [Error Codes](../api-specs/error-co
 ### Task Feature State
 
 **Task List Store:**
-```typescript
-import { writable, derived } from 'svelte/store';
-
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: 'todo' | 'in-progress' | 'completed';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  dueDate: number | null;
-  tags: string[];
-  createdAt: number;
-  updatedAt: number;
-}
-
-interface TaskListState {
-  tasks: Task[];
-  loading: boolean;
-  error: string | null;
-  filter: {
-    status: string | null;
-    priority: string | null;
-    search: string;
-  };
-}
-
-function createTaskListStore() {
-  const state = writable<TaskListState>({
-    tasks: [],
-    loading: false,
-    error: null,
-    filter: {
-      status: null,
-      priority: null,
-      search: '',
-    },
-  });
-
-  const filteredTasks = derived(state, $state => {
-    let tasks = $state.tasks;
-
-    if ($state.filter.status) {
-      tasks = tasks.filter(t => t.status === $state.filter.status);
-    }
-
-    if ($state.filter.priority) {
-      tasks = tasks.filter(t => t.priority === $state.filter.priority);
-    }
-
-    if ($state.filter.search) {
-      const search = $state.filter.search.toLowerCase();
-      tasks = tasks.filter(t =>
-        t.title.toLowerCase().includes(search) ||
-        t.description?.toLowerCase().includes(search)
-      );
-    }
-
-    return tasks;
-  });
-
-  async function loadTasks() {
-    state.update(s => ({ ...s, loading: true, error: null }));
-
-    try {
-      const response = await fetch('/api/v1/tasks');
-      const data = await response.json();
-
-      if (data.status.is_success) {
-        state.update(s => ({ ...s, tasks: data.data, loading: false }));
-      } else {
-        // Error message from standard response format
-        state.update(s => ({ ...s, error: data.status.message, loading: false }));
-      }
-    } catch (error) {
-      state.update(s => ({ ...s, error: 'Failed to load tasks', loading: false }));
-    }
-  }
-
-  function setFilter(filter: Partial<TaskListState['filter']>) {
-    state.update(s => ({
-      ...s,
-      filter: { ...s.filter, ...filter },
-    }));
-  }
-
-  return {
-    subscribe: state.subscribe,
-    filteredTasks,
-    loadTasks,
-    setFilter,
-  };
-}
-
-export const taskListStore = createTaskListStore();
-```
+- Define Task interface with all fields
+- Define TaskListState interface with tasks, loading, error, and filter
+- Create writable store for state
+- Create derived store for filtered tasks
+- Implement loadTasks function with API call
+- Implement setFilter function for filter updates
 
 ### Auth Feature State
 
 **Auth Store:**
-```typescript
-import { writable, derived } from 'svelte/store';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatarUrl: string | null;
-}
-
-interface AuthState {
-  user: User | null;
-  token: string | null;
-  loading: boolean;
-  error: string | null;
-}
-
-function createAuthStore() {
-  const state = writable<AuthState>({
-    user: null,
-    token: null,
-    loading: false,
-    error: null,
-  });
-
-  const isAuthenticated = derived(state, $state => !!$state.user);
-
-  // Load from localStorage on init
-  function init() {
-    const token = localStorage.getItem('access_token');
-    const user = localStorage.getItem('user');
-
-    if (token && user) {
-      state.update(s => ({
-        ...s,
-        token,
-        user: JSON.parse(user),
-      }));
-    }
-  }
-
-  async function loginWithGoogle() {
-    state.update(s => ({ ...s, loading: true, error: null }));
-
-    try {
-      // Redirect to Google OAuth
-      window.location.href = '/api/v1/auth/google';
-    } catch (error) {
-      state.update(s => ({ ...s, error: 'Failed to login', loading: false }));
-    }
-  }
-
-  async function logout() {
-    state.update(s => ({ ...s, loading: true, error: null }));
-
-    try {
-      await fetch('/api/v1/auth/logout', { method: 'POST' });
-
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('user');
-
-      state.update(s => ({
-        ...s,
-        user: null,
-        token: null,
-        loading: false,
-      }));
-    } catch (error) {
-      state.update(s => ({ ...s, error: 'Failed to logout', loading: false }));
-    }
-  }
-
-  return {
-    subscribe: state.subscribe,
-    isAuthenticated,
-    init,
-    loginWithGoogle,
-    logout,
-  };
-}
-
-export const authStore = createAuthStore();
-```
+- Define User interface with user fields
+- Define AuthState interface with user, token, loading, and error
+- Create writable store for state
+- Create derived store for isAuthenticated
+- Implement init function to load from localStorage
+- Implement loginWithGoogle function for OAuth redirect
+- Implement logout function to clear state and localStorage
 
 ---
 
@@ -327,39 +135,10 @@ export const authStore = createAuthStore();
 ### App-Level State
 
 **Theme Store:**
-```typescript
-import { writable } from 'svelte/store';
-
-type Theme = 'light' | 'dark';
-
-function createThemeStore() {
-  const theme = writable<Theme>('light');
-
-  // Load from localStorage
-  function init() {
-    const saved = localStorage.getItem('theme') as Theme;
-    if (saved) {
-      theme.set(saved);
-    }
-  }
-
-  function toggle() {
-    theme.update(t => {
-      const newTheme = t === 'light' ? 'dark' : 'light';
-      localStorage.setItem('theme', newTheme);
-      return newTheme;
-    });
-  }
-
-  return {
-    subscribe: theme.subscribe,
-    init,
-    toggle,
-  };
-}
-
-export const themeStore = createThemeStore();
-```
+- Define Theme type with light and dark options
+- Create writable store for theme
+- Implement init function to load from localStorage
+- Implement toggle function to switch themes and persist
 
 ---
 
@@ -368,61 +147,23 @@ export const themeStore = createThemeStore();
 ### Server-Side Data Loading
 
 **SvelteKit Load Function:**
-```typescript
-// src/pages/tasks/list/+page.ts
-export async function load({ fetch }) {
-  const response = await fetch('/api/v1/tasks');
-  const data = await response.json();
-
-  if (data.status.is_success) {
-    return {
-      tasks: data.data,
-    };
-  } else {
-    // Handle error from standard response format
-    return {
-      tasks: [],
-    };
-  }
-}
-```
+- Fetch data from API
+- Parse standard response format
+- Return data or fallback empty array
 
 ### Client-Side Hydration
 
 **Hydrate Store with Server Data:**
-```svelte
-<script lang="ts">
-  import { onMount } from 'svelte';
-  import { taskListStore } from './model/task-list.store';
-
-  export let data;
-
-  onMount(() => {
-    taskListStore.setTasks(data.tasks);
-  });
-</script>
-```
+- Import onMount lifecycle hook
+- Import store
+- Update store with server data on mount
 
 ### Data Refresh Strategy
 
 **Refresh on Visibility Change:**
-```typescript
-import { onMount, onDestroy } from 'svelte';
-
-onMount(() => {
-  const handleVisibilityChange = () => {
-    if (document.visibilityState === 'visible') {
-      taskListStore.loadTasks();
-    }
-  };
-
-  document.addEventListener('visibilitychange', handleVisibilityChange);
-
-  return () => {
-    document.removeEventListener('visibilitychange', handleVisibilityChange);
-  };
-});
-```
+- Add visibility change event listener on mount
+- Load tasks when document becomes visible
+- Remove event listener on cleanup
 
 ---
 
@@ -431,77 +172,18 @@ onMount(() => {
 ### IndexedDB Integration
 
 **Offline Store:**
-```typescript
-import { openDB } from 'idb';
-
-const DB_NAME = 'taskmanager';
-const DB_VERSION = 1;
-
-async function openDatabase() {
-  return openDB(DB_NAME, DB_VERSION, {
-    upgrade(db) {
-      if (!db.objectStoreNames.contains('tasks')) {
-        db.createObjectStore('tasks', { keyPath: 'id' });
-      }
-    },
-  });
-}
-
-async function saveTaskOffline(task: Task) {
-  const db = await openDatabase();
-  await db.put('tasks', task);
-}
-
-async function loadTasksOffline() {
-  const db = await openDatabase();
-  return db.getAll('tasks');
-}
-```
+- Open IndexedDB with database name and version
+- Create object store for tasks with key path
+- Implement saveTaskOffline function to store task
+- Implement loadTasksOffline function to retrieve tasks
 
 ### Sync Queue
 
 **Sync Queue Store:**
-```typescript
-interface SyncOperation {
-  id: string;
-  type: 'create' | 'update' | 'delete';
-  data: Task;
-  timestamp: number;
-}
-
-function createSyncQueueStore() {
-  const queue = writable<SyncOperation[]>([]);
-
-  async function enqueue(operation: SyncOperation) {
-    queue.update(q => [...q, operation]);
-
-    // Save to IndexedDB
-    const db = await openDatabase();
-    await db.put('syncQueue', operation);
-  }
-
-  async function processQueue() {
-    const operations = get(queue);
-
-    for (const op of operations) {
-      try {
-        await syncOperation(op);
-        queue.update(q => q.filter(item => item.id !== op.id));
-      } catch (error) {
-        console.error('Failed to sync operation:', error);
-      }
-    }
-  }
-
-  return {
-    subscribe: queue.subscribe,
-    enqueue,
-    processQueue,
-  };
-}
-
-export const syncQueueStore = createSyncQueueStore();
-```
+- Define SyncOperation interface with operation details
+- Create writable store for queue
+- Implement enqueue function to add operation to queue and IndexedDB
+- Implement processQueue function to sync operations with server
 
 ---
 
