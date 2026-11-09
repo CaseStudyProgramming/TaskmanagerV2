@@ -54,7 +54,7 @@ graph TB
     Podman -->|Backend Container| Instance
     Instance -->|File Links| VMStorage
     Instance -->|SQL| NeonProd
-    Instance -->|SQL (Tests)| NeonTest
+    Instance -->|SQL Tests| NeonTest
     Instance -->|Cache| Redis
     Forgejo -->|Build & Push| OCI_Registry
     Instance -->|Pull Images| OCI_Registry
