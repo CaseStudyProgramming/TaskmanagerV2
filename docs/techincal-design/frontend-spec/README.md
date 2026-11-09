@@ -358,6 +358,7 @@ Shared Layer (Global State)
 
 ## References
 
+- [System Architecture ADRs](../architecture/adr/README.md) - System architecture decisions
 - [Frontend FSD Architecture](../tdd/architecture/frontend-fsd.md) - Detailed FSD implementation
 - [State Management](./state-management.md) - State management patterns
 - [Design System & UI](./design-system-&-ui.md) - UI component design

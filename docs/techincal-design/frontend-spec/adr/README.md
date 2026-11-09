@@ -16,5 +16,6 @@ This folder contains ADRs specific to frontend architecture, UI patterns, and fr
 ## Related Documentation
 
 - [Central ADR Index](../../adr/README.md)
+- [System Architecture ADRs](../../architecture/adr/README.md)
 - [Frontend Specifications](../README.md)
 - [Architecture Overview](../../architecture/system-overview.md)

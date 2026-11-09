@@ -13,6 +13,10 @@ docs/
 ├── design DiC.md                       # Documentation design specification
 │
 ├── /architecture                       # MACRO ARCHITECTURE (Ex-SAD)
+│   ├── README.md                       # Architecture overview
+│   ├── /adr                            # Architecture Decision Records
+│   │   ├── global/                     # Cross-cutting architecture decisions
+│   │   └── infrastructure/             # Infrastructure architecture decisions
 │   ├── system-overview.md              # System C4 Model Diagram (Context & Container)
 │   ├── infrastructure-&-network.md      # Cloud topology, VPC, CDN, CI/CD pipeline
 │   ├── security-&-compliance.md        # Auth strategy, Data encryption, GDPR/ISO
@@ -119,9 +123,10 @@ docs/
 ### Architecture Decision Records (ADR)
 - [ADR Index](./techincal-design/adr/README.md) - Central ADR index and overview
 - [ADR Template](./techincal-design/adr/0000-template.md) - Standard ADR template
-- [Record Architecture Decisions](./techincal-design/adr/global/0001-record-architecture-decisions.md) - ADR adoption decision
-- [Technology Stack Selection](./techincal-design/adr/global/0002-technology-stack-selection.md) - Technology stack decision
-- [Use PostgreSQL for Core Database](./techincal-design/database-spec/adr/0003-use-postgresql-for-core-ledger.md) - Database selection decision
+- [System Architecture ADRs](./techincal-design/architecture/adr/README.md) - System architecture decisions
+- [Backend ADRs](./techincal-design/backend-spec/adr/README.md) - Backend architecture decisions
+- [Frontend ADRs](./techincal-design/frontend-spec/adr/README.md) - Frontend architecture decisions
+- [Database ADRs](./techincal-design/database-spec/adr/README.md) - Database architecture decisions
 
 ### Operation & Onboarding
 - [Local Setup](./guides/local-setup.md) - Step-by-step local environment setup

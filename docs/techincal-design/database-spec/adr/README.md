@@ -18,5 +18,6 @@ This folder contains ADRs specific to database, caching, and storage decisions f
 ## Related Documentation
 
 - [Central ADR Index](../../adr/README.md)
+- [System Architecture ADRs](../../architecture/adr/README.md)
 - [Database Schema](../database-schema.md)
 - [System Architecture](../../architecture/system-overview.md)

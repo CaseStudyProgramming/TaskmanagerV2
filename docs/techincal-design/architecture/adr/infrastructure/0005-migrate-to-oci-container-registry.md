@@ -197,5 +197,5 @@ This ADR supersedes the container registry decision in ADR 0002 (Technology Stac
 
 - [ADR 0002: Technology Stack Selection](../global/0002-technology-stack-selection.md) - Original decision for GHCR
 - [OCI Container Registry Documentation](https://docs.oracle.com/en-us/iaas/Content/Registry/Concepts/registryoverview.htm)
-- [Infrastructure & Network Architecture](../../architecture/infrastructure-&-network.md) - Current registry configuration
-- [Disaster Recovery](../../architecture/disaster-recovery.md) - Artifact retention details
+- [Infrastructure & Network Architecture](../infrastructure-&-network.md) - Current registry configuration
+- [Disaster Recovery](../disaster-recovery.md) - Artifact retention details

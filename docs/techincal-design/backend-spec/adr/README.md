@@ -16,5 +16,6 @@ This folder contains ADRs specific to backend architecture, services, and patter
 ## Related Documentation
 
 - [Central ADR Index](../../adr/README.md)
+- [System Architecture ADRs](../../architecture/adr/README.md)
 - [Backend Specifications](../README.md)
 - [Architecture Overview](../../architecture/system-overview.md)

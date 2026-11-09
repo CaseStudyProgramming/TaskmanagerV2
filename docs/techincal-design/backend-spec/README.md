@@ -312,6 +312,7 @@ Container configuration follows standard practices with Podman for production de
 
 ## References
 
+- [System Architecture ADRs](../architecture/adr/README.md) - System architecture decisions
 - [Backend DDD Architecture](../tdd/architecture/backend-ddd.md) - Detailed DDD implementation
 - [Database Schema](./database-schema.md) - Database design and migrations
 - [Background Jobs](./background-jobs.md) - Async processing and cron jobs

@@ -93,6 +93,7 @@ We will use PostgreSQL as the primary database, hosted on Neon with the followin
 
 ## References
 
+- [ADR 0002: Technology Stack Selection](../architecture/adr/global/0002-technology-stack-selection.md) - Overall technology stack context
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [Neon Documentation](https://neon.tech/docs)
 - [SQLBoiler Documentation](https://github.com/volatiletech/sqlboiler)

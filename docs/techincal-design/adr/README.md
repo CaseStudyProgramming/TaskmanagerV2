@@ -1,50 +1,59 @@
 # Architecture Decision Records (ADR)
 
-This directory contains Architecture Decision Records (ADRs) for the Advanced Task Manager project. ADRs document significant architectural decisions, their rationale, and consequences.
+This directory contains the central ADR template and index for the Advanced Task Manager project. ADRs document significant architectural decisions, their rationale, and consequences.
 
 ## Structure
 
-ADRs are organized by scope to help developers quickly find relevant decisions:
+ADRs are organized by scope within their respective technical design folders to ensure co-location with related documentation:
 
 ```
 docs/techincal-design/
-├── adr/                          # Central ADR folder (global & infrastructure)
+├── adr/                          # Central ADR folder (template & index only)
 │   ├── 0000-template.md         # Template for new ADRs
-│   ├── README.md                # This file
-│   ├── global/                  # Cross-cutting decisions (process, meta, overall architecture)
-│   └── infrastructure/          # Deployment, CI/CD, cloud, networking decisions
+│   └── README.md                # This file (central index)
+│
+├── architecture/
+│   ├── adr/                     # System architecture decisions
+│   │   ├── global/              # Cross-cutting decisions (process, meta, overall architecture)
+│   │   └── infrastructure/      # Deployment, CI/CD, cloud, networking decisions
+│   ├── system-overview.md
+│   ├── infrastructure-&-network.md
+│   ├── security-&-compliance.md
+│   └── disaster-recovery.md
+│
 ├── backend-spec/
-│   └── adr/                     # Backend-specific decisions
+│   ├── adr/                     # Backend-specific decisions
+│   ├── database-schema.md
+│   └── services/
+│
 ├── frontend-spec/
-│   └── adr/                     # Frontend-specific decisions
+│   ├── adr/                     # Frontend-specific decisions
+│   ├── state-management.md
+│   └── design-system-&-ui.md
+│
 └── database-spec/
-    └── adr/                     # Database, caching, storage decisions
+    ├── adr/                     # Database, caching, storage decisions
+    └── README.md
 ```
 
 ## ADR Index
 
-### Global
-Cross-cutting decisions that affect the entire project.
+### System Architecture
+Cross-cutting and infrastructure decisions that affect the entire system.
 
-| ID | Title | Status | Date |
-|----|-------|--------|------|
-| [0001](global/0001-record-architecture-decisions.md) | Record Architecture Decisions | Accepted | 2026-11-09 |
-| [0002](global/0002-technology-stack-selection.md) | Technology Stack Selection | Superseded (partially) | 2026-11-09 |
-
-### Infrastructure
-Deployment, CI/CD, cloud, and networking decisions.
-
-| ID | Title | Status | Date |
-|----|-------|--------|------|
-| [0004](infrastructure/0004-upgrade-to-cloudflare-full-strict-ssl.md) | Upgrade to Cloudflare Full Strict SSL/TLS Mode | Accepted | 2026-11-09 |
-| [0005](infrastructure/0005-migrate-to-oci-container-registry.md) | Migrate to OCI Container Registry | Accepted | 2026-11-09 |
+| ID | Title | Status | Date | Location |
+|----|-------|--------|------|----------|
+| [0001](../architecture/adr/global/0001-record-architecture-decisions.md) | Record Architecture Decisions | Accepted | 2026-11-09 | architecture/adr/global/ |
+| [0002](../architecture/adr/global/0002-technology-stack-selection.md) | Technology Stack Selection | Superseded (partially) | 2026-11-09 | architecture/adr/global/ |
+| [0004](../architecture/adr/infrastructure/0004-upgrade-to-cloudflare-full-strict-ssl.md) | Upgrade to Cloudflare Full Strict SSL/TLS Mode | Accepted | 2026-11-09 | architecture/adr/infrastructure/ |
+| [0005](../architecture/adr/infrastructure/0005-migrate-to-oci-container-registry.md) | Migrate to OCI Container Registry | Accepted | 2026-11-09 | architecture/adr/infrastructure/ |
 
 ### Database
 Database, caching, and storage decisions.
 
-| ID | Title | Status | Date |
-|----|-------|--------|------|
-| [0003](../database-spec/adr/0003-use-postgresql-for-core-ledger.md) | Use PostgreSQL for Core Database | Accepted | 2026-11-09 |
+| ID | Title | Status | Date | Location |
+|----|-------|--------|------|----------|
+| [0003](../database-spec/adr/0003-use-postgresql-for-core-ledger.md) | Use PostgreSQL for Core Database | Accepted | 2026-11-09 | database-spec/adr/ |
 
 ### Backend
 Backend-specific decisions (services, architecture, patterns).
@@ -60,7 +69,7 @@ Frontend-specific decisions (framework, architecture, patterns).
 
 1. Copy the template: `adr/0000-template.md`
 2. Place it in the appropriate scope folder:
-   - **Global/Infrastructure**: `adr/global/` or `adr/infrastructure/`
+   - **System Architecture (Global/Infrastructure)**: `architecture/adr/global/` or `architecture/adr/infrastructure/`
    - **Backend**: `backend-spec/adr/`
    - **Frontend**: `frontend-spec/adr/`
    - **Database**: `database-spec/adr/`

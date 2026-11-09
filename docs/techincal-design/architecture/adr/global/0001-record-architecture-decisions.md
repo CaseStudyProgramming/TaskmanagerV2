@@ -24,7 +24,11 @@ As the Advanced Task Manager project evolves, we are making numerous architectur
 
 We will adopt Architecture Decision Records (ADR) to document all significant architectural decisions. Each ADR will:
 - Use the Michael Nygard template
-- Be stored in the `docs/techincal-design/adr/` directory, organized by scope (global, infrastructure, backend, frontend, database)
+- Be stored in domain-specific folders for co-location with related documentation:
+  - System architecture decisions: `docs/techincal-design/architecture/adr/` (global, infrastructure)
+  - Backend decisions: `docs/techincal-design/backend-spec/adr/`
+  - Frontend decisions: `docs/techincal-design/frontend-spec/adr/`
+  - Database decisions: `docs/techincal-design/database-spec/adr/`
 - Follow the naming convention `NNNN-title.md` (zero-padded sequential number)
 - Include status (Proposed, Accepted, Deprecated, Superseded)
 - Clearly describe context, decision, and consequences
