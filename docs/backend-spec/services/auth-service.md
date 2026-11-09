@@ -62,105 +62,32 @@ sequenceDiagram
 ### Token Structure
 
 **Access Token (15 minutes):**
-```json
-{
-  "iss": "taskmanager-api",
-  "sub": "user-id",
-  "aud": "taskmanager-frontend",
-  "exp": 1726653300,
-  "iat": 1726652400,
-  "email": "user@example.com",
-  "name": "John Doe"
-}
-```
+- Issuer: taskmanager-api
+- Subject: user-id
+- Audience: taskmanager-frontend
+- Claims: email, name
 
 **Refresh Token (7 days):**
-```json
-{
-  "iss": "taskmanager-api",
-  "sub": "user-id",
-  "aud": "taskmanager-frontend",
-  "exp": 1727257200,
-  "iat": 1726652400,
-  "type": "refresh"
-}
-```
+- Issuer: taskmanager-api
+- Subject: user-id
+- Audience: taskmanager-frontend
+- Type: refresh
 
 ### Token Generation
 
-```go
-package auth
-
-import (
-    "time"
-    "github.com/golang-jwt/jwt/v5"
-)
-
-type TokenService struct {
-    secretKey []byte
-}
-
-func NewTokenService(secretKey string) *TokenService {
-    return &TokenService{secretKey: []byte(secretKey)}
-}
-
-func (s *TokenService) GenerateAccessToken(userID, email, name string) (string, error) {
-    now := time.Now()
-    claims := jwt.MapClaims{
-        "iss":   "taskmanager-api",
-        "sub":   userID,
-        "aud":   "taskmanager-frontend",
-        "exp":   now.Add(15 * time.Minute).Unix(),
-        "iat":   now.Unix(),
-        "email": email,
-        "name":  name,
-    }
-
-    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-    return token.SignedString(s.secretKey)
-}
-
-func (s *TokenService) GenerateRefreshToken(userID string) (string, error) {
-    now := time.Now()
-    claims := jwt.MapClaims{
-        "iss":   "taskmanager-api",
-        "sub":   userID,
-        "aud":   "taskmanager-frontend",
-        "exp":   now.Add(7 * 24 * time.Hour).Unix(),
-        "iat":   now.Unix(),
-        "type":  "refresh",
-    }
-
-    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-    return token.SignedString(s.secretKey)
-}
-```
+- TokenService struct with secret key
+- GenerateAccessToken method with user claims
+- GenerateRefreshToken method with refresh type
+- Use HMAC-SHA256 signing method
+- Set appropriate expiration times
 
 ### Token Validation
 
-```go
-func (s *TokenService) ValidateAccessToken(tokenString string) (*jwt.MapClaims, error) {
-    token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-        if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-            return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-        }
-        return s.secretKey, nil
-    })
-
-    if err != nil {
-        return nil, err
-    }
-
-    if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-        if claims["type"] == "refresh" {
-            return nil, fmt.Errorf("refresh token cannot be used as access token")
-        }
-        return &claims, nil
-    }
-
-    return nil, fmt.Errorf("invalid token")
-}
-```
+- Parse token with secret key validation
+- Verify signing method
+- Check token validity
+- Reject refresh tokens as access tokens
+- Return claims on successful validation
 
 ---
 
@@ -168,78 +95,19 @@ func (s *TokenService) ValidateAccessToken(tokenString string) (*jwt.MapClaims, 
 
 ### Session Creation
 
-```go
-package auth
-
-import (
-    "context"
-    "crypto/rand"
-    "encoding/hex"
-    "time"
-)
-
-type SessionService struct {
-    sessionRepo Repository
-    tokenService *TokenService
-}
-
-func (s *SessionService) CreateSession(ctx context.Context, userID string) (*Session, error) {
-    // Generate refresh token
-    refreshToken, err := s.tokenService.GenerateRefreshToken(userID)
-    if err != nil {
-        return nil, err
-    }
-
-    // Hash refresh token for storage
-    tokenHash := hashToken(refreshToken)
-
-    // Create session
-    now := time.Now().UnixMilli()
-    session := &Session{
-        ID:        generateUUID(),
-        UserID:    userID,
-        Token:     tokenHash,
-        ExpiresAt: now + (7 * 24 * 60 * 60 * 1000), // 7 days
-        CreatedAt: now,
-    }
-
-    // Save session
-    if err := s.sessionRepo.Create(ctx, session); err != nil {
-        return nil, err
-    }
-
-    return session, nil
-}
-
-func hashToken(token string) string {
-    h := sha256.New()
-    h.Write([]byte(token))
-    return hex.EncodeToString(h.Sum(nil))
-}
-```
+- Generate refresh token using TokenService
+- Hash refresh token for secure storage using SHA256
+- Create session with user ID, token hash, and expiration
+- Save session to repository
+- Return session on success
 
 ### Session Validation
 
-```go
-func (s *SessionService) ValidateSession(ctx context.Context, refreshToken string) (*Session, error) {
-    // Hash refresh token
-    tokenHash := hashToken(refreshToken)
-
-    // Find session by token hash
-    session, err := s.sessionRepo.FindByToken(ctx, tokenHash)
-    if err != nil {
-        return nil, err
-    }
-
-    // Check if session is expired
-    now := time.Now().UnixMilli()
-    if session.ExpiresAt < now {
-        return nil, ErrSessionExpired
-    }
-
-    return session, nil
-}
-```
+- Hash incoming refresh token
+- Find session by token hash in repository
+- Check if session is expired against current timestamp
+- Return session on successful validation
+- Return error if session not found or expired
 
 ### Session Cleanup
 

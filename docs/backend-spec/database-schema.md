@@ -239,35 +239,20 @@ CREATE INDEX idx_sessions_expires_at ON sessions(expires_at);
 ### Migration Workflow
 
 **Development:**
-```bash
-# Create new migration
-go run github.com/pressly/goose/v3/cmd/goose create add_user_timezone sql
-
-# Run migrations (dev branch)
-goose -dir migrations postgres "$DATABASE_URL" up
-
-# Rollback migrations
-goose -dir migrations postgres "$DATABASE_URL" down
-```
+- Create new migration with goose CLI
+- Run migrations on dev branch
+- Rollback migrations if needed
 
 **Testing:**
-```bash
-# Run migrations (testing branch)
-goose -dir migrations postgres "$TEST_DATABASE_URL" up
-
-# Reset testing database after tests
-goose -dir migrations postgres "$TEST_DATABASE_URL" reset
-```
+- Run migrations on testing branch
+- Reset testing database after tests
 
 **Production:**
-```bash
-# Review migration
-# Test migration on testing branch
-# Create production migration
-# Get approval from team
-# Run migration on production branch (main)
-goose -dir migrations postgres "$PROD_DATABASE_URL" up
-```
+- Review migration
+- Test migration on testing branch
+- Create production migration
+- Get approval from team
+- Run migration on production branch (main)
 
 ### Migration Best Practices
 
@@ -322,83 +307,28 @@ goose -dir migrations postgres "$PROD_DATABASE_URL" up
 ### Cache Operations
 
 **Read Through Cache:**
-```go
-func (r *TaskRepository) FindByID(ctx context.Context, id string) (*Task, error) {
-    // Try cache first
-    cacheKey := fmt.Sprintf("task:%s", id)
-    cached, err := r.cache.Get(ctx, cacheKey)
-    if err == nil {
-        return decodeTask(cached), nil
-    }
-
-    // Cache miss, query database
-    task, err := r.db.FindByID(ctx, id)
-    if err != nil {
-        return nil, err
-    }
-
-    // Update cache
-    r.cache.Set(ctx, cacheKey, encodeTask(task), 1*time.Hour)
-
-    return task, nil
-}
-```
+- Try cache first with resource key
+- Return cached data if available
+- On cache miss, query database
+- Update cache with fetched data
+- Return data
 
 **Write Through Cache:**
-```go
-func (r *TaskRepository) Update(ctx context.Context, task *Task) error {
-    // Update database
-    err := r.db.Update(ctx, task)
-    if err != nil {
-        return err
-    }
-
-    // Update cache
-    cacheKey := fmt.Sprintf("task:%s", task.ID)
-    r.cache.Set(ctx, cacheKey, encodeTask(task), 1*time.Hour)
-
-    return nil
-}
-```
+- Update database first
+- Update cache with new data
+- Return error if database update fails
 
 **Cache Invalidation:**
-```go
-func (r *TaskRepository) Delete(ctx context.Context, id string) error {
-    // Delete from database
-    err := r.db.Delete(ctx, id)
-    if err != nil {
-        return err
-    }
-
-    // Invalidate cache
-    cacheKey := fmt.Sprintf("task:%s", id)
-    r.cache.Delete(ctx, cacheKey)
-
-    return nil
-}
-```
+- Delete from database
+- Invalidate cache entry
+- Return error if database delete fails
 
 ### Cache Warmup
 
 **On Application Startup:**
-```go
-func WarmupCache(ctx context.Context, repo *TaskRepository) error {
-    // Cache frequently accessed tasks
-    tasks, err := repo.FindByUserID(ctx, userID, Filter{
-        Limit: 100,
-    })
-    if err != nil {
-        return err
-    }
-
-    for _, task := range tasks {
-        cacheKey := fmt.Sprintf("task:%s", task.ID)
-        repo.cache.Set(ctx, cacheKey, encodeTask(task), 1*time.Hour)
-    }
-
-    return nil
-}
-```
+- Retrieve frequently accessed tasks (limit 100)
+- Cache each task with appropriate TTL
+- Return error if retrieval or caching fails
 
 ---
 

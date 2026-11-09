@@ -77,31 +77,14 @@ This document defines the disaster recovery strategy, RTO/RPO targets, backup pr
 - **Method**: `rsync` incremental backup
 
 **Backup Script:**
-```bash
-#!/bin/bash
-# /usr/local/bin/backup-media.sh
-
-SOURCE="/home/ubuntu/media"
-DESTINATION="oci://bucket-name/backups/media"
-DATE=$(date +%Y-%m-%d)
-
-# Create backup
-oci os object bulk-upload \
-  --bucket-name bucket-name \
-  --prefix "backups/media/$DATE/" \
-  --source-dir "$SOURCE"
-
-# Clean old backups (older than 4 weeks)
-oci os object bulk-delete \
-  --bucket-name bucket-name \
-  --prefix "backups/media/" \
-  --older-than 28d
-```
+- Source: /home/ubuntu/media
+- Destination: OCI Object Storage with date prefix
+- Use OCI CLI for bulk upload
+- Clean old backups older than 4 weeks
 
 **Cron Job:**
-```bash
-0 2 * * 0 /usr/local/bin/backup-media.sh > /var/log/backup-media.log 2>&1
-```
+- Schedule: Weekly (Sundays at 2 AM)
+- Log output to /var/log/backup-media.log
 
 ### Configuration Backups
 
@@ -133,19 +116,15 @@ oci os object bulk-delete \
 **Use Case:** Recover from accidental data deletion or corruption within 7 days.
 
 **Steps:**
-```bash
-# 1. Log in to Neon Console
-# 2. Navigate to database: taskmanager_db
-# 3. Click "Restore" or "Time Travel"
-# 4. Select timestamp to restore to
-# 5. Choose restore target:
-#    - Create new branch (recommended)
-#    - Overwrite existing branch (dangerous)
-# 6. Wait for restore to complete
-# 7. Update application DATABASE_URL to new branch
-# 8. Verify data integrity
-# 9. Update DNS if needed (if new branch becomes production)
-```
+- Log in to Neon Console
+- Navigate to database: taskmanager_db
+- Click "Restore" or "Time Travel"
+- Select timestamp to restore to
+- Choose restore target (create new branch recommended)
+- Wait for restore to complete
+- Update application DATABASE_URL to new branch
+- Verify data integrity
+- Update DNS if needed (if new branch becomes production)
 
 **Verification:**
 ```sql
@@ -164,19 +143,11 @@ SELECT * FROM tasks ORDER BY created_at DESC LIMIT 10;
 **Use Case:** Production branch fails, switch to testing branch temporarily.
 
 **Steps:**
-```bash
-# 1. Update application DATABASE_URL to testing branch
-export DATABASE_URL="postgresql://user:password@ep-xxx.aws.neon.tech/taskmanager_db_testing"
-
-# 2. Restart application
-podman restart taskmanager-backend
-
-# 3. Verify application health
-curl http://localhost:8080/health
-
-# 4. Monitor for issues
-# 5. Once production branch is fixed, switch back
-```
+- Update application DATABASE_URL to testing branch
+- Restart application with Podman
+- Verify application health
+- Monitor for issues
+- Once production branch is fixed, switch back
 
 ### Cache Recovery
 
@@ -185,19 +156,15 @@ curl http://localhost:8080/health
 **Use Case:** Redis cache unavailable or data lost.
 
 **Steps:**
-```bash
-# 1. Check Redis status
-redis-cli ping
-
-# 2. If Redis is down, check Upstash dashboard
-# 3. Upstash provides automatic failover
-# 4. Application will continue working (cache miss, slower)
-# 5. If Redis is permanently lost:
-#    a. Create new Redis instance in Upstash
-#    b. Update REDIS_URL in .env.production
-#    c. Restart application
-#    d. Cache will warm up over time
-```
+- Check Redis status with redis-cli ping
+- If Redis is down, check Upstash dashboard
+- Upstash provides automatic failover
+- Application will continue working (cache miss, slower)
+- If Redis is permanently lost:
+  - Create new Redis instance in Upstash
+  - Update REDIS_URL in .env.production
+  - Restart application
+  - Cache will warm up over time
 
 **Note:** Cache is not critical for data persistence. Application will function without cache (slower performance).
 
@@ -208,25 +175,11 @@ redis-cli ping
 **Use Case:** 200GB VM storage becomes corrupted or unavailable.
 
 **Steps:**
-```bash
-# 1. Check VM storage status
-df -h /home/ubuntu/media
-
-# 2. If storage is corrupted, restore from backup
-oci os object bulk-download \
-  --bucket-name bucket-name \
-  --prefix "backups/media/latest/" \
-  --dest-dir "/home/ubuntu/media"
-
-# 3. Verify restored files
-ls -lh /home/ubuntu/media
-
-# 4. Update file references in database if paths changed
-#    (This should not be needed if backup structure is consistent)
-
-# 5. Restart application
-podman restart taskmanager-backend
-```
+- Check VM storage status with df -h
+- If storage is corrupted, restore from backup using OCI CLI
+- Verify restored files
+- Update file references in database if paths changed
+- Restart application with Podman
 
 ### Application Recovery
 
@@ -235,113 +188,39 @@ podman restart taskmanager-backend
 **Use Case:** Backend container crashes or becomes unresponsive.
 
 **Steps:**
-```bash
-# 1. Check container status
-podman ps -a
-
-# 2. Check container logs
-podman logs taskmanager-backend
-
-# 3. Restart container
-podman restart taskmanager-backend
-
-# 4. If restart fails, try to recreate
-podman stop taskmanager-backend
-podman rm taskmanager-backend
-podman run -d \
-  --name taskmanager-backend \
-  -p 8080:8080 \
-  --restart unless-stopped \
-  --env-file .env.production \
-  ghcr.io/davidtan/taskmanager-backend:latest
-
-# 5. Verify health
-curl http://localhost:8080/health
-```
+- Check container status with podman ps -a
+- Check container logs with podman logs
+- Restart container with podman restart
+- If restart fails, stop and remove container, then recreate
+- Verify health with curl to /health endpoint
 
 **Scenario 2: Image Corruption**
 
 **Use Case:** Docker image is corrupted or not working.
 
 **Steps:**
-```bash
-# 1. Pull latest image from GHCR
-podman pull ghcr.io/davidtan/taskmanager-backend:latest
-
-# 2. If latest is corrupted, pull previous tag
-podman pull ghcr.io/davidtan/taskmanager-backend:main-abc123def
-
-# 3. Rebuild from source (if needed)
-cd /home/ubuntu/apps/taskmanager
-git pull origin main
-podman build -t taskmanager-backend ./backend
-
-# 4. Recreate container with new image
-podman stop taskmanager-backend
-podman rm taskmanager-backend
-podman run -d \
-  --name taskmanager-backend \
-  -p 8080:8080 \
-  --restart unless-stopped \
-  --env-file .env.production \
-  ghcr.io/davidtan/taskmanager-backend:latest
-```
+- Pull latest image from GHCR
+- If latest is corrupted, pull previous tag
+- Rebuild from source if needed
+- Stop and remove old container
+- Recreate container with new image
+- Verify health
 
 **Scenario 3: Complete Server Failure**
 
 **Use Case:** OCI instance is unrecoverable (hardware failure, account issue).
 
 **Steps:**
-```bash
-# 1. Create new OCI instance
-#    - Same specification: A1.Flex 2 OCPU 12GB
-#    - Same OS: Debian 26 LTS
-#    - Same SSH key
-
-# 2. Install dependencies
-sudo apt update
-sudo apt install -y podman podman-compose nginx
-
-# 3. Clone repository
-git clone https://github.com/davidtan/taskmanagerV2.git
-cd taskmanagerV2
-
-# 4. Restore .env.production from backup
-oci os object get \
-  --bucket-name bucket-name \
-  --name "backups/config/.env.production" \
-  --file .env.production
-
-# 5. Restore Nginx configuration
-oci os object get \
-  --bucket-name bucket-name \
-  --name "backups/config/nginx.conf" \
-  --file /etc/nginx/nginx.conf
-
-# 6. Pull image from GHCR
-podman pull ghcr.io/davidtan/taskmanager-backend:latest
-
-# 7. Start container
-podman run -d \
-  --name taskmanager-backend \
-  -p 8080:8080 \
-  --restart unless-stopped \
-  --env-file .env.production \
-  ghcr.io/davidtan/taskmanager-backend:latest
-
-# 8. Restore media storage from backup
-oci os object bulk-download \
-  --bucket-name bucket-name \
-  --prefix "backups/media/latest/" \
-  --dest-dir /home/ubuntu/media
-
-# 9. Update DNS (if IP changed)
-#    - Update DDNS configuration
-#    - Or manually update A record in Cloudflare
-
-# 10. Verify deployment
-curl http://localhost:8080/health
-```
+- Create new OCI instance with same specification (A1.Flex 2 OCPU 12GB, Debian 26 LTS)
+- Install dependencies (Podman, Nginx)
+- Clone repository from GitHub
+- Restore .env.production from backup using OCI CLI
+- Restore Nginx configuration from backup
+- Pull image from GHCR
+- Start container with Podman
+- Restore media storage from backup
+- Update DNS if IP changed (DDNS or manual)
+- Verify deployment with health check
 
 ### Configuration Recovery
 

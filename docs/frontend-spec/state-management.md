@@ -118,6 +118,12 @@ User Action → Component → Store → API Client → HTTP Request → Response
 - Data extraction and typing
 - Meta information processing
 
+### Standard Response Format
+
+All API responses follow the standard response format defined in [Standard Response Format](../api-specs/standard-response-format.md).
+
+For error codes and their meanings, refer to [Error Codes](../api-specs/error-codes.md).
+
 **State Update Layer:**
 - Store state updates
 - Reactivity triggers
@@ -201,6 +207,7 @@ function createTaskListStore() {
       if (data.status.is_success) {
         state.update(s => ({ ...s, tasks: data.data, loading: false }));
       } else {
+        // Error message from standard response format
         state.update(s => ({ ...s, error: data.status.message, loading: false }));
       }
     } catch (error) {
@@ -371,11 +378,12 @@ export async function load({ fetch }) {
     return {
       tasks: data.data,
     };
+  } else {
+    // Handle error from standard response format
+    return {
+      tasks: [],
+    };
   }
-
-  return {
-    tasks: [],
-  };
 }
 ```
 

@@ -74,7 +74,7 @@ export async function load({ params, fetch }) {
     };
   }
 
-  throw error(404, 'Task not found');
+  throw error(404, 'Task not found'); // RES_001
 }
 ```
 
@@ -117,7 +117,7 @@ export async function load({ cookies, url }) {
 
   // Admin-only routes
   if (url.pathname.startsWith('/admin') && user.role !== 'admin') {
-    throw error(403, 'Forbidden');
+    throw error(403, 'Forbidden'); // AUTHZ_001
   }
 
   return {};
@@ -196,6 +196,10 @@ goto(`/tasks/${taskId}`);
 ---
 
 ## Error Handling
+
+Frontend error handling follows the standard response format defined in [Standard Response Format](../api-specs/standard-response-format.md).
+
+For error codes and their meanings, refer to [Error Codes](../api-specs/error-codes.md).
 
 ### Error Pages
 

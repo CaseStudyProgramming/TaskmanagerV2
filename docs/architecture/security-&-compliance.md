@@ -92,29 +92,16 @@ sequenceDiagram
 ### JWT Token Structure
 
 **Access Token (15 minutes expiration):**
-```json
-{
-  "iss": "taskmanager-api",
-  "sub": "user-id",
-  "aud": "taskmanager-frontend",
-  "exp": 1726653300,
-  "iat": 1726652400,
-  "email": "user@example.com",
-  "name": "John Doe"
-}
-```
+- Issuer: taskmanager-api
+- Subject: user-id
+- Audience: taskmanager-frontend
+- Claims: email, name
 
 **Refresh Token (7 days expiration):**
-```json
-{
-  "iss": "taskmanager-api",
-  "sub": "user-id",
-  "aud": "taskmanager-frontend",
-  "exp": 1727257200,
-  "iat": 1726652400,
-  "type": "refresh"
-}
-```
+- Issuer: taskmanager-api
+- Subject: user-id
+- Audience: taskmanager-frontend
+- Type: refresh
 
 ### Token Storage
 
@@ -233,30 +220,26 @@ sequenceDiagram
 ### Security Headers
 
 **Nginx Configuration:**
-```nginx
-add_header X-Frame-Options "SAMEORIGIN" always;
-add_header X-Content-Type-Options "nosniff" always;
-add_header X-XSS-Protection "1; mode=block" always;
-add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';" always;
-add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-```
+- X-Frame-Options: SAMEORIGIN
+- X-Content-Type-Options: nosniff
+- X-XSS-Protection: 1; mode=block
+- Referrer-Policy: strict-origin-when-cross-origin
+- Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'
+- Strict-Transport-Security: max-age=31536000; includeSubDomains
 
 ### Content Security Policy (CSP)
 
 **Frontend CSP:**
-```http
-Content-Security-Policy: default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval';
-  style-src 'self' 'unsafe-inline';
-  img-src 'self' data: https:;
-  connect-src 'self' https://*.googleapis.com;
-  font-src 'self';
-  object-src 'none';
-  base-uri 'self';
-  form-action 'self';
-  frame-ancestors 'none';
-```
+- default-src 'self'
+- script-src 'self' 'unsafe-inline' 'unsafe-eval'
+- style-src 'self' 'unsafe-inline'
+- img-src 'self' data: https:
+- connect-src 'self' https://*.googleapis.com
+- font-src 'self'
+- object-src 'none'
+- base-uri 'self'
+- form-action 'self'
+- frame-ancestors 'none'
 
 ---
 
@@ -265,46 +248,28 @@ Content-Security-Policy: default-src 'self';
 ### Frontend Validation (Zod)
 
 **Task Creation Schema:**
-```typescript
-import { z } from 'zod';
-
-const taskSchema = z.object({
-  title: z.string().min(1).max(200),
-  description: z.string().optional(),
-  status: z.enum(['todo', 'in-progress', 'completed']),
-  priority: z.enum(['low', 'medium', 'high', 'urgent']),
-  due_date: z.number().optional(),
-  tags: z.array(z.string()).optional(),
-});
-```
+- Title: string, min 1, max 200
+- Description: string, optional
+- Status: enum (todo, in-progress, completed)
+- Priority: enum (low, medium, high, urgent)
+- Due date: number, optional
+- Tags: array of strings, optional
 
 ### Backend Validation (Go Validator)
 
 **Task Creation Validation:**
-```go
-type CreateTaskRequest struct {
-    Title       string   `json:"title" validate:"required,min=1,max=200"`
-    Description string   `json:"description" validate:"max=5000"`
-    Status      string   `json:"status" validate:"required,oneof=todo in-progress completed"`
-    Priority    string   `json:"priority" validate:"required,oneof=low medium high urgent"`
-    DueDate     int64    `json:"due_date" validate:"omitempty,min=0"`
-    Tags        []string `json:"tags" validate:"omitempty,max=10"`
-}
-```
+- Title: required, min 1, max 200
+- Description: max 5000
+- Status: required, oneof (todo, in-progress, completed)
+- Priority: required, oneof (low, medium, high, urgent)
+- Due date: optional, min 0
+- Tags: optional, max 10
 
 ### SQL Injection Prevention
 
 **Parameterized Queries (SQLBoiler):**
-```go
-// SQLBoiler automatically uses parameterized queries
-task, err := models.Tasks(
-    qm.Where("user_id = ?", userID),
-    qm.Where("status = ?", status),
-).All(ctx, db)
-```
-
-**No raw SQL without validation:**
 - All database access through SQLBoiler ORM
+- Automatic parameterized queries
 - No string concatenation in queries
 - Input validation before database operations
 
@@ -330,22 +295,14 @@ task, err := models.Tasks(
 ### Rate Limiting Implementation
 
 **Nginx Configuration:**
-```nginx
-# Global rate limiting
-limit_req_zone $binary_remote_addr zone=global:10m rate=10r/s;
-limit_req_zone $http_x_user_id zone=user:10m rate=20r/s;
-
-# Apply rate limiting
-limit_req zone=global burst=20 nodelay;
-limit_req zone=user burst=40 nodelay;
-```
+- Global rate limiting zone based on IP address
+- User-based rate limiting zone
+- Burst and nodelay configuration
 
 **Response Headers:**
-```http
-X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 95
-X-RateLimit-Reset: 1726653000
-```
+- X-RateLimit-Limit: Total limit
+- X-RateLimit-Remaining: Remaining requests
+- X-RateLimit-Reset: Reset timestamp
 
 ---
 

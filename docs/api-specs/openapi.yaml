@@ -42,6 +42,12 @@ paths:
         Exchanges authorization code for access tokens and creates user session.
       operationId: googleOAuthCallback
       security: []
+      x-error-codes:
+        - VAL_002
+        - AUTH_001
+        - EXT_001
+        - EXT_002
+        - SRV_001
       requestBody:
         required: true
         content:
@@ -81,9 +87,43 @@ paths:
                     timestamp: 1726652400000
                     request_id: "550e8400-e29b-41d4-a716-446655440001"
         '400':
-          $ref: '#/components/responses/BadRequest'
+          description: Invalid OAuth code or redirect URI
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              example:
+                status:
+                  code: 400
+                  message: "Invalid OAuth parameters"
+                  is_success: false
+                data: null
+                meta:
+                  timestamp: 1726652400000
+                  request_id: "550e8400-e29b-41d4-a716-446655440000"
+                  errors:
+                    - code: "VAL_002"
+                      field: "code"
+                      message: "Invalid authorization code"
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          description: OAuth authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              example:
+                status:
+                  code: 401
+                  message: "OAuth authentication failed"
+                  is_success: false
+                data: null
+                meta:
+                  timestamp: 1726652400000
+                  request_id: "550e8400-e29b-41d4-a716-446655440000"
+                  errors:
+                    - code: "AUTH_001"
+                      field: null
+                      message: "Invalid Google OAuth credentials"
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -97,6 +137,12 @@ paths:
         Returns new access and refresh tokens.
       operationId: refreshToken
       security: []
+      x-error-codes:
+        - VAL_002
+        - AUTH_002
+        - AUTH_003
+        - AUTH_004
+        - SRV_001
       requestBody:
         required: true
         content:
@@ -128,9 +174,43 @@ paths:
                     timestamp: 1726652400000
                     request_id: "550e8400-e29b-41d4-a716-446655440001"
         '400':
-          $ref: '#/components/responses/BadRequest'
+          description: Invalid refresh token format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              example:
+                status:
+                  code: 400
+                  message: "Invalid token format"
+                  is_success: false
+                data: null
+                meta:
+                  timestamp: 1726652400000
+                  request_id: "550e8400-e29b-41d4-a716-446655440000"
+                  errors:
+                    - code: "VAL_002"
+                      field: "refresh_token"
+                      message: "Invalid refresh token format"
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          description: Refresh token expired or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              example:
+                status:
+                  code: 401
+                  message: "Token expired"
+                  is_success: false
+                data: null
+                meta:
+                  timestamp: 1726652400000
+                  request_id: "550e8400-e29b-41d4-a716-446655440000"
+                  errors:
+                    - code: "AUTH_002"
+                      field: null
+                      message: "Refresh token has expired"
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -145,6 +225,9 @@ paths:
       operationId: logout
       security:
         - BearerAuth: []
+      x-error-codes:
+        - AUTH_006
+        - SRV_001
       responses:
         '200':
           description: Logout successful
@@ -177,6 +260,17 @@ paths:
       operationId: listTasks
       security:
         - BearerAuth: []
+      x-error-codes:
+        - VAL_002
+        - VAL_003
+        - VAL_008
+        - VAL_009
+        - AUTH_006
+        - RATE_001
+        - RATE_002
+        - DB_001
+        - DB_002
+        - SRV_001
       parameters:
         - name: status
           in: query
@@ -279,6 +373,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -292,6 +388,19 @@ paths:
       operationId: createTask
       security:
         - BearerAuth: []
+      x-error-codes:
+        - VAL_001
+        - VAL_002
+        - VAL_003
+        - VAL_004
+        - VAL_005
+        - VAL_008
+        - VAL_009
+        - AUTH_006
+        - DB_001
+        - DB_002
+        - DB_004
+        - SRV_001
       requestBody:
         required: true
         content:
@@ -330,6 +439,25 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: Task validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              example:
+                status:
+                  code: 422
+                  message: "Validation failed"
+                  is_success: false
+                data: null
+                meta:
+                  timestamp: 1726652400000
+                  request_id: "550e8400-e29b-41d4-a716-446655440000"
+                  errors:
+                    - code: "VAL_003"
+                      field: "priority"
+                      message: "Invalid priority value"
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -344,6 +472,14 @@ paths:
       operationId: getTask
       security:
         - BearerAuth: []
+      x-error-codes:
+        - VAL_007
+        - AUTH_006
+        - AUTHZ_003
+        - RES_001
+        - DB_001
+        - DB_002
+        - SRV_001
       parameters:
         - name: id
           in: path
@@ -381,7 +517,24 @@ paths:
                     timestamp: 1726652400000
                     request_id: "550e8400-e29b-41d4-a716-446655440001"
         '400':
-          $ref: '#/components/responses/BadRequest'
+          description: Invalid UUID format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              example:
+                status:
+                  code: 400
+                  message: "Invalid UUID format"
+                  is_success: false
+                data: null
+                meta:
+                  timestamp: 1726652400000
+                  request_id: "550e8400-e29b-41d4-a716-446655440000"
+                  errors:
+                    - code: "VAL_007"
+                      field: "id"
+                      message: "Invalid UUID format"
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -401,6 +554,20 @@ paths:
       operationId: updateTask
       security:
         - BearerAuth: []
+      x-error-codes:
+        - VAL_002
+        - VAL_003
+        - VAL_007
+        - VAL_008
+        - VAL_009
+        - AUTH_006
+        - AUTHZ_003
+        - RES_001
+        - RES_003
+        - DB_001
+        - DB_002
+        - DB_004
+        - SRV_001
       parameters:
         - name: id
           in: path
@@ -451,6 +618,25 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          description: Task conflict - concurrent modification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              example:
+                status:
+                  code: 409
+                  message: "Resource conflict"
+                  is_success: false
+                data: null
+                meta:
+                  timestamp: 1726652400000
+                  request_id: "550e8400-e29b-41d4-a716-446655440000"
+                  errors:
+                    - code: "RES_003"
+                      field: null
+                      message: "Task was modified by another user, please refresh and try again"
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -463,6 +649,14 @@ paths:
       operationId: deleteTask
       security:
         - BearerAuth: []
+      x-error-codes:
+        - VAL_007
+        - AUTH_006
+        - AUTHZ_003
+        - RES_001
+        - DB_001
+        - DB_002
+        - SRV_001
       parameters:
         - name: id
           in: path
@@ -488,7 +682,24 @@ paths:
                     timestamp: 1726652400000
                     request_id: "550e8400-e29b-41d4-a716-446655440001"
         '400':
-          $ref: '#/components/responses/BadRequest'
+          description: Invalid UUID format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              example:
+                status:
+                  code: 400
+                  message: "Invalid UUID format"
+                  is_success: false
+                data: null
+                meta:
+                  timestamp: 1726652400000
+                  request_id: "550e8400-e29b-41d4-a716-446655440000"
+                  errors:
+                    - code: "VAL_007"
+                      field: "id"
+                      message: "Invalid UUID format"
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -509,6 +720,15 @@ paths:
       operationId: syncTasks
       security:
         - BearerAuth: []
+      x-error-codes:
+        - VAL_002
+        - VAL_007
+        - AUTH_006
+        - RES_003
+        - DB_001
+        - DB_002
+        - DB_003
+        - SRV_001
       requestBody:
         required: true
         content:
@@ -553,9 +773,45 @@ paths:
                     timestamp: 1726652600000
                     request_id: "550e8400-e29b-41d4-a716-446655440001"
         '400':
-          $ref: '#/components/responses/BadRequest'
+          description: Invalid sync data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              example:
+                status:
+                  code: 400
+                  message: "Invalid sync data"
+                  is_success: false
+                data: null
+                meta:
+                  timestamp: 1726652400000
+                  request_id: "550e8400-e29b-41d4-a716-446655440000"
+                  errors:
+                    - code: "VAL_002"
+                      field: "changes"
+                      message: "Invalid sync changes format"
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Sync conflict detected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              example:
+                status:
+                  code: 409
+                  message: "Sync conflict"
+                  is_success: false
+                data: null
+                meta:
+                  timestamp: 1726652400000
+                  request_id: "550e8400-e29b-41d4-a716-446655440000"
+                  errors:
+                    - code: "RES_003"
+                      field: null
+                      message: "Unresolvable sync conflict detected"
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -570,6 +826,12 @@ paths:
       operationId: exportTasks
       security:
         - BearerAuth: []
+      x-error-codes:
+        - VAL_009
+        - AUTH_006
+        - DB_001
+        - DB_002
+        - SRV_001
       parameters:
         - name: format
           in: path
@@ -619,7 +881,24 @@ paths:
                 type: string
                 example: 'attachment; filename="tasks_export_20250919.json"'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          description: Invalid export format or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              example:
+                status:
+                  code: 400
+                  message: "Invalid export format"
+                  is_success: false
+                data: null
+                meta:
+                  timestamp: 1726652400000
+                  request_id: "550e8400-e29b-41d4-a716-446655440000"
+                  errors:
+                    - code: "VAL_009"
+                      field: "format"
+                      message: "Invalid export format, must be json, csv, or pdf"
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
@@ -636,6 +915,17 @@ paths:
       operationId: importTasks
       security:
         - BearerAuth: []
+      x-error-codes:
+        - VAL_002
+        - VAL_003
+        - VAL_008
+        - AUTH_006
+        - RES_002
+        - RES_004
+        - DB_001
+        - DB_002
+        - DB_004
+        - SRV_001
       requestBody:
         required: true
         content:
@@ -682,9 +972,45 @@ paths:
                     timestamp: 1726652400000
                     request_id: "550e8400-e29b-41d4-a716-446655440001"
         '400':
-          $ref: '#/components/responses/BadRequest'
+          description: Invalid file format or content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              example:
+                status:
+                  code: 400
+                  message: "Invalid file format"
+                  is_success: false
+                data: null
+                meta:
+                  timestamp: 1726652400000
+                  request_id: "550e8400-e29b-41d4-a716-446655440000"
+                  errors:
+                    - code: "VAL_002"
+                      field: "file"
+                      message: "Invalid file format, only JSON and CSV are supported"
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: File validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              example:
+                status:
+                  code: 422
+                  message: "File validation failed"
+                  is_success: false
+                data: null
+                meta:
+                  timestamp: 1726652400000
+                  request_id: "550e8400-e29b-41d4-a716-446655440000"
+                  errors:
+                    - code: "VAL_003"
+                      field: "due_date"
+                      message: "Invalid date format in row 5"
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -699,6 +1025,14 @@ paths:
       operationId: getPrioritizedTasks
       security:
         - BearerAuth: []
+      x-error-codes:
+        - VAL_002
+        - AUTH_006
+        - RATE_001
+        - RATE_002
+        - DB_001
+        - DB_002
+        - SRV_001
       parameters:
         - name: limit
           in: query
@@ -746,6 +1080,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -756,6 +1092,88 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: JWT token obtained from authentication endpoint
+
+  # Standard Error Codes (see error-codes.md for full documentation)
+  x-error-codes:
+    authentication:
+      - AUTH_001
+      - AUTH_002
+      - AUTH_003
+      - AUTH_004
+      - AUTH_005
+      - AUTH_006
+    authorization:
+      - AUTHZ_001
+      - AUTHZ_002
+      - AUTHZ_003
+    validation:
+      - VAL_001
+      - VAL_002
+      - VAL_003
+      - VAL_004
+      - VAL_005
+      - VAL_006
+      - VAL_007
+      - VAL_008
+      - VAL_009
+    resource:
+      - RES_001
+      - RES_002
+      - RES_003
+      - RES_004
+    database:
+      - DB_001
+      - DB_002
+      - DB_003
+      - DB_004
+    external_service:
+      - EXT_001
+      - EXT_002
+      - EXT_003
+    rate_limiting:
+      - RATE_001
+      - RATE_002
+    server:
+      - SRV_001
+      - SRV_002
+      - SRV_003
+
+  # Error Rate Tracking Configuration
+  x-error-tracking:
+    enabled: true
+    alert_thresholds:
+      critical:
+        rate: 100
+        window: "5 minutes"
+      warning:
+        rate: 50
+        window: "5 minutes"
+    monitored_codes:
+      critical:
+        - DB_001
+        - DB_002
+        - SRV_001
+        - EXT_001
+      warning:
+        - AUTH_002
+        - RATE_001
+        - RES_003
+    alert_channels:
+      - slack
+      - email
+      - pagerduty
+
+  # Migration Helpers (for breaking changes)
+  # Add migration hints when deprecating error codes, fields, or endpoints
+  x-migration-hints:
+    # Example (remove when not needed):
+    # VAL_010:
+    #   deprecated_since: "v2.0.0"
+    #   use_instead: "VAL_011"
+    #   migration_guide: "https://docs.example.com/migration/val-010-to-val-011"
+    #   reason: "VAL_010 was too generic, VAL_011 provides more specific validation"
+    #   breaking: true
+    #   auto_migration: false
 
   schemas:
     StandardResponse:
@@ -810,6 +1228,10 @@ components:
           format: uuid
           description: Unique identifier for request tracking
           example: "550e8400-e29b-41d4-a716-446655440001"
+        trace_id:
+          type: string
+          description: Distributed trace ID for debugging across services
+          example: "4bf92f3577b34da6a3ce929d0e0e4736"
         pagination:
           $ref: '#/components/schemas/PaginationMeta'
         errors:
@@ -817,6 +1239,8 @@ components:
           description: Error details (included in error responses)
           items:
             $ref: '#/components/schemas/ErrorDetail'
+        rate_limit:
+          $ref: '#/components/schemas/RateLimitMeta'
 
     PaginationMeta:
       type: object
@@ -843,20 +1267,111 @@ components:
           description: Total number of pages
           example: 5
 
+    RateLimitMeta:
+      type: object
+      required:
+        - limit
+        - remaining
+        - reset
+      properties:
+        limit:
+          type: integer
+          description: Rate limit (requests per time window)
+          example: 100
+        remaining:
+          type: integer
+          description: Remaining requests in current window
+          example: 0
+        reset:
+          type: integer
+          format: int64
+          description: Unix timestamp when rate limit resets
+          example: 1726653000
+
     ErrorDetail:
       type: object
       required:
+        - code
         - field
         - message
       properties:
+        code:
+          type: string
+          enum:
+            # Authentication Errors
+            - AUTH_001
+            - AUTH_002
+            - AUTH_003
+            - AUTH_004
+            - AUTH_005
+            - AUTH_006
+            # Authorization Errors
+            - AUTHZ_001
+            - AUTHZ_002
+            - AUTHZ_003
+            # Validation Errors
+            - VAL_001
+            - VAL_002
+            - VAL_003
+            - VAL_004
+            - VAL_005
+            - VAL_006
+            - VAL_007
+            - VAL_008
+            - VAL_009
+            # Resource Errors
+            - RES_001
+            - RES_002
+            - RES_003
+            - RES_004
+            # Database Errors
+            - DB_001
+            - DB_002
+            - DB_003
+            - DB_004
+            # External Service Errors
+            - EXT_001
+            - EXT_002
+            - EXT_003
+            # Rate Limiting Errors
+            - RATE_001
+            - RATE_002
+            # Server Errors
+            - SRV_001
+            - SRV_002
+            - SRV_003
+          description: Standardized error code (see error-codes.md)
+          example: "VAL_001"
         field:
           type: string
-          description: Field that caused the error
+          description: Field that caused the error (null if not field-specific)
           example: "title"
+          nullable: true
         message:
           type: string
-          description: Error message
+          description: Human-readable error message
           example: "Title is required"
+        context:
+          type: object
+          description: Additional error context for debugging (e.g., expected value, received value, constraints)
+          additionalProperties: true
+          example:
+            expected: "uuid"
+            received: "123"
+            constraints:
+              pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        nested_errors:
+          type: array
+          description: Nested error details for complex validation errors
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+          example:
+            - code: "VAL_001"
+              field: "items[0].title"
+              message: "Title is required"
+            - code: "VAL_007"
+              field: "items[1].user_id"
+              message: "Invalid UUID format"
 
     Task:
       type: object
@@ -1044,10 +1559,21 @@ components:
             data: null
             meta:
               timestamp: 1726652400000
-              request_id: "550e8400-e29b-41d4-a716-446655440001"
+              request_id: "550e8400-e29b-41d4-a716-446655440000"
+              trace_id: "4bf92f3577b34da6a3ce929d0e0e4736"
               errors:
-                - field: "title"
+                - code: "VAL_001"
+                  field: "title"
                   message: "Title is required"
+                  context:
+                    constraint: "required"
+                - code: "VAL_007"
+                  field: "user_id"
+                  message: "Invalid UUID format"
+                  context:
+                    expected: "uuid"
+                    received: "123"
+                    pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 
     Unauthorized:
       description: Unauthorized - authentication required or invalid
@@ -1058,12 +1584,19 @@ components:
           example:
             status:
               code: 401
-              message: "Unauthorized"
+              message: "Not authenticated"
               is_success: false
             data: null
             meta:
               timestamp: 1726652400000
-              request_id: "550e8400-e29b-41d4-a716-446655440001"
+              request_id: "550e8400-e29b-41d4-a716-446655440000"
+              trace_id: "4bf92f3577b34da6a3ce929d0e0e4736"
+              errors:
+                - code: "AUTH_006"
+                  field: null
+                  message: "Authentication required"
+                  context:
+                    auth_type: "Bearer"
 
     Forbidden:
       description: Forbidden - insufficient permissions
@@ -1079,7 +1612,16 @@ components:
             data: null
             meta:
               timestamp: 1726652400000
-              request_id: "550e8400-e29b-41d4-a716-446655440001"
+              request_id: "550e8400-e29b-41d4-a716-446655440000"
+              trace_id: "4bf92f3577b34da6a3ce929d0e0e4736"
+              errors:
+                - code: "AUTHZ_003"
+                  field: null
+                  message: "User does not own the resource"
+                  context:
+                    resource_type: "Task"
+                    resource_id: "550e8400-e29b-41d4-a716-446655440000"
+                    user_id: "550e8400-e29b-41d4-a716-446655440001"
 
     NotFound:
       description: Resource not found
@@ -1090,12 +1632,104 @@ components:
           example:
             status:
               code: 404
-              message: "Task not found"
+              message: "Resource not found"
               is_success: false
             data: null
             meta:
               timestamp: 1726652400000
-              request_id: "550e8400-e29b-41d4-a716-446655440001"
+              request_id: "550e8400-e29b-41d4-a716-446655440000"
+              trace_id: "4bf92f3577b34da6a3ce929d0e0e4736"
+              errors:
+                - code: "RES_001"
+                  field: "id"
+                  message: "Task with ID '123' not found"
+                  context:
+                    resource_type: "Task"
+                    resource_id: "123"
+
+    Conflict:
+      description: Resource conflict - duplicate or concurrency issue
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StandardResponse'
+          example:
+            status:
+              code: 409
+              message: "Resource conflict"
+              is_success: false
+            data: null
+            meta:
+              timestamp: 1726652400000
+              request_id: "550e8400-e29b-41d4-a716-446655440000"
+              trace_id: "4bf92f3577b34da6a3ce929d0e0e4736"
+              errors:
+                - code: "RES_002"
+                  field: "title"
+                  message: "Task with this title already exists"
+                  context:
+                    resource_type: "Task"
+                    field_value: "Complete project documentation"
+                    existing_id: "550e8400-e29b-41d4-a716-446655440002"
+
+    UnprocessableEntity:
+      description: Unprocessable entity - semantic validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StandardResponse'
+          example:
+            status:
+              code: 422
+              message: "Validation failed"
+              is_success: false
+            data: null
+            meta:
+              timestamp: 1726652400000
+              request_id: "550e8400-e29b-41d4-a716-446655440000"
+              trace_id: "4bf92f3577b34da6a3ce929d0e0e4736"
+              errors:
+                - code: "VAL_003"
+                  field: "priority"
+                  message: "Invalid priority value"
+                  context:
+                    expected: "low, medium, high, urgent"
+                    received: "critical"
+                  nested_errors:
+                    - code: "VAL_009"
+                      field: "tags[0]"
+                      message: "Invalid tag format"
+                      context:
+                        max_length: 50
+                        received_length: 60
+
+    RateLimitExceeded:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StandardResponse'
+          example:
+            status:
+              code: 429
+              message: "Rate limit exceeded"
+              is_success: false
+            data: null
+            meta:
+              timestamp: 1726652400000
+              request_id: "550e8400-e29b-41d4-a716-446655440000"
+              trace_id: "4bf92f3577b34da6a3ce929d0e0e4736"
+              errors:
+                - code: "RATE_001"
+                  field: null
+                  message: "Request rate limit exceeded (100 requests per minute)"
+                  context:
+                    limit: 100
+                    window: "1 minute"
+              rate_limit:
+                limit: 100
+                remaining: 0
+                reset: 1726653000
 
     InternalServerError:
       description: Internal server error
@@ -1111,4 +1745,36 @@ components:
             data: null
             meta:
               timestamp: 1726652400000
-              request_id: "550e8400-e29b-41d4-a716-446655440001"
+              request_id: "550e8400-e29b-41d4-a716-446655440000"
+              trace_id: "4bf92f3577b34da6a3ce929d0e0e4736"
+              errors:
+                - code: "SRV_001"
+                  field: null
+                  message: "An unexpected error occurred"
+                  context:
+                    error_type: "UnexpectedError"
+                    logged: true
+
+    ServiceUnavailable:
+      description: Service temporarily unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StandardResponse'
+          example:
+            status:
+              code: 503
+              message: "Service unavailable"
+              is_success: false
+            data: null
+            meta:
+              timestamp: 1726652400000
+              request_id: "550e8400-e29b-41d4-a716-446655440000"
+              trace_id: "4bf92f3577b34da6a3ce929d0e0e4736"
+              errors:
+                - code: "SRV_002"
+                  field: null
+                  message: "Service temporarily unavailable, please try again later"
+                  context:
+                    retry_after: 60
+                    reason: "maintenance"

@@ -38,6 +38,19 @@ docs/
 │   ├── API_VALIDATION.md               # API validation rules
 │   └── error-codes.md                  # Global error dictionary (Standardized error payloads)
 │
+├── /examples                           # CODE EXAMPLES (Reference implementations)
+│   ├── README.md                       # Examples overview and usage
+│   ├── /backend-implementation         # Backend Go implementation examples
+│   │   ├── entity-example.go           # Domain entity implementation
+│   │   ├── repository-example.go       # Repository interface definition
+│   │   └── handler-example.go          # HTTP handler implementation
+│   ├── /api-implementation             # API response helper implementations
+│   │   ├── go-response-helper.go      # Go response helper functions
+│   │   └── typescript-response-helper.ts  # TypeScript response helper functions
+│   └── /infrastructure                 # Infrastructure configuration examples
+│       ├── dockerfile.example         # Docker container configuration
+│       └── ci-cd-workflow.example     # CI/CD workflow configuration
+│
 ├── /adr                                # ARCHITECTURE DECISION RECORDS (Lightweight logs)
 │   ├── 0000-template.md                # Standard ADR template
 │   ├── 0001-record-architecture-decisions.md
@@ -64,6 +77,7 @@ docs/
 - [Product Requirements Document (PRD)](./prd.md) - Product requirements and specifications
 - [Local Setup Guide](./guides/local-setup.md) - Quick start development setup
 - [Credentials Guide](./CREDENTIALS_GUIDE.md) - Credentials and security management
+- [Implementation Tutorials](./guides/) - Step-by-step implementation guides
 
 ### Architecture (Macro)
 - [System Overview](./architecture/system-overview.md) - C4 Model Diagram (Context & Container)
@@ -90,6 +104,12 @@ docs/
 - [API Validation](./api-specs/API_VALIDATION.md) - API validation rules
 - [Error Codes](./api-specs/error-codes.md) - Global error dictionary
 
+### Code Examples
+- [Examples Overview](./examples/README.md) - Code examples overview and usage
+- [Backend Implementation](./examples/backend-implementation/) - Backend Go implementation examples
+- [API Implementation](./examples/api-implementation/) - API response helper implementations
+- [Infrastructure Examples](./examples/infrastructure/) - Docker and CI/CD configuration examples
+
 ### Architecture Decision Records (ADR)
 - [ADR Template](./adr/0000-template.md) - Standard ADR template
 - [Record Architecture Decisions](./adr/0001-record-architecture-decisions.md) - ADR adoption decision
@@ -100,6 +120,10 @@ docs/
 - [Local Setup](./guides/local-setup.md) - Step-by-step local environment setup
 - [Git Workflow](./guides/git-workflow.md) - Branch naming, conventional commits
 - [Release & Deployment](./guides/release-&-deployment.md) - Release checklists, rollback procedures
+
+### Implementation Tutorials
+- [Implementing Backend Entities](./guides/implementing-backend-entity.md) - How to implement domain entities
+- [Implementing API Handlers](./guides/implementing-api-handler.md) - How to implement HTTP handlers
 
 ### Legacy Documentation (to be migrated)
 - [Legacy TDD Documentation](./tdd/README.md) - Legacy technical design documentation
@@ -155,17 +179,20 @@ Documentation maintenance is part of the development process:
 ### Separation of Concerns
 
 - **Folder /architecture**: Only discusses what components are and why they were chosen
-- **Folder /backend-spec**: Discusses how the backend platform implements architecture internally
-- **Folder /frontend-spec**: Discusses how the frontend platform implements architecture internally
+- **Folder /backend-spec**: Discusses how the backend platform implements architecture internally (design decisions, no full implementation)
+- **Folder /frontend-spec**: Discusses how the frontend platform implements architecture internally (design decisions, no full implementation)
+- **Folder /examples**: Contains complete implementation examples for reference
+- **Folder /guides**: Operational procedures and onboarding tutorials
 
 ### Documentation Philosophy
 
 - **Architecture**: High-level design decisions and rationale
-- **Backend-spec**: Technical implementation details for backend
-- **Frontend-spec**: Technical implementation details for frontend
+- **Backend-spec**: Technical design details for backend (what and why, not full how)
+- **Frontend-spec**: Technical design details for frontend (what and why, not full how)
 - **API-specs**: Truth contracts for API (spec-driven development)
+- **Examples**: Complete implementation examples (reference code)
 - **ADR**: Lightweight logs of architecture decisions
-- **Guides**: Operation and onboarding procedures
+- **Guides**: Operation and onboarding procedures (step-by-step)
 
 ## References
 

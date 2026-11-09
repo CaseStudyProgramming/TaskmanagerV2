@@ -206,130 +206,9 @@ backend/
 - Document external dependencies
 - Update dependencies regularly
 
-### Example Code
+### Code Examples
 
-**Entity Example:**
-```go
-package task
-
-import (
-    "time"
-    "github.com/google/uuid"
-)
-
-type Task struct {
-    ID           string
-    UserID       string
-    Title        string
-    Description  string
-    Status       Status
-    Priority     Priority
-    DueDate      int64           // Epoch milliseconds
-    Tags         []string
-    CreatedAt    int64           // Epoch milliseconds
-    UpdatedAt    int64           // Epoch milliseconds
-    CompletedAt  *int64          // Epoch milliseconds (nullable)
-    PriorityScore int
-}
-
-func NewTask(userID, title string, priority Priority) (*Task, error) {
-    if title == "" {
-        return nil, ErrEmptyTitle
-    }
-
-    now := time.Now().UnixMilli()
-
-    return &Task{
-        ID:          uuid.New().String(),
-        UserID:      userID,
-        Title:       title,
-        Status:      StatusTodo,
-        Priority:    priority,
-        CreatedAt:   now,
-        UpdatedAt:   now,
-    }, nil
-}
-```
-
-**Repository Interface Example:**
-```go
-package task
-
-import "context"
-
-type Repository interface {
-    Create(ctx context.Context, task *Task) error
-    FindByID(ctx context.Context, id string) (*Task, error)
-    FindByUserID(ctx context.Context, userID string, filter Filter) ([]*Task, error)
-    Update(ctx context.Context, task *Task) error
-    Delete(ctx context.Context, id string) error
-}
-
-type Filter struct {
-    Status   Status
-    Priority Priority
-    Search   string
-    Limit    int
-    Offset   int
-}
-```
-
-**Handler Example:**
-```go
-package http
-
-import (
-    "encoding/json"
-    "net/http"
-
-    "github.com/go-chi/chi/v5"
-    "internal/application/task/command"
-    "internal/shared/response"
-)
-
-type TaskHandler struct {
-    createTaskHandler *command.CreateTaskHandler
-    getTaskHandler    *query.GetTaskHandler
-}
-
-func NewTaskHandler(
-    createTaskHandler *command.CreateTaskHandler,
-    getTaskHandler *query.GetTaskHandler,
-) *TaskHandler {
-    return &TaskHandler{
-        createTaskHandler: createTaskHandler,
-        getTaskHandler:    getTaskHandler,
-    }
-}
-
-func (h *TaskHandler) RegisterRoutes(r chi.Router) {
-    r.Route("/tasks", func(r chi.Router) {
-        r.Post("/", h.CreateTask)
-        r.Get("/{id}", h.GetTask)
-        r.Put("/{id}", h.UpdateTask)
-        r.Delete("/{id}", h.DeleteTask)
-    })
-}
-
-func (h *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
-    var cmd command.CreateTaskCommand
-    if err := json.NewDecoder(r.Body).Decode(&cmd); err != nil {
-        response.Error(w, http.StatusBadRequest, "Invalid request body")
-        return
-    }
-
-    userID := r.Context().Value("user_id").(string)
-    cmd.UserID = userID
-
-    task, err := h.createTaskHandler.Handle(r.Context(), cmd)
-    if err != nil {
-        response.Error(w, http.StatusInternalServerError, err.Error())
-        return
-    }
-
-    response.Success(w, task)
-}
-```
+For complete implementation examples, refer to the specific service design documents and database schema documentation.
 
 ---
 
@@ -351,64 +230,16 @@ func (h *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 - `DELETE`: Delete resources
 
 **Status Codes:**
-- `200 OK`: Successful GET, PUT, PATCH, DELETE
-- `201 Created`: Successful POST
-- `204 No Content`: Successful DELETE (no response body)
-- `400 Bad Request`: Invalid request
-- `401 Unauthorized`: Authentication required
-- `403 Forbidden`: Authorization failed
-- `404 Not Found`: Resource not found
-- `409 Conflict`: Resource conflict (duplicate, etc.)
-- `500 Internal Server Error`: Server error
+
+For complete HTTP status codes and error codes, refer to [Error Codes](../api-specs/error-codes.md).
 
 ### Standard Response Format
 
-All API responses MUST follow this standard format:
+All API responses MUST follow the standard response format defined in [API Specifications](../api-specs/standard-response-format.md).
 
-```json
-{
-  "status": {
-    "code": 200,
-    "message": "Success",
-    "is_success": true
-  },
-  "data": {
-    // Response data here
-  },
-  "meta": {
-    "timestamp": 1726652400000,
-    "request_id": "uuid-here",
-    "pagination": {
-      "page": 1,
-      "limit": 20,
-      "total": 100,
-      "total_pages": 5
-    }
-  }
-}
-```
-
-**Error Response Format:**
-```json
-{
-  "status": {
-    "code": 400,
-    "message": "Validation failed",
-    "is_success": false
-  },
-  "data": null,
-  "meta": {
-    "timestamp": 1726652400000,
-    "request_id": "uuid-here",
-    "errors": [
-      {
-        "field": "title",
-        "message": "Title is required"
-      }
-    ]
-  }
-}
-```
+For implementation examples, see:
+- [Go Response Helper](../examples/api-implementation/go-response-helper.go)
+- [TypeScript Response Helper](../examples/api-implementation/typescript-response-helper.ts)
 
 ---
 
@@ -463,23 +294,7 @@ All API responses MUST follow this standard format:
 
 ### Container Configuration
 
-**Dockerfile:**
-```dockerfile
-# Multi-stage build
-FROM golang:1.21-alpine AS builder
-WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o server ./cmd/api
-
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/
-COPY --from=builder /app/server .
-EXPOSE 8080
-CMD ["./server"]
-```
+Container configuration follows standard practices with Podman for production deployment.
 
 **Environment Variables:**
 - `DATABASE_URL`: PostgreSQL connection string
@@ -488,50 +303,6 @@ CMD ["./server"]
 - `GOOGLE_OAUTH_CLIENT_SECRET`: Google OAuth client secret
 - `JWT_SECRET`: JWT signing secret
 - `PORT`: Server port (default: 8080)
-
-### CI/CD Pipeline
-
-**Forgejo Actions Workflow:**
-```yaml
-name: CI
-
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.21'
-
-      - name: Build
-        run: go build -v ./...
-
-      - name: Test
-        run: go test -v -race -coverprofile=coverage.out ./...
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage.out
-
-      - name: Build Docker image
-        run: |
-          podman build -t ghcr.io/davidtan/taskmanager-backend:${{ github.sha }} ./backend
-
-      - name: Push to GHCR
-        run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | podman login ghcr.io -u davidtan --password-stdin
-          podman push ghcr.io/davidtan/taskmanager-backend:${{ github.sha }}
-```
 
 ---
 

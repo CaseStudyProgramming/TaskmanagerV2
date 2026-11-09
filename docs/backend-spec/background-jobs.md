@@ -45,60 +45,12 @@ This document describes the background job processing strategy, message broker c
 ### Job Queue Implementation
 
 **Channel-Based Queue:**
-```go
-package jobs
-
-import (
-    "context"
-    "sync"
-)
-
-type Job interface {
-    Execute(ctx context.Context) error
-}
-
-type JobQueue struct {
-    jobs chan Job
-    wg   sync.WaitGroup
-}
-
-func NewJobQueue(bufferSize int) *JobQueue {
-    return &JobQueue{
-        jobs: make(chan Job, bufferSize),
-    }
-}
-
-func (q *JobQueue) Start(ctx context.Context, workers int) {
-    for i := 0; i < workers; i++ {
-        q.wg.Add(1)
-        go q.worker(ctx)
-    }
-}
-
-func (q *JobQueue) worker(ctx context.Context) {
-    defer q.wg.Done()
-
-    for {
-        select {
-        case job := <-q.jobs:
-            if err := job.Execute(ctx); err != nil {
-                log.Printf("Job failed: %v", err)
-            }
-        case <-ctx.Done():
-            return
-        }
-    }
-}
-
-func (q *JobQueue) Enqueue(job Job) {
-    q.jobs <- job
-}
-
-func (q *JobQueue) Stop() {
-    close(q.jobs)
-    q.wg.Wait()
-}
-```
+- Job interface with Execute method
+- JobQueue struct with buffered channel and wait group
+- Worker goroutines process jobs from channel
+- Context-based shutdown
+- Enqueue method for adding jobs
+- Stop method for graceful shutdown
 
 ### Job Types
 
@@ -109,69 +61,10 @@ func (q *JobQueue) Stop() {
 **Schedule:** Daily at 2:00 AM UTC
 
 **Implementation:**
-```go
-package jobs
-
-import (
-    "context"
-    "time"
-    "internal/domain/task"
-    "internal/infrastructure/persistence/postgresql"
-)
-
-type RecalculatePriorityJob struct {
-    taskRepo task.Repository
-}
-
-func NewRecalculatePriorityJob(taskRepo task.Repository) *RecalculatePriorityJob {
-    return &RecalculatePriorityJob{taskRepo: taskRepo}
-}
-
-func (j *RecalculatePriorityJob) Execute(ctx context.Context) error {
-    // Get all active tasks
-    tasks, err := j.taskRepo.FindByUserID(ctx, "", task.Filter{
-        Status: task.StatusTodo,
-    })
-    if err != nil {
-        return err
-    }
-
-    // Recalculate priority scores
-    for _, t := range tasks {
-        t.PriorityScore = calculatePriorityScore(t)
-        if err := j.taskRepo.Update(ctx, t); err != nil {
-            log.Printf("Failed to update task %s: %v", t.ID, err)
-        }
-    }
-
-    return nil
-}
-
-func calculatePriorityScore(t *task.Task) int {
-    score := t.Priority.Weight()
-
-    // Add due date weight
-    if t.DueDate > 0 {
-        now := time.Now().UnixMilli()
-        daysUntilDue := (t.DueDate - now) / (24 * 60 * 60 * 1000)
-        if daysUntilDue > 0 {
-            score += int(50.0 / float64(daysUntilDue))
-        } else {
-            score += 50 // Overdue
-        }
-    }
-
-    // Add age weight (max 10)
-    age := (time.Now().UnixMilli() - t.CreatedAt) / (24 * 60 * 60 * 1000)
-    if age > 7 {
-        score += 10
-    } else {
-        score += int(age)
-    }
-
-    return score
-}
-```
+- Retrieve all active tasks from repository
+- Calculate priority score based on due date proximity, task age, and priority weight
+- Update tasks with new scores
+- Log failures for individual task updates
 
 #### Session Cleanup
 
@@ -180,36 +73,9 @@ func calculatePriorityScore(t *task.Task) int {
 **Schedule:** Hourly
 
 **Implementation:**
-```go
-package jobs
-
-import (
-    "context"
-    "time"
-    "internal/domain/auth"
-    "internal/infrastructure/persistence/postgresql"
-)
-
-type SessionCleanupJob struct {
-    sessionRepo auth.Repository
-}
-
-func NewSessionCleanupJob(sessionRepo auth.Repository) *SessionCleanupJob {
-    return &SessionCleanupJob{sessionRepo: sessionRepo}
-}
-
-func (j *SessionCleanupJob) Execute(ctx context.Context) error {
-    now := time.Now().UnixMilli()
-
-    // Delete expired sessions
-    err := j.sessionRepo.DeleteExpired(ctx, now)
-    if err != nil {
-        return err
-    }
-
-    return nil
-}
-```
+- Get current timestamp
+- Delete sessions with expires_at less than current timestamp
+- Return error if deletion fails
 
 #### Cache Warmup
 
@@ -218,46 +84,9 @@ func (j *SessionCleanupJob) Execute(ctx context.Context) error {
 **Schedule:** On application startup
 
 **Implementation:**
-```go
-package jobs
-
-import (
-    "context"
-    "internal/domain/task"
-    "internal/infrastructure/persistence/postgresql"
-    "internal/infrastructure/persistence/redis"
-)
-
-type CacheWarmupJob struct {
-    taskRepo  task.Repository
-    cacheRepo redis.Repository
-}
-
-func NewCacheWarmupJob(taskRepo task.Repository, cacheRepo redis.Repository) *CacheWarmupJob {
-    return &CacheWarmupJob{
-        taskRepo:  taskRepo,
-        cacheRepo: cacheRepo,
-    }
-}
-
-func (j *CacheWarmupJob) Execute(ctx context.Context) error {
-    // Get frequently accessed tasks
-    tasks, err := j.taskRepo.FindByUserID(ctx, "", task.Filter{
-        Limit: 100,
-    })
-    if err != nil {
-        return err
-    }
-
-    // Cache tasks
-    for _, task := range tasks {
-        cacheKey := fmt.Sprintf("task:%s", task.ID)
-        j.cacheRepo.Set(ctx, cacheKey, encodeTask(task), 1*time.Hour)
-    }
-
-    return nil
-}
-```
+- Retrieve frequently accessed tasks (limit 100)
+- Cache each task with appropriate TTL
+- Return error if retrieval or caching fails
 
 ---
 
@@ -268,33 +97,10 @@ func (j *CacheWarmupJob) Execute(ctx context.Context) error {
 **Package:** github.com/robfig/cron/v3
 
 **Configuration:**
-```go
-package main
-
-import (
-    "github.com/robfig/cron/v3"
-)
-
-func main() {
-    // Create cron scheduler
-    c := cron.New(cron.WithSeconds())
-
-    // Add jobs
-    c.AddFunc("0 0 2 * * *", func() {
-        jobQueue.Enqueue(recalculatePriorityJob)
-    })
-
-    c.AddFunc("0 0 * * * *", func() {
-        jobQueue.Enqueue(sessionCleanupJob)
-    })
-
-    // Start scheduler
-    c.Start()
-
-    // Run application
-    runApplication()
-}
-```
+- Create cron scheduler with seconds precision
+- Add job functions with cron expressions
+- Start scheduler in application initialization
+- Scheduler runs in background goroutine
 
 ### Cron Schedule Definitions
 
@@ -318,82 +124,11 @@ func main() {
 - Need distributed job processing
 
 **RabbitMQ Configuration:**
-```go
-package messaging
-
-import (
-    amqp "github.com/rabbitmq/amqp091-go"
-)
-
-type RabbitMQClient struct {
-    conn *amqp.Connection
-    ch   *amqp.Channel
-}
-
-func NewRabbitMQClient(url string) (*RabbitMQClient, error) {
-    conn, err := amqp.Dial(url)
-    if err != nil {
-        return nil, err
-    }
-
-    ch, err := conn.Channel()
-    if err != nil {
-        return nil, err
-    }
-
-    return &RabbitMQClient{conn: conn, ch: ch}, nil
-}
-
-func (c *RabbitMQClient) Publish(queue string, message []byte) error {
-    q, err := c.ch.QueueDeclare(
-        queue, // name
-        true,  // durable
-        false, // delete when unused
-        false, // exclusive
-        false, // no-wait
-        nil,   // arguments
-    )
-    if err != nil {
-        return err
-    }
-
-    return c.ch.PublishWithContext(
-        context.Background(),
-        "",     // exchange
-        q.Name, // routing key
-        false,  // mandatory
-        false,  // immediate
-        amqp.Publishing{
-            ContentType: "application/json",
-            Body:        message,
-        },
-    )
-}
-
-func (c *RabbitMQClient) Consume(queue string) (<-chan amqp.Delivery, error) {
-    q, err := c.ch.QueueDeclare(
-        queue, // name
-        true,  // durable
-        false, // delete when unused
-        false, // exclusive
-        false, // no-wait
-        nil,   // arguments
-    )
-    if err != nil {
-        return nil, err
-    }
-
-    return c.ch.Consume(
-        q.Name, // queue
-        "",     // consumer
-        false,  // auto-ack
-        false,  // exclusive
-        false,  // no-local
-        false,  // no-wait
-        nil,    // args
-    )
-}
-```
+- Connection and channel management
+- Queue declaration with durability
+- Message publishing with context
+- Message consumption with manual acknowledgment
+- Error handling for connection failures
 
 ### Kafka Integration (Future)
 
@@ -404,52 +139,10 @@ func (c *RabbitMQClient) Consume(queue string) (<-chan amqp.Delivery, error) {
 - Real-time data processing
 
 **Kafka Configuration:**
-```go
-package messaging
-
-import (
-    "github.com/segmentio/kafka-go"
-)
-
-type KafkaClient struct {
-    writer *kafka.Writer
-    reader *kafka.Reader
-}
-
-func NewKafkaClient(brokers []string, topic string) *KafkaClient {
-    writer := &kafka.Writer{
-        Addr:     kafka.TCP(brokers...),
-        Topic:   topic,
-        Balancer: &kafka.LeastBytes{},
-    }
-
-    reader := kafka.NewReader(kafka.ReaderConfig{
-        Brokers:  brokers,
-        Topic:    topic,
-        GroupID:  "taskmanager-group",
-        MinBytes: 10e3, // 10KB
-        MaxBytes: 10e6, // 10MB
-    })
-
-    return &KafkaClient{writer: writer, reader: reader}
-}
-
-func (c *KafkaClient) Publish(message []byte) error {
-    return c.writer.WriteMessages(context.Background(),
-        kafka.Message{
-            Value: message,
-        },
-    )
-}
-
-func (c *KafkaClient) Consume() ([]byte, error) {
-    m, err := c.reader.ReadMessage(context.Background())
-    if err != nil {
-        return nil, err
-    }
-    return m.Value, nil
-}
-```
+- Writer configuration with topic and balancer
+- Reader configuration with group ID and byte limits
+- Message publishing with context
+- Message consumption with error handling
 
 ---
 
@@ -458,34 +151,12 @@ func (c *KafkaClient) Consume() ([]byte, error) {
 ### Job Retry Strategy
 
 **Retry Configuration:**
-```go
-type JobConfig struct {
-    MaxRetries    int
-    RetryInterval time.Duration
-    BackoffFactor float64
-}
-
-func (j *JobQueue) ExecuteWithRetry(ctx context.Context, job Job, config JobConfig) error {
-    var lastErr error
-
-    for attempt := 0; attempt <= config.MaxRetries; attempt++ {
-        err := job.Execute(ctx)
-        if err == nil {
-            return nil
-        }
-
-        lastErr = err
-
-        if attempt < config.MaxRetries {
-            waitTime := time.Duration(float64(config.RetryInterval) * math.Pow(config.BackoffFactor, float64(attempt)))
-            log.Printf("Job failed (attempt %d/%d), retrying in %v: %v", attempt+1, config.MaxRetries, waitTime, err)
-            time.Sleep(waitTime)
-        }
-    }
-
-    return fmt.Errorf("job failed after %d attempts: %w", config.MaxRetries, lastErr)
-}
-```
+- Max retries count
+- Retry interval duration
+- Exponential backoff factor
+- Execute job with retry loop
+- Log retry attempts with wait time
+- Return final error after max retries
 
 ### Dead Letter Queue (Future)
 
@@ -495,27 +166,10 @@ func (j *JobQueue) ExecuteWithRetry(ctx context.Context, job Job, config JobConf
 - Need manual intervention
 
 **Dead Letter Queue Implementation:**
-```go
-type DeadLetterQueue struct {
-    jobs chan FailedJob
-}
-
-type FailedJob struct {
-    Job      Job
-    Error    error
-    Attempts int
-    Time     time.Time
-}
-
-func (dlq *DeadLetterQueue) Enqueue(job Job, err error, attempts int) {
-    dlq.jobs <- FailedJob{
-        Job:      job,
-        Error:    err,
-        Attempts: attempts,
-        Time:     time.Now(),
-    }
-}
-```
+- FailedJob struct with job, error, attempts, and timestamp
+- Channel-based queue for failed jobs
+- Enqueue method for adding failed jobs
+- Monitor and process failed jobs manually
 
 ---
 
@@ -530,62 +184,19 @@ func (dlq *DeadLetterQueue) Enqueue(job Job, err error, attempts int) {
 - Worker utilization
 
 **Prometheus Metrics (Future):**
-```go
-import "github.com/prometheus/client_golang/prometheus"
-
-var (
-    jobDuration = prometheus.NewHistogramVec(
-        prometheus.HistogramOpts{
-            Name: "job_duration_seconds",
-            Help: "Job execution duration in seconds",
-        },
-        []string{"job_type"},
-    )
-
-    jobSuccess = prometheus.NewCounterVec(
-        prometheus.CounterOpts{
-            Name: "job_success_total",
-            Help: "Total number of successful jobs",
-        },
-        []string{"job_type"},
-    )
-
-    jobFailure = prometheus.NewCounterVec(
-        prometheus.CounterOpts{
-            Name: "job_failure_total",
-            Help: "Total number of failed jobs",
-        },
-        []string{"job_type"},
-    )
-)
-```
+- Histogram for job duration by job type
+- Counter for successful jobs by job type
+- Counter for failed jobs by job type
+- Labels for job type categorization
 
 ### Logging
 
 **Job Execution Logs:**
-```go
-func (j *JobQueue) worker(ctx context.Context) {
-    defer j.wg.Done()
-
-    for {
-        select {
-        case job := <-q.jobs:
-            start := time.Now()
-            log.Printf("Starting job: %T", job)
-
-            if err := job.Execute(ctx); err != nil {
-                duration := time.Since(start)
-                log.Printf("Job failed after %v: %T - %v", duration, job, err)
-            } else {
-                duration := time.Since(start)
-                log.Printf("Job completed successfully in %v: %T", duration, job)
-            }
-        case <-ctx.Done():
-            return
-        }
-    }
-}
-```
+- Log job start with job type
+- Track execution duration
+- Log success or failure with duration
+- Log error details on failure
+- Log job type for troubleshooting
 
 ---
 

@@ -309,6 +309,107 @@ sequenceDiagram
 
 ---
 
+## Dependencies
+
+### Frontend Dependencies
+
+**Core Framework:**
+- sveltekit (TBD): Web framework for building Svelte applications
+- svelte (TBD): Reactive UI library
+- @sveltejs/adapter-cloudflare (TBD): Cloudflare Workers adapter for SvelteKit
+
+**TypeScript & Build:**
+- typescript (TBD): TypeScript compiler
+- vite (TBD): Build tool and dev server
+- @sveltejs/vite-plugin-svelte (TBD): Vite plugin for Svelte
+
+**Styling:**
+- tailwindcss (TBD): Utility-first CSS framework
+- autoprefixer (TBD): CSS autoprefixer
+
+**Validation:**
+- zod (TBD): Schema validation library
+
+**HTTP Client:**
+- ky (TBD): HTTP client for making API requests
+
+**State Management:**
+- svelte/store (TBD): Built-in state management
+
+**Utilities:**
+- date-fns (TBD): Date manipulation library
+- lodash (TBD): Utility library
+
+**Testing:**
+- @testing-library/svelte (TBD): Testing utilities for Svelte
+- vitest (TBD): Unit testing framework
+- @playwright/test (TBD): E2E testing framework
+
+### Backend Dependencies
+
+**Core Framework:**
+- chi (TBD): Lightweight HTTP router
+- net/http (Go stdlib): Standard library HTTP server
+
+**Database:**
+- sqlboiler (TBD): ORM for generating Go code from database schema
+- lib/pq (TBD): PostgreSQL driver for Go
+- pgx (TBD): Modern PostgreSQL driver (alternative to lib/pq)
+
+**Validation:**
+- go-playground/validator (TBD): Struct validation
+
+**Authentication:**
+- golang-jwt/jwt (TBD): JWT token generation and validation
+- golang.org/x/oauth2 (TBD): OAuth2 client implementation
+
+**Logging:**
+- sirupsen/logrus (TBD): Structured logging
+- zerolog (TBD): Zero-allocation JSON logger
+
+**Configuration:**
+- spf13/viper (TBD): Configuration management
+- godotenv (TBD): Environment variable loading
+
+**Testing:**
+- testify (TBD): Testing toolkit
+- golang.org/x/tools (TBD): Additional testing tools
+
+**Utilities:**
+- google/uuid (TBD): UUID generation
+- golang.org/x/crypto (TBD): Cryptographic functions
+
+### Infrastructure Dependencies
+
+**Containerization:**
+- docker (TBD): Container platform (development)
+- podman (TBD): Container runtime (production)
+- docker-compose (TBD): Multi-container orchestration
+
+**CI/CD:**
+- forgejo (TBD): Self-hosted Git platform with CI/CD
+- ghcr (TBD): GitHub Container Registry
+
+**Monitoring:**
+- grafana (TBD): Metrics visualization
+- prometheus (TBD): Metrics collection (optional)
+
+**Database:**
+- neon (TBD): Managed PostgreSQL service
+- upstash (TBD): Managed Redis service
+
+**DNS & CDN:**
+- cloudflare (TBD): DNS, CDN, and edge security
+
+**Cloud Infrastructure:**
+- oracle cloud infrastructure (OCI) (TBD): Cloud provider
+
+---
+
+## Non-Functional Requirements
+
+---
+
 ## Non-Functional Requirements
 
 ### Performance

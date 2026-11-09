@@ -133,15 +133,8 @@ For the current setup where the backend only listens on HTTP (port 8080) without
 Oracle-provided iptables rules block HTTP (port 80) and HTTPS (port 443) by default. After opening ports in OCI Security List/NSG, you must also add iptables rules on the instance.
 
 **Add iptables rules for HTTP/HTTPS:**
-```bash
-sudo iptables -I INPUT -p tcp --dport 80 -j ACCEPT
-sudo iptables -I INPUT -p tcp --dport 443 -j ACCEPT
-```
-
-**Make iptables rules persistent (survive reboot):**
-```bash
-sudo netfilter-persistent save
-```
+- Use iptables to allow ports 80 and 443
+- Ensure rules persist across reboots using netfilter-persistent
 
 **Why this is needed:**
 - OCI Security List controls VCN-level traffic
@@ -166,44 +159,20 @@ sudo netfilter-persistent save
 ### Development Setup
 
 **Windows/macOS (Docker Desktop)**
-```bash
-# Install Docker Desktop
-# Download from: https://www.docker.com/products/docker-desktop
-
-# Verify installation
-docker --version
-docker-compose --version
-
-# Start development environment
-docker-compose up -d
-```
+- Install Docker Desktop from official website
+- Verify installation with docker --version
+- Start development environment with docker-compose up -d
 
 **Linux (Docker - Recommended)**
-```bash
-# Install Docker
-curl -fsSL https://get.docker.com | sh
-sudo usermod -aG docker $USER
-
-# Verify installation
-docker --version
-docker-compose --version
-
-# Start development environment
-docker-compose up -d
-```
+- Install Docker using official script
+- Add user to docker group
+- Verify installation with docker --version
+- Start development environment with docker-compose up -d
 
 **Linux (Podman - Optional)**
-```bash
-# Install Podman
-sudo apt install podman podman-compose
-
-# Optional: Docker compatibility alias
-alias docker=podman
-alias docker-compose=podman-compose
-
-# Start development environment (same docker-compose.yml)
-docker-compose up -d
-```
+- Install Podman using package manager
+- Optional: Set Docker compatibility aliases
+- Use same docker-compose.yml with podman-compose
 
 **Important:** Both Docker and Podman use the same `Dockerfile` and `docker-compose.yml`. OCI standard ensures compatibility.
 
@@ -219,27 +188,11 @@ docker-compose up -d
 - **Reverse Proxy**: Nginx
 
 **Manual deployment to OCI Instance:**
-```bash
-# SSH into OCI Instance
-ssh user@oci-instance-ip
-
-# Pull latest image
-podman pull ghcr.io/davidtan/taskmanager-backend:latest
-
-# Stop old container
-podman stop taskmanager-backend
-podman rm taskmanager-backend
-
-# Start new container
-podman run -d \
-  --name taskmanager-backend \
-  -p 8080:8080 \
-  --restart unless-stopped \
-  ghcr.io/davidtan/taskmanager-backend:latest
-
-# Configure Nginx reverse proxy
-sudo systemctl reload nginx
-```
+- SSH into OCI instance
+- Pull latest image from GHCR
+- Stop and remove old container
+- Start new container with appropriate configuration
+- Configure Nginx reverse proxy
 
 ---
 
@@ -303,25 +256,9 @@ graph TB
 ### Forgejo Configuration
 
 **Forgejo Environment Variables (docker-compose.yml):**
-```yaml
-# Database Configuration
-FORGEJO__database__DB_TYPE=postgres
-FORGEJO__database__HOST=ep-broad-king-azlvkfiu.c-3.ap-southeast-1.aws.neon.tech
-FORGEJO__database__NAME=ci-forgejo-oci
-FORGEJO__database__USER=ci-forgejo-oci_owner
-FORGEJO__database__PASSWD=${FORGEJO_DATABASE_PASSWD}
-FORGEJO__database__SSL_MODE=require
-
-# Server Configuration
-FORGEJO__server__DOMAIN=ci.davidcps.my.id
-FORGEJO__server__ROOT_URL=https://ci.davidcps.my.id
-FORGEJO__server__SSH_DOMAIN=ci.davidcps.my.id
-FORGEJO__server__SSH_PORT=2222
-FORGEJO__server__HTTP_PORT=3000
-
-# Actions (CI/CD)
-FORGEJO__actions__ENABLED=true
-```
+- Database configuration with Neon PostgreSQL
+- Server configuration with domain and ports
+- Actions enabled for CI/CD
 
 **Forgejo Database:**
 - **Current**: Neon PostgreSQL (`ci-forgejo-oci` project)
