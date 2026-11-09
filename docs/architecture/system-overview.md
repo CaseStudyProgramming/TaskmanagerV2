@@ -68,7 +68,7 @@ graph TB
     subgraph "Infrastructure Layer"
         OCI[OCI Instance<br/>A1.Flex 2 OCPU 12GB]
         Forgejo[Forgejo CI/CD<br/>Self-hosted]
-        GHCR[GitHub Container Registry<br/>Image Registry]
+        OCIR[OCI Registry<br/>Image Registry]
     end
 
     Browser -->|HTTPS| CDN
@@ -82,8 +82,8 @@ graph TB
     PWA -->|Local Storage| IndexedDB
     Backend -->|File Links| VMStorage
     Backend -.->|Deploy| OCI
-    Forgejo -->|Build & Push| GHCR
-    OCI -->|Pull Images| GHCR
+    Forgejo -->|Build & Push| OCIR
+    OCI -->|Pull Images| OCIR
 ```
 
 ### Container Descriptions
@@ -103,7 +103,7 @@ graph TB
 | **VM Storage** | OCI VM Storage | 200GB storage for media files (videos, photos) |
 | **OCI Instance** | Podman + Debian 26 LTS | Production server with 2 OCPUs, 12GB RAM |
 | **Forgejo CI/CD** | Forgejo Actions | Self-hosted CI/CD pipeline |
-| **GitHub Container Registry** | GHCR | Container image registry |
+| **OCI Registry** | Container image registry | Artifact management (1-day retention, 3 last releases) |
 
 ---
 
@@ -304,7 +304,7 @@ sequenceDiagram
 - **Cache**: Upstash (Redis)
 - **CDN**: Cloudflare CDN
 - **CI/CD**: Forgejo (self-hosted)
-- **Container Registry**: GitHub Container Registry (GHCR)
+- **Container Registry**: OCI Registry
 - **Monitoring**: Grafana (Free tier)
 
 ---
@@ -388,7 +388,7 @@ sequenceDiagram
 
 **CI/CD:**
 - forgejo (TBD): Self-hosted Git platform with CI/CD
-- ghcr (TBD): GitHub Container Registry
+- ghcr (TBD): OCI Registry
 
 **Monitoring:**
 - grafana (TBD): Metrics visualization

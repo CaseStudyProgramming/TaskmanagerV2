@@ -120,7 +120,7 @@ git push origin your-branch
 **Forgejo CI/CD will:**
 - Build image from your code
 - Run tests
-- Push to GHCR (if passes)
+- Push to OCI Registry (if passes)
 - Deploy to production (if passes)
 
 
@@ -198,8 +198,8 @@ taskmanagerV2/
 
 **Important:** Regardless of whether you use Docker or Podman for development, CI/CD will work:
 
-- If you build with Docker → Image pushed to GHCR → CI/CD (Podman) can pull and run
-- If you build with Podman → Image pushed to GHCR → CI/CD (Podman) can pull and run
+- If you build with Docker → Image pushed to OCI Registry → CI/CD (Podman) can pull and run
+- If you build with Podman → Image pushed to OCI Registry → CI/CD (Podman) can pull and run
 
 **Docker and Podman use the same image format (OCI compliant).**
 

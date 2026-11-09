@@ -1,6 +1,6 @@
 # ADR 0002: Technology Stack Selection
 
-**Status**: Accepted
+**Status**: Superseded by ADR 0004 (SSL/TLS mode) and ADR 0005 (Container Registry)
 
 **Date**: 2026-11-09
 
@@ -141,3 +141,25 @@ We evaluated multiple technology options across frontend, backend, database, and
 - [Go Documentation](https://go.dev/doc/)
 - [Neon Documentation](https://neon.tech/docs)
 - [Upstash Documentation](https://upstash.com/docs)
+
+## Superseded By
+
+This ADR is partially superseded by:
+
+1. [ADR 0004: Upgrade to Cloudflare Full Strict SSL/TLS Mode](./0004-upgrade-to-cloudflare-full-strict-ssl.md)
+2. [ADR 0005: Migrate to OCI Container Registry](./0005-migrate-to-oci-container-registry.md)
+
+**What Changed (ADR 0004):**
+- **SSL/TLS Mode**: Changed from Cloudflare Flexible to Full (strict)
+- **Reason**: Let's Encrypt wildcard certificate now installed on OCI instance
+- **Impact**: End-to-end encryption from browser to origin
+
+**What Changed (ADR 0005):**
+- **Container Registry**: Changed from GitHub Container Registry (GHCR) to OCI Registry
+- **Reason**: Better integration with OCI ecosystem and artifact management
+- **Impact**: Updated CI/CD pipeline, deployment scripts, and documentation
+
+**What Remains Valid:**
+- All other technology stack decisions (frontend, backend, database, cache, deployment platform)
+- Infrastructure choices remain unchanged
+- Only SSL/TLS configuration and container registry were updated

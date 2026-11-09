@@ -30,9 +30,9 @@ jobs:
 
       - name: Build Docker image
         run: |
-          podman build -t ghcr.io/davidtan/taskmanager-backend:${{ github.sha }} ./backend
+          podman build -t ocir.io/tenancy-namespace/taskmanager-backend:${{ github.sha }} ./backend
 
-      - name: Push to GHCR
+      - name: Push to OCI Registry
         run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | podman login ghcr.io -u davidtan --password-stdin
-          podman push ghcr.io/davidtan/taskmanager-backend:${{ github.sha }}
+          echo ${{ secrets.OCI_AUTH_TOKEN }} | podman login ocir.io -u tenancy-namespace --password-stdin
+          podman push ocir.io/tenancy-namespace/taskmanager-backend:${{ github.sha }}

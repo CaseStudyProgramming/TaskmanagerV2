@@ -43,7 +43,7 @@ graph TB
 
     subgraph "CI/CD Infrastructure"
         Forgejo[Forgejo<br/>Self-hosted CI/CD]
-        GHCR[GitHub Container Registry<br/>Image Registry]
+        OCI Registry[OCI Registry<br/>Image Registry]
     end
 
     CDN -->|Static Assets| Workers
@@ -56,8 +56,8 @@ graph TB
     Instance -->|SQL| NeonProd
     Instance -->|SQL (Tests)| NeonTest
     Instance -->|Cache| Redis
-    Forgejo -->|Build & Push| GHCR
-    Instance -->|Pull Images| GHCR
+    Forgejo -->|Build & Push| OCI Registry
+    Instance -->|Pull Images| OCI Registry
 ```
 
 ### Infrastructure Components
@@ -70,7 +70,7 @@ graph TB
 | **Cache** | Upstash Redis | Global edge cache | Application caching |
 | **Media Storage** | OCI VM Storage | 200GB attached storage | Video, photo, media files |
 | **CI/CD** | Forgejo (Self-hosted) | On OCI instance | Build, test, deploy pipeline |
-| **Container Registry** | GitHub Container Registry | Integrated with GitHub | Docker image storage |
+| **Container Registry** | OCI Registry | Integrated with GitHub | Docker image storage |
 | **DNS** | Cloudflare DNS | Dynamic DNS support | Domain resolution |
 
 ---
@@ -107,19 +107,24 @@ graph LR
 
 ### SSL/TLS Configuration
 
-**Important: Cloudflare SSL/TLS Mode for HTTP-Only Servers**
+**Important: Cloudflare SSL/TLS Mode - Full Strict**
 
-For the current setup where the backend only listens on HTTP (port 8080) without SSL certificate:
-
-- **SSL/TLS Mode**: Flexible
+**Current Configuration:**
+- **SSL/TLS Mode**: Full (strict)
 - **Browser → Cloudflare**: HTTPS (encrypted)
-- **Cloudflare → Origin**: HTTP (unencrypted, trusted via Cloudflare)
+- **Cloudflare → Origin**: HTTPS (encrypted)
+- **SSL Certificate**: Let's Encrypt wildcard for `*.davidcps.my.id` and `davidcps.my.id`
+- **Certificate Location**: `/etc/letsencrypt/live/davidcps.my.id/fullchain.pem`
+- **Certificate Validity**: Valid until 2027-02-04 (auto-renewal via certbot)
+- **Nginx SSL termination**: Port 443 with SSL certificate
+- **HTTP redirect**: Port 80 redirects to HTTPS
 
-**Why Flexible Mode?**
-- Backend server has no SSL certificate
-- Cloudflare handles SSL termination
-- Cloudflare → Origin traffic is trusted (no direct public access)
-- Future upgrade to Full/Full (strict) mode when SSL certificate is implemented
+**Why Full Strict Mode?**
+- End-to-end encryption (browser → Cloudflare → origin)
+- Server must have valid SSL certificate for handshake with Cloudflare
+- SSL certificate installed on OCI instance (Nginx container)
+- Nginx handles SSL termination and proxies to backend (HTTP 8080)
+- Maximum security for production deployment
 
 **SSL Certificate Future Plan:**
 - Install Let's Encrypt wildcard certificate on OCI instance
@@ -154,7 +159,7 @@ Oracle-provided iptables rules block HTTP (port 80) and HTTPS (port 443) by defa
 | **Development (Linux)** | Docker or Podman | Flexibility for team preference |
 | **CI/CD (Forgejo Actions)** | Podman | Consistent with production (OCI) |
 | **Production** | OCI Instance (Podman) | Self-managed container runtime |
-| **Registry** | GHCR | Integrated with GitHub, no signup needed |
+| **Registry** | OCI Registry | Integrated with GitHub, no signup needed |
 
 ### Development Setup
 
@@ -180,7 +185,7 @@ Oracle-provided iptables rules block HTTP (port 80) and HTTPS (port 443) by defa
 
 **OCI Instance Configuration**
 
-- **Image Source**: GitHub Container Registry
+- **Image Source**: OCI Registry
 - **Image**: `ghcr.io/davidtan/taskmanager-backend:latest`
 - **Authentication**: GitHub username + PAT or OCI credentials
 - **Instance Type**: A1.Flex - 2 OCPUs, 12 GB RAM
@@ -189,7 +194,7 @@ Oracle-provided iptables rules block HTTP (port 80) and HTTPS (port 443) by defa
 
 **Manual deployment to OCI Instance:**
 - SSH into OCI instance
-- Pull latest image from GHCR
+- Pull latest image from OCI Registry
 - Stop and remove old container
 - Start new container with appropriate configuration
 - Configure Nginx reverse proxy
@@ -208,7 +213,7 @@ graph TB
     Runner[Forgejo Runner<br/>Podman]
     Build[Build Stage<br/>Docker Build]
     Test[Test Stage<br/>Unit & Integration Tests]
-    Push[Push Stage<br/>GHCR Registry]
+    Push[Push Stage<br/>OCI Registry Registry]
     Deploy[Deploy Stage<br/>Manual to OCI]
 
     GitHub -->|Mirror| Mirror
@@ -242,14 +247,14 @@ graph TB
    - Enforce coverage thresholds
 
 3. **Push Stage**
-   - Login to GitHub Container Registry (GHCR)
-   - Push image to GHCR with SHA tag
-   - Push image to GHCR with latest tag (if main branch)
+   - Login to OCI Registry (OCI Registry)
+   - Push image to OCI Registry with SHA tag
+   - Push image to OCI Registry with latest tag (if main branch)
 
 4. **Deploy Stage**
    - Manual trigger (not automatic)
    - SSH to OCI instance
-   - Pull latest image from GHCR
+   - Pull latest image from OCI Registry
    - Restart container with Podman
    - Verify deployment health
 
@@ -392,7 +397,7 @@ cp /backup/.env.production /home/ubuntu/apps/taskmanager/.env.production
 **Application Failover:**
 1. Monitor health endpoint: `GET /health`
 2. If unhealthy, restart container via Podman
-3. If container fails, pull latest image from GHCR
+3. If container fails, pull latest image from OCI Registry
 4. If image fails, rollback to previous image tag
 5. If server fails, create new OCI instance and restore from backups
 

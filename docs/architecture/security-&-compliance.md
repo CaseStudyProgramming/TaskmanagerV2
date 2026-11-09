@@ -157,10 +157,19 @@ sequenceDiagram
 - Media Storage: OCI VM Storage (disk encryption enabled)
 
 **Encryption in Transit:**
-- Frontend → Backend: TLS 1.3 (Cloudflare Flexible mode)
+- Frontend → Backend: TLS 1.3 (Cloudflare Full Strict mode)
 - Backend → Database: TLS 1.3 (Neon PostgreSQL)
 - Backend → Cache: TLS 1.3 (Upstash Redis)
 - API → Google OAuth: TLS 1.3
+
+**SSL Certificate Configuration:**
+- Provider: Let's Encrypt (certbot + Cloudflare DNS plugin)
+- Type: ECDSA wildcard certificate
+- Domains: `*.davidcps.my.id` and `davidcps.my.id`
+- Location: `/etc/letsencrypt/live/davidcps.my.id/`
+- Validity: Auto-renewal via certbot systemd timer
+- Nginx SSL termination on port 443
+- HTTP (port 80) redirects to HTTPS
 
 ### Data Classification
 

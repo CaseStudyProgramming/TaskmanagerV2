@@ -76,7 +76,7 @@ cd /home/ubuntu/apps/taskmanager
 git pull origin main
 
 # Pull latest image
-podman pull ghcr.io/davidtan/taskmanager-backend:v1.0.0-rc.1
+podman pull ocir.io/tenancy-namespace/taskmanager-backend:v1.0.0-rc.1
 
 # Restart container
 podman stop taskmanager-backend
@@ -86,7 +86,7 @@ podman run -d \
   -p 8080:8080 \
   --restart unless-stopped \
   --env-file .env.staging \
-  ghcr.io/davidtan/taskmanager-backend:v1.0.0-rc.1
+  ocir.io/tenancy-namespace/taskmanager-backend:v1.0.0-rc.1
 ```
 
 4. **Run database migrations:**
@@ -147,7 +147,7 @@ cd /home/ubuntu/apps/taskmanager
 git pull origin main
 
 # Pull latest image
-podman pull ghcr.io/davidtan/taskmanager-backend:v1.0.0
+podman pull ocir.io/tenancy-namespace/taskmanager-backend:v1.0.0
 
 # Stop old container
 podman stop taskmanager-backend
@@ -159,7 +159,7 @@ podman run -d \
   -p 8080:8080 \
   --restart unless-stopped \
   --env-file .env.production \
-  ghcr.io/davidtan/taskmanager-backend:v1.0.0
+  ocir.io/tenancy-namespace/taskmanager-backend:v1.0.0
 
 # Reload Nginx
 sudo systemctl reload nginx
@@ -229,7 +229,7 @@ podman stop taskmanager-backend
 podman rm taskmanager-backend
 
 # 2. Pull previous image
-podman pull ghcr.io/davidtan/taskmanager-backend:v0.9.0
+podman pull ocir.io/tenancy-namespace/taskmanager-backend:v0.9.0
 
 # 3. Start previous container
 podman run -d \
@@ -237,7 +237,7 @@ podman run -d \
   -p 8080:8080 \
   --restart unless-stopped \
   --env-file .env.production \
-  ghcr.io/davidtan/taskmanager-backend:v0.9.0
+  ocir.io/tenancy-namespace/taskmanager-backend:v0.9.0
 
 # 4. Verify rollback
 curl http://localhost:8080/health

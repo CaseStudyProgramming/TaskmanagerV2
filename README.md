@@ -54,7 +54,7 @@ bun run dev
 - **Development**: Docker (Windows/macOS) or Podman (Linux optional)
 - **CI/CD**: Docker (GitHub Actions native support)
 - **Production**: PaaS (Koyeb, Vercel, Supabase, Upstash)
-- **Registry**: GitHub Container Registry (GHCR)
+- **Registry**: OCI Registry
 
 See [Container Strategy](docs/architecture/container-strategy.md) for details.
 
@@ -124,7 +124,7 @@ See [Container Strategy](docs/architecture/container-strategy.md) for details.
 - **Integration Tests**: Database integration tests
 - **E2E Tests**: Playwright
 - **Security Scan**: Snyk, gitleaks
-- **Build & Push**: Docker to GHCR
+- **Build & Push**: Docker to OCI Registry
 
 See [GitHub Actions Configuration](docs/ci-cd/github-actions.md) for details.
 
@@ -160,7 +160,7 @@ go test ./... -short
 
 ### Production Deployment
 
-1. **CI/CD** builds and pushes to GHCR
+1. **CI/CD** builds and pushes to OCI Registry
 2. **Koyeb** pulls latest image and deploys
 3. **Vercel** builds frontend from Git
 4. **Supabase/Upstash** managed services

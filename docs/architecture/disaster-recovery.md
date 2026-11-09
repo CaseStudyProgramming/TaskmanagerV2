@@ -21,7 +21,7 @@ This document defines the disaster recovery strategy, RTO/RPO targets, backup pr
 | **Database (Neon)** | 1 hour | 5 minutes | Point-in-time recovery |
 | **Cache (Upstash)** | 15 minutes | 0 minutes | Replication (automatic) |
 | **Media Storage (VM)** | 4 hours | 24 hours | Weekly backups to Object Storage |
-| **Application (OCI)** | 2 hours | 0 minutes | Container images in GHCR |
+| **Application (OCI)** | 2 hours | 0 minutes | Container images in OCI Registry (3 last releases) |
 | **Configuration** | 1 hour | 0 minutes | Version control + backups |
 | **DNS (Cloudflare)** | 5 minutes | 0 minutes | DDNS + manual override |
 
@@ -199,7 +199,7 @@ SELECT * FROM tasks ORDER BY created_at DESC LIMIT 10;
 **Use Case:** Docker image is corrupted or not working.
 
 **Steps:**
-- Pull latest image from GHCR
+- Pull latest image from OCI Registry
 - If latest is corrupted, pull previous tag
 - Rebuild from source if needed
 - Stop and remove old container
@@ -216,7 +216,7 @@ SELECT * FROM tasks ORDER BY created_at DESC LIMIT 10;
 - Clone repository from GitHub
 - Restore .env.production from backup using OCI CLI
 - Restore Nginx configuration from backup
-- Pull image from GHCR
+- Pull image from OCI Registry
 - Start container with Podman
 - Restore media storage from backup
 - Update DNS if IP changed (DDNS or manual)
@@ -324,16 +324,16 @@ podman run -d \
   -p 8080:8080 \
   --restart unless-stopped \
   --env-file .env.production \
-  ghcr.io/davidtan/taskmanager-backend:latest
+  ocir.io/tenancy-namespace/taskmanager-backend:latest
 
 # 6. If image is corrupted, pull previous tag
-podman pull ghcr.io/davidtan/taskmanager-backend:main-abc123def
+podman pull ocir.io/tenancy-namespace/taskmanager-backend:main-abc123def
 podman run -d \
   --name taskmanager-backend \
   -p 8080:8080 \
   --restart unless-stopped \
   --env-file .env.production \
-  ghcr.io/davidtan/taskmanager-backend:main-abc123def
+  ocir.io/tenancy-namespace/taskmanager-backend:main-abc123def
 
 # 7. If all images fail, rebuild from source
 cd /home/ubuntu/apps/taskmanager

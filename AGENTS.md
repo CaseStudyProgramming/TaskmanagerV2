@@ -120,11 +120,11 @@ ssh -i /home/davidtan/_Workspaces/_Catatan_WSL/SSH-KEY/ssh-key-2026-10-21.key ub
 - iptables controls OS-level traffic on the instance
 - All three layers must allow the port for traffic to pass through
 
-### Cloudflare SSL/TLS Mode for HTTP-Only Servers
+### Cloudflare SSL/TLS Mode - Full Strict
 
-**Important: Match SSL/TLS mode with server configuration**
+**Important: Server requires SSL certificate for Full Strict mode**
 
-If your server only listens on HTTP (port 80) without SSL certificate, you must set Cloudflare SSL/TLS mode to **Flexible**.
+Cloudflare SSL/TLS mode is set to **Full (strict)** for end-to-end encryption.
 
 **SSL/TLS modes:**
 - **Flexible**: Browser → Cloudflare (HTTPS), Cloudflare → Origin (HTTP)
@@ -136,9 +136,13 @@ If your server only listens on HTTP (port 80) without SSL certificate, you must 
   - Use when: Server has valid SSL certificate matching domain
   - Will fail if server has no SSL or self-signed cert
 
-**For HTTP-only servers (like current setup):**
-- Set SSL/TLS mode to **Flexible**
-- Otherwise Cloudflare will return error 521 (origin unreachable)
+**Current setup (Full Strict):**
+- Let's Encrypt wildcard certificate installed on OCI instance
+- Certificate: `*.davidcps.my.id` and `davidcps.my.id`
+- Valid until 2027-02-04 (auto-renewal via certbot)
+- Nginx handles SSL termination on port 443
+- HTTP (port 80) redirects to HTTPS
+- Backend container listens on HTTP (8080) internally
 
 ### DDNS (Dynamic DNS) with Cloudflare
 
