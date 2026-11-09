@@ -26,6 +26,7 @@ See [architecture/adr/README.md](./adr/README.md) for system architecture ADRs.
 - [Infrastructure & Network](./infrastructure-&-network.md) - Cloud topology, VPC, CDN, CI/CD
 - [Security & Compliance](./security-&-compliance.md) - Auth strategy, encryption, GDPR/ISO
 - [Disaster Recovery](./disaster-recovery.md) - RTO/RPO, backup strategies, failover
+- [Dependency Versions](./dependencies.md) - Complete dependency version specifications
 
 ## Related Documentation
 

@@ -283,6 +283,8 @@ For implementation examples, see:
 - Run in CI/CD pipeline
 - Include smoke tests
 
+For detailed testing guidelines for Go backend, see [Testing Strategy (Go)](./testing-strategy-go.md).
+
 ### Security Standards
 
 - OWASP Top 10 compliance
@@ -317,4 +319,7 @@ Container configuration follows standard practices with Podman for production de
 - [Database Schema](./database-schema.md) - Database design and migrations
 - [Background Jobs](./background-jobs.md) - Async processing and cron jobs
 - [API Specifications](../api-specs/openapi.yaml) - Complete API contract
+- [Testing Strategy (Go)](./testing-strategy-go.md) - Go-specific testing guidelines
+- [Testing Strategy (Rust)](./testing-strategy-rust.md) - Rust-specific testing guidelines
+- [Testing Strategy (Bun/Node.js)](./testing-strategy-bun.md) - Bun/Node.js/TypeScript testing guidelines
 - [Backend Quality & Reliability](../tdd/quality-reliability/backend-quality-reliability.md) - Quality requirements

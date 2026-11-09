@@ -1,0 +1,657 @@
+# Dependency Versions
+
+This document tracks the exact dependency versions used in the Advanced Task Manager project. This is the single source of truth for all version requirements.
+
+**Important**: When adding or updating dependencies, this file MUST be updated accordingly.
+
+---
+
+## Frontend Dependencies
+
+### Core Framework & Language
+
+**TypeScript**
+- version: 7.0.2
+- purpose: Type-safe JavaScript
+- doc link: https://github.com/microsoft/TypeScript/releases
+
+**SvelteKit**
+- version: @sveltejs/kit@2.70.3
+- purpose: Web framework
+- doc link: https://github.com/sveltejs/kit
+
+**Svelte**
+- version: svelte@5.57.1
+- purpose: Web framework
+- doc link: https://github.com/sveltejs/svelte
+
+**Vite**
+- version: 8.3.0
+- purpose: Build tool and dev server
+- doc link: https://vite.dev/releases
+
+### Package Manager & Runtime
+
+**bun**
+- version: ^1.4.2
+- purpose: JavaScript runtime and package manager for frontend (TypeScript/JavaScript)
+- doc link: https://github.com/oven-sh/bun
+- note: Bun is the JavaScript runtime for frontend only - not for backend
+
+**Node.js** (Optional, for compatibility)
+- version: v24.20.0
+- purpose: JavaScript runtime (optional, only for tools that require Node.js specifically)
+- doc link: https://nodejs.org/en/download
+- note: Optional fallback for tools that don't support Bun yet
+
+### Styling
+
+**Tailwind CSS**
+- version: ^4.3.3
+- purpose: Utility-first CSS framework
+- doc link: https://github.com/tailwindlabs/tailwindcss/releases
+
+**@tailwindcss/vite**
+- version: ^4.3.3
+- purpose: Tailwind CSS Vite plugin
+- doc link: https://tailwindcss.com/docs/installation/using-postcss
+
+
+### Validation & Schema
+
+**Zod**
+- version: 4.6.5 
+- purpose: Schema validation and type inference
+- doc link: https://github.com/colinhacks/zod/releases
+
+### Code Quality
+
+**@biomejs/biome**
+- version: 2.5.14
+- purpose: Biome CLI tool
+- doc link: https://github.com/biomejs/biome/releases
+
+**@lhci/cli**
+- version: ^0.15.1
+- purpose: Lighthouse CI for frontend performance testing
+- doc link: https://github.com/GoogleChrome/lighthouse-ci
+
+### Testing
+
+**Vitest**
+- version: 5.0.1 
+- purpose: Unit testing framework
+- doc link: https://github.com/vitest-dev/vitest
+
+**@testing-library/svelte**
+- version: 5.4.2
+- purpose: Component testing utilities
+- doc link: https://github.com/testing-library/svelte-testing-library
+
+**@testing-library/jest-dom**
+- version: v7.0.1
+- purpose: Custom Jest matchers
+- doc link: https://github.com/testing-library/jest-dom
+
+**Playwright**
+- version: 1.63.0 
+- purpose: E2E testing framework
+- doc link: https://github.com/microsoft/playwright/releases
+
+**@playwright/test**
+- version: ^1.63.0
+- purpose: Playwright test runner
+- doc link: https://github.com/microsoft/playwright
+
+### Build & Development Tools
+
+**svelte-preprocess**
+- version: ^6.0.5
+- purpose: Svelte preprocessor for TypeScript/PostCSS
+- doc link: https://github.com/sveltejs/svelte-preprocess
+
+**@sveltejs/vite-plugin-svelte**
+- version: ^7.1.2
+- purpose: Vite plugin for Svelte
+- doc link: https://github.com/sveltejs/vite-plugin-svelte
+
+**svelte-check**
+- version: ^4.6.0
+- purpose: Type checking for Svelte components
+- doc link: https://github.com/sveltejs/language-tools
+
+**@sveltejs/adapter-auto**
+- version: ^7.0.1
+- purpose: Automatic adapter selection for deployment
+- doc link: https://svelte.dev/docs/adapter-auto
+
+**@sveltejs/adapter-cloudflare**
+- version: latest
+- purpose: Cloudflare Workers edge deployment adapter
+- doc link: https://developers.cloudflare.com/pages/framework-guides/deploy-a-sveltekit-site
+
+**@sveltejs/adapter-static**
+- version: ^3.0.10
+- purpose: Static site generation adapter
+- doc link: https://svelte-changelog.dev/package/@sveltejs/adapter-static
+
+**@sveltejs/adapter-vercel**
+- version: 6.3.4
+- purpose: Vercel deployment adapter (alternative deployment option)
+- doc link: https://svelte.dev/docs/adapter-vercel
+
+### API & HTTP
+
+**Fetch API**
+- version: Built-in
+- purpose: Native browser API for HTTP requests
+- doc link: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
+
+### Offline & Storage
+
+**idb**
+- version: ^8.0.3
+- purpose: IndexedDB wrapper for offline storage
+- doc link: https://www.npmjs.com/package/idb
+
+**workbox-window**
+- version: v7.4.1
+- purpose: Service worker registration
+- doc link: https://github.com/GoogleChrome/workbox
+
+### Utilities
+
+**date-fns**
+- version: ^4.4.0
+- purpose: Date manipulation utilities
+- doc link: https://github.com/date-fns/date-fns
+
+**clsx**
+- version: ^2.1.1
+- purpose: Conditional className utility
+- doc link: https://github.com/lukeed/clsx
+
+---
+
+## Backend Dependencies
+
+### Core Language & Framework
+
+**Go**
+- version: 1.27+
+- purpose: Programming language
+- doc link: https://go.dev/dl/
+
+**Chi**
+- version: ^5.1.0
+- purpose: Idiomatic HTTP router
+- doc link: https://github.com/go-chi/chi
+
+**Standard Library**
+- version: Go 1.25+
+- purpose: Built-in packages (crypto, http, etc.)
+- doc link: https://pkg.go.dev/std
+
+### ORM & Database
+
+**SQLBoiler**
+- version: ^4.17.0
+- purpose: ORM for code generation
+- doc link: https://github.com/volatiletech/sqlboiler
+
+**lib/pq**
+- version: ^1.10.9
+- purpose: PostgreSQL driver
+- doc link: https://github.com/lib/pq
+
+**pgx**
+- version: ^5.7.0
+- purpose: PostgreSQL driver (alternative, higher performance)
+- doc link: https://github.com/jackc/pgx
+
+### API Specification
+
+**oapi-codegen**
+- version: ^2.80+
+- purpose: OpenAPI 3.1+ code generation
+- doc link: https://github.com/oapi-codegen/oapi-codegen
+
+### Validation
+
+**go-playground/validator**
+- version: ^10.23.0
+- purpose: Struct validation
+- doc link: https://github.com/go-playground/validator
+
+**go-validator**
+- version: ^10.23.0
+- purpose: Alternative validation package
+- doc link: https://github.com/asaskevich/govalidator
+
+### Authentication & Security
+
+**golang-jwt/jwt**
+- version: ^5.2.0
+- purpose: JWT token generation and validation
+- doc link: https://github.com/golang-jwt/jwt
+
+**golang.org/x/oauth2**
+- version: ^0.24.0
+- purpose: OAuth2 client (Google OAuth)
+- doc link: https://pkg.go.dev/golang.org/x/oauth2
+
+**golang.org/x/crypto**
+- version: ^0.31.0
+- purpose: Cryptographic functions
+- doc link: https://pkg.go.dev/golang.org/x/crypto
+
+### Caching
+
+**redis/go-redis**
+- version: ^9.7.0
+- purpose: Redis client
+- doc link: https://github.com/redis/go-redis
+
+### HTTP & Utilities
+
+**stretchr/testify**
+- version: ^1.9.0
+- purpose: Testing assertions (primary tool for all Go tests)
+- doc link: https://github.com/stretchr/testify
+- note: Used for both unit and integration tests
+
+**golang/mock**
+- version: ^1.6.0
+- purpose: Interface mocking (optional, pragmatic use only)
+- doc link: https://github.com/golang/mock
+- note: Use only when pragmatic (external dependencies, complex logic isolation)
+- see: [Backend Testing Strategy (Go)](../backend-spec/testing-strategy-go.md) for guidelines
+
+**testcontainers-go**
+- version: ^0.33.0
+- purpose: Container-based testing (alternative to Neon testing branch)
+- doc link: https://golang.testcontainers.org/
+- note: Optional alternative if Neon testing branch is not used
+
+### Logging & Monitoring
+
+**uber-go/zap**
+- version: ^1.27.0
+- purpose: Structured logging
+- doc link: https://github.com/uber-go/zap
+
+**prometheus/client_golang**
+- version: ^1.20.0
+- purpose: Prometheus metrics
+- doc link: https://github.com/prometheus/client_golang
+
+**opentelemetry-go**
+- version: ^1.32.0
+- purpose: OpenTelemetry tracing
+- doc link: https://github.com/open-telemetry/opentelemetry-go
+
+### Configuration
+
+**spf13/viper**
+- version: ^1.19.0
+- purpose: Configuration management
+- doc link: https://github.com/spf13/viper
+
+**kelseyhightower/envconfig**
+- version: ^1.4.0
+- purpose: Environment variable parsing
+- doc link: https://github.com/kelseyhightower/envconfig
+
+### Utilities
+
+**google/uuid**
+- version: ^1.6.0
+- purpose: UUID generation
+- doc link: https://github.com/google/uuid
+
+### Code Quality
+
+**golangci-lint**
+- version: ^1.62.0
+- purpose: Go linting aggregator
+- doc link: https://golangci-lint.run/
+
+**gofmt**
+- version: Built-in
+- purpose: Go formatter
+- doc link: https://pkg.go.dev/cmd/gofmt
+
+**go vet**
+- version: Built-in
+- purpose: Go static analysis
+- doc link: https://pkg.go.dev/cmd/vet
+
+---
+
+## Infrastructure Dependencies
+
+### Database
+
+**PostgreSQL**
+- version: 16.x
+- purpose: Primary database (via Neon)
+- doc link: https://www.postgresql.org/docs/
+
+**Neon**
+- purpose: PostgreSQL cloud database with branch-first workflow
+- doc link: https://neon.tech/docs
+- features: Branching, autoscaling, scale-to-zero, read replicas
+
+**Neon Testing Branch**
+- purpose: Isolated database for integration testing
+- doc link: https://neon.tech/docs/branches/branching
+- note: Branch-first workflow allows integration tests with real database without affecting production
+- benefits: No container management, instant branch creation, automatic cleanup
+- primary use: Integration tests for repository and service layers
+
+**Redis**
+- version: 7.x
+- purpose: Caching layer (via Upstash)
+- doc link: https://redis.io/docs/
+
+### Database Limits (Free Tier)
+
+**Neon Free Tier**
+- PostgreSQL database: 3 GB storage
+- Branches: Unlimited
+- Compute: 2 OCPUs, 1 GB RAM (scale-to-zero)
+- Monthly Active Users: No limit (compute-based)
+- Auto-suspend: 1 hour inactivity
+
+**Upstash Free Tier**
+- Commands/day: 10,000
+- Storage: 256 MB
+
+### Reverse Proxy
+
+**Nginx**
+- version: 1.27.x
+- purpose: Reverse proxy and load balancer with SSL termination
+- doc link: https://nginx.org/en/docs/
+
+### SSL Certificate Management
+
+**Let's Encrypt**
+- purpose: Free SSL certificate provider
+- doc link: https://letsencrypt.org/docs/
+
+**certbot**
+- version: Latest
+- purpose: SSL certificate automation and renewal
+- doc link: https://certbot.eff.org/docs/
+
+**python3-certbot-dns-cloudflare**
+- version: Latest
+- purpose: Cloudflare DNS plugin for certbot (for wildcard certificate)
+- doc link: https://certbot.eff.org/docs/install.html#dns-plugins
+
+### Monitoring
+
+**Grafana**
+- version: 11.x
+- purpose: Monitoring and visualization (Free tier)
+- doc link: https://grafana.com/docs/
+
+**Prometheus**
+- version: 3.x
+- purpose: Metrics collection (optional, can use Grafana Cloud)
+- doc link: https://prometheus.io/docs/
+
+### Containerization
+
+**Docker**
+- version: 27.x
+- purpose: Container platform (primary recommendation)
+- doc link: https://docs.docker.com/
+
+**Podman**
+- version: 5.x
+- purpose: Alternative container platform (recommended for development)
+- doc link: https://docs.podman.io/
+
+**podman-compose**
+- version: ^1.2.0
+- purpose: Docker Compose alternative for Podman
+- doc link: https://github.com/containers/podman-compose
+
+### CI/CD
+
+**Forgejo CI**
+- version: Latest
+- purpose: Self-hosted CI/CD automation on OCI Debian 26 LTS
+- doc link: https://forgejo.org/docs/
+
+**Forgejo Actions**
+- purpose: GitHub Actions-compatible CI/CD workflows
+- doc link: https://forgejo.org/docs/next/user/actions/
+- note: Compatible with GitHub Actions marketplace actions
+
+**docker/login-action**
+- version: v3
+- purpose: Container registry login for CI/CD
+- doc link: https://github.com/docker/login-action
+- note: Used in Forgejo Actions for OCI Registry authentication
+
+**docker/build-push-action**
+- version: v5
+- purpose: Build and push container images
+- doc link: https://github.com/docker/build-push-action
+- note: Used in Forgejo Actions for building backend images
+
+**Mergify**
+- version: Latest
+- purpose: PR batching (3 PRs at once, free tier)
+- doc link: https://doc.mergify.io/
+
+### Platform Limits (Free Tier)
+
+**Cloudflare Workers**
+- Requests: 100,000 requests/day (free tier)
+- Workers: Unlimited workers
+- Edge locations: 300+ global locations
+- Storage: Included with Pages
+- Bandwidth: Unlimited bandwidth
+
+**Cloudflare DNS**
+- purpose: DNS management and Dynamic DNS (DDNS) support
+- doc link: https://developers.cloudflare.com/dns/
+- note: DDNS script `/usr/local/bin/update-cloudflare-dns` runs via cron every 5 minutes
+
+**Oracle Cloud Infrastructure (OCI)**
+- Backend: OCI Instance (A1.Flex - 2 OCPUs, 12 GB RAM)
+- Container runtime: Podman
+- Nginx reverse proxy
+- VM Storage: 200GB (for media files)
+- OCI Object Storage: 10GB Standard tier PAYG (for CI/CD artifacts)
+- Registry: OCI Container Registry (OCIR)
+
+**OCI CLI**
+- purpose: Command-line interface for Oracle Cloud Infrastructure
+- doc link: https://docs.oracle.com/en-us/iaas/Content/API/Concepts/cliconcepts.htm
+- note: Used for Object Storage operations (backup/restore)
+
+**iptables**
+- purpose: Linux firewall utility for packet filtering
+- doc link: https://linux.die.net/man/8/iptables
+- note: Required to open HTTP (80) and HTTPS (443) ports on OCI instance
+
+**netfilter-persistent**
+- purpose: Persistent iptables rules across reboots
+- doc link: https://manpages.ubuntu.com/manpages/bionic/man8/netfilter-persistent.8.html
+- note: Required to save iptables rules persistently on OCI instance
+
+**Neon**
+- Storage: 3 GB
+- Compute: 2 OCPUs, 1 GB RAM (scale-to-zero)
+- Branches: Unlimited
+- Auto-suspend: 1 hour inactivity
+
+**Grafana**
+- Cloud Grafana: Free tier
+
+---
+
+## Development Tools
+
+### Version Control
+
+**Git**
+- version: 2.47+
+- purpose: Version control system
+- doc link: https://git-scm.com/doc
+
+### API Documentation
+
+**Swagger/OpenAPI**
+- version: 3.0+
+- purpose: API specification
+- doc link: https://swagger.io/specification/
+
+### Security Scanning
+
+**Snyk**
+- version: Latest
+- purpose: Dependency vulnerability scanning
+- doc link: https://snyk.io/docs/
+
+**gitleaks**
+- version: ^8.21.0
+- purpose: Secret scanning
+- doc link: https://github.com/gitleaks/gitleaks
+
+### Performance Testing
+
+**k6**
+- version: ^0.55.0
+- purpose: Load testing
+- doc link: https://k6.io/docs/
+
+---
+
+## Compatibility Matrix
+
+**Bun** (JavaScript Runtime)
+- Frontend: 1.4.2 (JavaScript runtime for TypeScript/JavaScript)
+- Backend: N/A (Go uses its own runtime)
+- Infrastructure: N/A
+
+**Node.js** (Optional)
+- Frontend: 24.20.0 (optional, for tools that require Node.js specifically)
+- Backend: N/A (Go uses its own runtime)
+- Infrastructure: N/A
+
+**Go** (Go Runtime)
+- Frontend: N/A (Bun is the JavaScript runtime for frontend)
+- Backend: 1.27+ (built-in Go runtime with stdlib + Chi router)
+- Infrastructure: N/A
+
+**PostgreSQL**
+- Frontend: N/A
+- Backend: Compatible with 16.x
+- Infrastructure: 16.x
+
+**Redis**
+- Frontend: N/A
+- Backend: Compatible with 7.x
+- Infrastructure: 7.x
+
+---
+
+## Version Management Strategy
+
+### Dependency Update Policy
+
+1. **Security Updates**: Apply immediately when critical vulnerabilities are identified
+2. **Minor Updates**: Review and apply monthly during maintenance windows
+3. **Major Updates**: Evaluate and apply quarterly with thorough testing
+4. **Latest Versions**: Always use the latest stable versions for new dependencies
+
+### Version Pinning
+
+- **Frontend**: Use caret ranges (`^`) for dependencies to allow minor and patch updates
+- **Backend**: Use specific versions in go.mod for reproducible builds
+- **Infrastructure**: Pin to major versions with rolling updates for minor/patch
+
+---
+
+## Testing Strategy Overview
+
+**Pragmatic Testing Approach:**
+
+Testing strategy follows pragmatic principles with focus on integration tests over excessive mocking.
+
+- **Primary Integration Tests:** Use Neon testing branch for database and cache testing
+- **Optional Unit Tests:** Only for complex business logic isolation (if needed)
+- **Pragmatic Mocking:** Mock only external dependencies (payment, email, SMS) when necessary
+- **No Over-mocking:** Avoid mocking database, cache, or internal services
+
+**Testing Tools:**
+- **testify:** Primary tool for assertions in all Go tests
+- **golang/mock:** Optional for pragmatic interface mocking (when needed)
+- **testcontainers-go:** Alternative to Neon testing branch (optional)
+- **Neon testing branch:** Primary for integration tests with real database
+
+**For detailed testing guidelines, mocking rules, and examples:**
+- Backend (Go): [Backend Testing Strategy (Go)](../backend-spec/testing-strategy-go.md)
+- Backend (Rust): [Backend Testing Strategy (Rust)](../backend-spec/testing-strategy-rust.md)
+- Backend (Bun/Node.js): [Backend Testing Strategy (Bun/Node.js)](../backend-spec/testing-strategy-bun.md)
+- Frontend (SvelteKit/Next.js/Nuxt): [Frontend Testing Strategy (SvelteKit/Next.js/Nuxt)](../frontend-spec/testing-strategy-sveltekit.md)
+
+---
+
+## Documentation Links
+
+- [Bun Documentation](https://bun.sh/docs)
+- [Go Releases](https://go.dev/dl/)
+- [SvelteKit Documentation](https://kit.svelte.dev/docs)
+- [SQLBoiler Documentation](https://github.com/volatiletech/sqlboiler)
+- [Neon Documentation](https://neon.tech/docs)
+- [Cloudflare Workers Documentation](https://developers.cloudflare.com/workers)
+- [Cloudflare Pages Documentation](https://developers.cloudflare.com/pages)
+- [Node.js Releases](https://nodejs.org/en/download) (optional, for compatibility)
+- [Upstash Documentation](https://upstash.com/docs)
+
+---
+
+## Change Log
+
+**2025-09-19**
+- version: 1.0.0
+- changes: Initial dependency version documentation with latest stable versions
+
+**2025-09-20**
+- version: 1.1.0
+- changes: Simplified to focus only on dependency versions
+
+**2025-09-21**
+- version: 1.2.0
+- changes: Converted from table format to bullet point format with version, purpose, and doc link
+
+**2026-11-06**
+- version: 1.3.0
+- changes: Updated infrastructure to Cloudflare Workers edge, OCI Instance, Neon database, Cloudflare DNS + DDNS
+- changes: Added Cloudflare Workers adapter for SvelteKit deployment
+- changes: Updated database from Supabase to Neon with branch-first workflow
+- changes: Updated backend deployment to OCI Instance (A1.Flex) with Podman
+- changes: Added Cloudflare DNS + DDNS configuration
+
+**2026-11-10**
+- version: 1.4.0
+- changes: Added Let's Encrypt, certbot, and Cloudflare DNS plugin for SSL certificate management
+- changes: Added Cloudflare DNS documentation for DDNS support
+- changes: Updated Nginx description to include SSL termination
+- changes: Added Forgejo Actions, docker/login-action, docker/build-push-action for CI/CD
+- changes: Added OCI CLI for Object Storage operations
+- changes: Added iptables and netfilter-persistent for firewall management on OCI instance
+- changes: Added @tailwindcss/vite, @sveltejs/vite-plugin-svelte, svelte-check, @sveltejs/adapter-auto, @sveltejs/adapter-vercel
+- changes: Added google/uuid for UUID generation in backend
+- changes: Consolidated all dependency versioning from architecture documents into single source of truth
+- changes: Added Neon Testing Branch documentation for integration testing
+- changes: Updated golang/mock and testcontainers-go to mark as optional with pragmatic use guidelines
+- changes: Added Testing Strategy Overview section with references to technology-specific testing strategies
+- changes: Separated testing strategies by technology: backend-spec/testing-strategy-go.md and frontend-spec/testing-strategy-sveltekit.md

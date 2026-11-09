@@ -45,3 +45,4 @@ Deployment, CI/CD, cloud, and networking decisions.
 - [Infrastructure & Network](../infrastructure-&-network.md)
 - [Security & Compliance](../security-&-compliance.md)
 - [Disaster Recovery](../disaster-recovery.md)
+- [Dependency Versions](../dependencies.md)

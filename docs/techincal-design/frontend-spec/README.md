@@ -327,6 +327,8 @@ Shared Layer (Global State)
 - Run in CI/CD pipeline
 - Use Playwright for testing
 
+For detailed testing guidelines for SvelteKit frontend, see [Testing Strategy (SvelteKit)](./testing-strategy-sveltekit.md).
+
 ---
 
 ## Deployment
@@ -363,4 +365,5 @@ Shared Layer (Global State)
 - [State Management](./state-management.md) - State management patterns
 - [Design System & UI](./design-system-&-ui.md) - UI component design
 - [Routing & Middleware](./routing-&-middleware.md) - Routing configuration
+- [Testing Strategy (SvelteKit)](./testing-strategy-sveltekit.md) - SvelteKit-specific testing guidelines
 - [Frontend Quality & Reliability](../tdd/quality-reliability/frontend-quality-reliability.md) - Quality requirements
