@@ -10,6 +10,10 @@
 
 This document describes the backend technical design, technology stack, architecture patterns, and coding standards for the Advanced Task Manager project.
 
+## Architecture Decision Records
+
+See [backend-spec/adr/README.md](./adr/README.md) for backend-specific ADRs.
+
 ---
 
 ## Technology Stack

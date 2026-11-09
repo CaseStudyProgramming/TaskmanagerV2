@@ -165,9 +165,9 @@ This ADR supersedes the SSL/TLS mode decision in ADR 0002 (Technology Stack Sele
 
 ## References
 
-- [ADR 0002: Technology Stack Selection](./0002-technology-stack-selection.md) - Original decision for Flexible mode
-- [Infrastructure & Network Architecture](../architecture/infrastructure-&-network.md) - Current SSL/TLS configuration
-- [Security & Compliance](../architecture/security-&-compliance.md) - Security requirements
-- [AGENTS.md](../../AGENTS.md) - SSL certificate setup procedures
+- [ADR 0002: Technology Stack Selection](../global/0002-technology-stack-selection.md) - Original decision for Flexible mode
+- [Infrastructure & Network Architecture](../../architecture/infrastructure-&-network.md) - Current SSL/TLS configuration
+- [Security & Compliance](../../architecture/security-&-compliance.md) - Security requirements
+- [AGENTS.md](../../../AGENTS.md) - SSL certificate setup procedures
 - [Cloudflare SSL/TLS Documentation](https://developers.cloudflare.com/ssl/tls-configuration/)
 - [Let's Encrypt Documentation](https://letsencrypt.org/docs/)

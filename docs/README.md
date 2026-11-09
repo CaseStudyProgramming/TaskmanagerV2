@@ -22,15 +22,21 @@ docs/
 │   ├── README.md                       # Backend tech stack, Directory conventions, Coding standards
 │   ├── database-schema.md              # ERD (Mermaid.js), Migration rules, Caching strategy (Redis)
 │   ├── background-jobs.md              # Message brokers, Cron schedules
+│   ├── /adr                            # Backend architecture decisions
 │   └── /services                       # Module-specific design (only for complex logic)
 │       ├── auth-service.md             # Authentication service design
 │       └── payment-service.md         # Payment service design (future)
+│
+├── /database-spec                      # DATABASE TECHNICAL DESIGN
+│   ├── README.md                       # Database tech stack, migration strategy
+│   └── /adr                            # Database architecture decisions
 │
 ├── /frontend-spec                      # FRONTEND TECHNICAL DESIGN (Ex-SDD Frontend)
 │   ├── README.md                       # Frontend tech stack, Rendering strategy (SSR/SPA)
 │   ├── state-management.md             # Client-side data flow, Hydration rules
 │   ├── design-system-&-ui.md           # Component anatomy, Theme tokens, Accessibility (WCAG)
-│   └── routing-&-middleware.md         # Route mapping, Navigation guards, Code-splitting rules
+│   ├── routing-&-middleware.md         # Route mapping, Navigation guards, Code-splitting rules
+│   └── /adr                            # Frontend architecture decisions
 │
 ├── /api-specs                          # TRUTH CONTRACTS (Jantung Spec-Driven Development)
 │   ├── openapi.yaml                    # REST API specifications (Swagger format)
@@ -53,9 +59,9 @@ docs/
 │
 ├── /adr                                # ARCHITECTURE DECISION RECORDS (Lightweight logs)
 │   ├── 0000-template.md                # Standard ADR template
-│   ├── 0001-record-architecture-decisions.md
-│   ├── 0002-technology-stack-selection.md
-│   └── 0003-use-postgresql-for-core-ledger.md
+│   ├── README.md                       # Central ADR index
+│   ├── global/                         # Cross-cutting decisions
+│   └── infrastructure/                 # Deployment, CI/CD, cloud, networking
 │
 ├── /guides                             # OPERATION & ONBOARDING PADS
 │   ├── local-setup.md                  # Step-by-step local environment spinning (Docker)
@@ -111,10 +117,11 @@ docs/
 - [Infrastructure Examples](./examples/infrastructure/) - Docker and CI/CD configuration examples
 
 ### Architecture Decision Records (ADR)
-- [ADR Template](./adr/0000-template.md) - Standard ADR template
-- [Record Architecture Decisions](./adr/0001-record-architecture-decisions.md) - ADR adoption decision
-- [Technology Stack Selection](./adr/0002-technology-stack-selection.md) - Technology stack decision
-- [Use PostgreSQL for Core Database](./adr/0003-use-postgresql-for-core-ledger.md) - Database selection decision
+- [ADR Index](./techincal-design/adr/README.md) - Central ADR index and overview
+- [ADR Template](./techincal-design/adr/0000-template.md) - Standard ADR template
+- [Record Architecture Decisions](./techincal-design/adr/global/0001-record-architecture-decisions.md) - ADR adoption decision
+- [Technology Stack Selection](./techincal-design/adr/global/0002-technology-stack-selection.md) - Technology stack decision
+- [Use PostgreSQL for Core Database](./techincal-design/database-spec/adr/0003-use-postgresql-for-core-ledger.md) - Database selection decision
 
 ### Operation & Onboarding
 - [Local Setup](./guides/local-setup.md) - Step-by-step local environment setup

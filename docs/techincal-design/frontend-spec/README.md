@@ -10,6 +10,10 @@
 
 This document describes the frontend technical design, technology stack, architecture patterns, and coding standards for the Advanced Task Manager project.
 
+## Architecture Decision Records
+
+See [frontend-spec/adr/README.md](./adr/README.md) for frontend-specific ADRs.
+
 ---
 
 ## Technology Stack

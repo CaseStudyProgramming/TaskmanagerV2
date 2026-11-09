@@ -146,8 +146,8 @@ We evaluated multiple technology options across frontend, backend, database, and
 
 This ADR is partially superseded by:
 
-1. [ADR 0004: Upgrade to Cloudflare Full Strict SSL/TLS Mode](./0004-upgrade-to-cloudflare-full-strict-ssl.md)
-2. [ADR 0005: Migrate to OCI Container Registry](./0005-migrate-to-oci-container-registry.md)
+1. [ADR 0004: Upgrade to Cloudflare Full Strict SSL/TLS Mode](../infrastructure/0004-upgrade-to-cloudflare-full-strict-ssl.md)
+2. [ADR 0005: Migrate to OCI Container Registry](../infrastructure/0005-migrate-to-oci-container-registry.md)
 
 **What Changed (ADR 0004):**
 - **SSL/TLS Mode**: Changed from Cloudflare Flexible to Full (strict)
